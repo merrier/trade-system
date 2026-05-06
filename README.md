@@ -29,7 +29,7 @@ API 默认运行在 `http://localhost:8787`，Web 看板默认运行在 `http://
 
 源码提交到 `dev` 分支后，`.github/workflows/deploy-pages.yml` 会自动构建前端并把 `dist-web` 发布到 `main` 分支。仓库的 GitHub Pages 需要配置为从 `main` 分支根目录发布。
 
-GitHub Pages 只能托管静态页面，不能运行 Fastify API。若要让 Pages 上的看板访问接口，请在仓库 Variables 里配置：
+GitHub Pages 只能托管静态页面，不能运行 Fastify API。若要让 Pages 上的看板访问接口，请在仓库 Variables 里配置。这里必须是后端 API 的公开地址，不是 GitHub Pages 页面地址：
 
 ```text
 PAGES_API_BASE_URL=https://your-api-host.example.com
