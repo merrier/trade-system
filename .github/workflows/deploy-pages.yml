@@ -25,16 +25,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       - name: Install dependencies
-        run: npm ci --include=dev
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          yarn install --non-interactive --no-lockfile
 
       - name: Generate Prisma client
-        run: ./node_modules/.bin/prisma generate
+        run: yarn prisma:generate
 
       - name: Build static site
-        run: npm run build
+        run: yarn build
         env:
           VITE_API_BASE_URL: ${{ vars.PAGES_API_BASE_URL }}
 
