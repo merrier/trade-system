@@ -37,6 +37,19 @@ PAGES_API_BASE_URL=https://your-api-host.example.com
 
 本地开发不需要这个变量，前端会继续通过 Vite proxy 请求 `http://localhost:8787/api`。
 
+## 部署后端 API
+
+GitHub Pages 只托管前端静态文件，Fastify API 需要部署到能长期运行 Node 服务的平台。推荐先用 Render：
+
+1. 在 Render 创建 Web Service，连接 `merrier/trade-system` 仓库。
+2. 选择 `dev` 分支，Runtime 选择 Docker。仓库已提供 `Dockerfile` 和 `render.yaml`。
+3. Health Check Path 设置为 `/api/health`。
+4. 配置环境变量：`DEEPSEEK_API_KEY`、`ALLOW_SAMPLE_DATA=false`，必要时配置 `PYTHON_BIN=python3`。
+5. 部署成功后得到类似 `https://trade-system-api.onrender.com` 的地址。
+6. 回到 GitHub 仓库 Variables，把 `PAGES_API_BASE_URL` 设置为这个后端地址，然后重新运行 Pages workflow。
+
+注意：当前 SQLite 数据库在容器文件系统中，适合第一版验证。生产长期使用应改为持久磁盘或外部数据库，否则服务重建后需要重新跑盘后落库。
+
 ## 数据源
 
 默认通过 `python/akshare_worker.py` 调用 AKShare。系统默认不允许静默展示 sample 数据；只有设置 `ALLOW_SAMPLE_DATA=true` 时，才会在真实数据源不可用时返回开发演示数据。
