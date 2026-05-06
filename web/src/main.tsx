@@ -54,11 +54,22 @@ type DataStatus = {
 
 const api = {
   async get<T>(url: string): Promise<T> {
+    if (isStaticMode() && url === "/api/watchlist") {
+      return { items: readStoredWatchlist() } as T;
+    }
     const response = await fetch(apiUrl(url));
     if (!response.ok) throw new Error(await response.text());
     return response.json() as Promise<T>;
   },
   async post<T>(url: string, body: unknown): Promise<T> {
+    if (isStaticMode() && url === "/api/watchlist") {
+      const items = [createStoredWatchItem(body), ...readStoredWatchlist()];
+      localStorage.setItem("trade-system-watchlist", JSON.stringify(items));
+      return { item: items[0] } as T;
+    }
+    if (isStaticMode()) {
+      throw new Error("静态模式下不能执行写入操作；盘后数据由 GitHub Actions 自动生成。");
+    }
     const response = await fetch(apiUrl(url), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -71,7 +82,46 @@ const api = {
 
 function apiUrl(path: string) {
   const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "";
+  if (isStaticMode()) return staticDataUrl(path);
   return `${baseUrl}${path}`;
+}
+
+function isStaticMode() {
+  const hasApiBase = Boolean(import.meta.env.VITE_API_BASE_URL);
+  const isLocalhost = ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
+  return !hasApiBase && !isLocalhost;
+}
+
+function staticDataUrl(path: string) {
+  if (path === "/api/recommendations/latest") return "./data/recommendations/latest.json";
+  if (path === "/api/limit-up/ladder") return "./data/limit-up/ladder.json";
+  if (path === "/api/sectors/ladder") return "./data/sectors/ladder.json";
+  if (path === "/api/watchlist/triggers") return "./data/watchlist/triggers.json";
+  if (path.startsWith("/api/stocks/") && path.endsWith("/analysis")) {
+    const code = path.replace("/api/stocks/", "").replace("/analysis", "");
+    return `./data/stocks/${code}.json`;
+  }
+  return path;
+}
+
+function readStoredWatchlist(): WatchItem[] {
+  try {
+    return JSON.parse(localStorage.getItem("trade-system-watchlist") ?? "[]") as WatchItem[];
+  } catch {
+    return [];
+  }
+}
+
+function createStoredWatchItem(body: unknown): WatchItem {
+  const value = body as Partial<WatchItem>;
+  return {
+    id: crypto.randomUUID(),
+    code: String(value.code ?? ""),
+    name: String(value.name ?? ""),
+    thesis: String(value.thesis ?? ""),
+    conditionPrompt: String(value.conditionPrompt ?? ""),
+    isActive: true
+  };
 }
 
 function App() {
@@ -95,7 +145,7 @@ function App() {
     setBusy(true);
     try {
       const [latest, ladder, sectorLadder, watch, triggerData] = await Promise.all([
-        api.get<{ recommendations: Recommendation[]; source?: string; tradeDate?: string; dataAsOf?: string }>("/api/recommendations/latest"),
+        api.get<{ recommendations: Recommendation[]; source?: string; tradeDate?: string; dataAsOf?: string; warnings?: string[] }>("/api/recommendations/latest"),
         api.get<{ items: LimitUp[] }>("/api/limit-up/ladder"),
         api.get<{ items: Sector[] }>("/api/sectors/ladder"),
         api.get<{ items: WatchItem[] }>("/api/watchlist"),
@@ -106,8 +156,8 @@ function App() {
       setSectors(sectorLadder.items ?? []);
       setWatchlist(watch.items ?? []);
       setTriggers(triggerData.triggers ?? []);
-      setDataStatus({ source: latest.source, tradeDate: latest.tradeDate, dataAsOf: latest.dataAsOf, warnings: [] });
-      setMessage("数据已刷新");
+      setDataStatus({ source: latest.source, tradeDate: latest.tradeDate, dataAsOf: latest.dataAsOf, warnings: latest.warnings ?? [] });
+      setMessage(isStaticMode() ? "静态盘后数据已刷新" : "数据已刷新");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "刷新失败");
     } finally {
@@ -116,6 +166,10 @@ function App() {
   }
 
   async function runPostClose() {
+    if (isStaticMode()) {
+      setMessage("静态模式下盘后落库由 GitHub Actions 自动执行；也可以在 GitHub Actions 页面手动运行 workflow。");
+      return;
+    }
     setBusy(true);
     try {
       const result = await api.post<DataStatus>("/api/jobs/post-close-ingest", {});
@@ -130,6 +184,10 @@ function App() {
   }
 
   async function runRecommendation() {
+    if (isStaticMode()) {
+      setMessage("静态模式下展示最近一次盘后推荐；自然语言实时选股需要后端或手动触发 Actions。");
+      return;
+    }
     setBusy(true);
     try {
       const result = await api.post<{ results: Recommendation[]; source?: string; warnings?: string[]; dataAsOf?: string }>("/api/recommendations/run", {
@@ -165,7 +223,7 @@ function App() {
     try {
       await api.post("/api/watchlist", { ...watchForm, market: watchForm.code.startsWith("300") ? "gem" : "main", markets: ["main", "gem"] });
       await refreshDashboard();
-      setMessage("已加入监控池");
+      setMessage(isStaticMode() ? "已保存到本机浏览器监控池；自动触发需要后端或 GitHub Actions 支持。" : "已加入监控池");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "加入监控池失败");
     } finally {

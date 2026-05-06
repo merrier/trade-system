@@ -27,19 +27,15 @@ API 默认运行在 `http://localhost:8787`，Web 看板默认运行在 `http://
 
 ## GitHub Pages
 
-源码提交到 `dev` 分支后，`.github/workflows/deploy-pages.yml` 会自动构建前端并把 `dist-web` 发布到 `main` 分支。仓库的 GitHub Pages 需要配置为从 `main` 分支根目录发布。
+源码提交到 `dev` 分支后，`.github/workflows/deploy-pages.yml` 会自动构建前端、导出静态行情 JSON，并把 `dist-web` 发布到 `main` 分支。仓库的 GitHub Pages 需要配置为从 `main` 分支根目录发布。
 
-GitHub Pages 只能托管静态页面，不能运行 Fastify API。若要让 Pages 上的看板访问接口，请在仓库 Variables 里配置。这里必须是后端 API 的公开地址，不是 GitHub Pages 页面地址：
+GitHub Pages 只能托管静态页面，不能运行 Fastify API。当前免费部署模式不需要 `PAGES_API_BASE_URL`，页面会直接读取 `data/*.json`。本地开发仍然通过 Vite proxy 请求 `http://localhost:8787/api`。
 
-```text
-PAGES_API_BASE_URL=https://your-api-host.example.com
-```
+Workflow 会在北京时间交易日 16:30 左右自动运行，也可以在 GitHub Actions 页面手动触发。
 
-本地开发不需要这个变量，前端会继续通过 Vite proxy 请求 `http://localhost:8787/api`。
+## 可选：部署后端 API
 
-## 部署后端 API
-
-GitHub Pages 只托管前端静态文件，Fastify API 需要部署到能长期运行 Node 服务的平台。推荐先用 Render：
+静态模式完全免费，但自然语言实时选股、监控池自动触发、盘中即时数据需要后端。若后续要恢复这些实时能力，可以把 Fastify API 部署到能长期运行 Node 服务的平台。推荐先用 Render：
 
 1. 在 Render 创建 Web Service，连接 `merrier/trade-system` 仓库。
 2. 选择 `dev` 分支，Runtime 选择 Docker。仓库已提供 `Dockerfile` 和 `render.yaml`。

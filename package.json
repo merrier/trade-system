@@ -14,7 +14,8 @@
     "prisma:generate": "prisma generate",
     "db:init": "python3 python/init_db.py",
     "prisma:migrate": "npm run db:init && npm run prisma:generate",
-    "ingest:post-close": "tsx src/jobs/postCloseIngest.ts"
+    "ingest:post-close": "tsx src/jobs/postCloseIngest.ts",
+    "export:static-data": "tsx src/jobs/exportStaticData.ts"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",
