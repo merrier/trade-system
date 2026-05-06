@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Stock {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  name         String
+  market       String
+  industry     String?
+  concepts     String?
+  isST         Boolean  @default(false)
+  isSuspended  Boolean  @default(false)
+  listedAt     DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model TradingDay {
+  id        String   @id @default(cuid())
+  tradeDate String   @unique
+  status    String   @default("closed")
+  createdAt DateTime @default(now())
+}
+
+model LimitUpRecord {
+  id             String   @id @default(cuid())
+  tradeDate      String
+  code           String
+  name           String
+  market         String
+  industry       String?
+  concepts       String?
+  consecutive    Int      @default(1)
+  firstLimitTime String?
+  lastLimitTime  String?
+  openCount      Int      @default(0)
+  sealedAmount   Float    @default(0)
+  turnoverRate   Float    @default(0)
+  pctChange      Float    @default(10)
+  strengthScore  Float    @default(0)
+  createdAt      DateTime @default(now())
+
+  @@unique([tradeDate, code])
+  @@index([tradeDate, consecutive])
+}
+
+model DragonTigerRecord {
+  id          String   @id @default(cuid())
+  tradeDate   String
+  code        String
+  name        String
+  reason      String?
+  buyAmount   Float    @default(0)
+  sellAmount  Float    @default(0)
+  netAmount   Float    @default(0)
+  seats       String?
+  createdAt   DateTime @default(now())
+
+  @@unique([tradeDate, code])
+  @@index([tradeDate, netAmount])
+}
+
+model SectorRecord {
+  id              String   @id @default(cuid())
+  tradeDate       String
+  name            String
+  type            String
+  pctChange       Float    @default(0)
+  inflowAmount    Float    @default(0)
+  outflowAmount   Float    @default(0)
+  netInflow       Float    @default(0)
+  companyCount    Int      @default(0)
+  limitUpCount    Int      @default(0)
+  leaderCode      String?
+  leaderName      String?
+  leaderPctChange Float    @default(0)
+  heatScore       Float    @default(0)
+  trend           String?
+  createdAt       DateTime @default(now())
+
+  @@unique([tradeDate, name, type])
+  @@index([tradeDate, heatScore])
+}
+
+model Strategy {
+  id             String   @id @default(cuid())
+  name           String
+  prompt         String
+  dsl            String
+  markets        String
+  style          String   @default("short_term")
+  compileWarnings String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model RecommendationRun {
+  id         String   @id @default(cuid())
+  tradeDate  String
+  mode       String
+  source     String
+  strategyId String?
+  prompt     String?
+  dataAsOf   DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  recommendations Recommendation[]
+}
+
+model Recommendation {
+  id          String   @id @default(cuid())
+  runId       String
+  tradeDate   String
+  mode        String
+  rank        Int
+  code        String
+  name        String
+  market      String
+  score       Float
+  confidence  Float
+  reasons     String
+  risks       String
+  factors     String
+  dataAsOf    DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  run RecommendationRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([tradeDate, mode, rank])
+  @@index([runId, rank])
+}
+
+model WatchlistItem {
+  id              String   @id @default(cuid())
+  code            String
+  name            String
+  market          String
+  thesis          String
+  conditionPrompt String
+  conditionDsl    String
+  markets         String
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  triggers WatchlistTrigger[]
+}
+
+model WatchlistTrigger {
+  id             String   @id @default(cuid())
+  watchlistItemId String
+  tradeDate      String
+  code           String
+  name           String
+  priority       String
+  score          Float
+  reasons        String
+  risks          String
+  dataAsOf       DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  item WatchlistItem @relation(fields: [watchlistItemId], references: [id], onDelete: Cascade)
+
+  @@index([tradeDate, priority])
+}

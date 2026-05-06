@@ -1,0 +1,14 @@
+node_modules/
+dist/
+dist-web/
+.vite/
+.env
+.env.*
+!.env.example
+data/*.db
+data/*.db-journal
+data/*.sqlite
+data/*.sqlite-journal
+coverage/
+__pycache__/
+*.pyc
