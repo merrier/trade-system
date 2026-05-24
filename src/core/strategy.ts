@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createDefaultStrategy } from "./defaults.js";
+import { createDefaultStrategy, createLimitUpPullbackStrategy } from "./defaults.js";
 import type { CompileResult, Market, StrategyDsl, StrategyStyle, WatchConditionDsl, WatchTemplate } from "../shared/types.js";
 
 const marketSchema = z.enum(["main", "gem", "star", "bse"]);
@@ -8,6 +8,7 @@ const styleSchema = z.enum(["short_term", "stable", "custom"]);
 export const strategyDslSchema: z.ZodType<StrategyDsl> = z.object({
   style: styleSchema,
   markets: z.array(marketSchema).min(1),
+  strategyTemplates: z.array(z.enum(["limit_up_pullback"])).optional().default([]),
   include: z.array(z.string()),
   exclude: z.array(z.string()),
   weights: z.object({
@@ -26,7 +27,14 @@ export const strategyDslSchema: z.ZodType<StrategyDsl> = z.object({
     minTurnoverAmount: z.number().min(0),
     maxOpenCount: z.number().min(0).optional(),
     minConsecutiveLimitUps: z.number().min(1).optional(),
-    sectorTopN: z.number().min(1).max(100).optional()
+    sectorTopN: z.number().min(1).max(100).optional(),
+    recentLimitUpDays: z.number().min(1).max(30).optional(),
+    requireBearishCandle: z.boolean().optional(),
+    requireHoldLimitUpPrice: z.boolean().optional(),
+    requireAboveMa: z.enum(["ma5_or_ma10"]).optional(),
+    requireVolumeContraction: z.boolean().optional(),
+    maxTwentyDayGainPct: z.number().min(0).max(100).optional(),
+    requireBullishMaAlignment: z.boolean().optional()
   })
 });
 
@@ -60,7 +68,19 @@ export function compileStrategyLocally(prompt: string, markets: Market[] = ["mai
   addKeyword(dsl.include, prompt, ["涨停", "连板", "封板", "回封"]);
   addKeyword(dsl.include, prompt, ["龙虎榜", "机构", "游资", "净买入"]);
   addKeyword(dsl.include, prompt, ["板块", "概念", "行业", "主线", "热度"]);
-  addKeyword(dsl.exclude, prompt, ["炸板多", "高位风险", "缩量", "st"]);
+  addKeyword(dsl.exclude, prompt, ["炸板多", "高位风险", "st"]);
+
+  if (isLimitUpPullbackPrompt(prompt)) {
+    Object.assign(dsl, createLimitUpPullbackStrategy(markets));
+  }
+
+  const twentyDayGainMatch = prompt.match(/(?:近|最近)?\s*20\s*(?:天|日).*?(?:涨幅|涨跌幅).*?(?:不超过|不要超过|小于|低于|<=|≤)\s*(\d+(?:\.\d+)?)\s*%?/);
+  if (twentyDayGainMatch?.[1]) {
+    dsl.filters.maxTwentyDayGainPct = Number(twentyDayGainMatch[1]);
+  }
+  if (/多头排列|均线多头/.test(prompt)) {
+    dsl.filters.requireBullishMaAlignment = true;
+  }
 
   if (normalized.includes("稳健") || normalized.includes("低回撤")) {
     Object.assign(dsl, createDefaultStrategy("stable", markets));
@@ -99,6 +119,18 @@ export function compileStrategyLocally(prompt: string, markets: Market[] = ["mai
   }
 
   return { dsl: strategyDslSchema.parse(dsl), warnings, unsupported };
+}
+
+function isLimitUpPullbackPrompt(prompt: string): boolean {
+  const text = prompt.trim();
+  return Boolean(
+    text.includes("涨停") &&
+    (
+      text.includes("回调") ||
+      (/阴线/.test(text) && /缩量/.test(text)) ||
+      /五日线|5日线|十日线|10日线/.test(text)
+    )
+  );
 }
 
 export function compileWatchConditionLocally(prompt: string, markets: Market[] = ["main"]): WatchConditionDsl {

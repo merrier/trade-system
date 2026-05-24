@@ -9,7 +9,9 @@ import { compileStrategy, compileWatchCondition } from "../core/deepseek.js";
 import { createDefaultStrategy } from "../core/defaults.js";
 import { rankSectors } from "../core/scoring.js";
 import { normalizeMarkets, strategyDslSchema } from "../core/strategy.js";
-import { fetchMarketDataset } from "../data/akshareClient.js";
+import { fetchDailyBars, fetchMarketDataset } from "../data/akshareClient.js";
+import { appendWeixinInboundMessage, readLatestWeixinInboundMessages } from "../inbox/weixinInbox.js";
+import { readReportArtifact } from "../jobs/reportArtifacts.js";
 import type { RunMode, StrategyStyle } from "../shared/types.js";
 import { fromJsonText, toJsonText } from "./json.js";
 import { evaluateActiveWatchlist, latestDatasetFromDb, persistMarketDataset, runPostCloseIngest, runRecommendation } from "./repository.js";
@@ -34,6 +36,10 @@ const watchlistBodySchema = z.object({
   thesis: z.string().default(""),
   conditionPrompt: z.string().default("板块进入前三且主力净流入转正"),
   markets: z.array(z.string()).optional()
+});
+
+const weixinInboxQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(500).default(50)
 });
 
 export function createApp(prisma: PrismaClient) {
@@ -84,10 +90,13 @@ export function createApp(prisma: PrismaClient) {
     }
 
     const dataset = body.mode === "intraday" ? await fetchMarketDataset("intraday") : await latestDatasetFromDb(prisma);
+    const dailyBars = dsl.strategyTemplates?.includes("limit_up_pullback")
+      ? await fetchDailyBars(dataset.tradeDate, 30).then((result) => result.bars).catch(() => [])
+      : [];
     if (body.mode === "post_close") {
       await persistMarketDataset(prisma, dataset);
     }
-    const result = await runRecommendation(prisma, dataset, dsl, body.mode as RunMode, prompt, body.strategyId);
+    const result = await runRecommendation(prisma, dataset, dsl, body.mode as RunMode, prompt, body.strategyId, { dailyBars });
     return {
       runId: result.runId,
       mode: body.mode,
@@ -259,6 +268,32 @@ export function createApp(prisma: PrismaClient) {
           markets: fromJsonText<string[]>(item.item.markets, [])
         }
       }))
+    };
+  });
+
+  app.get("/api/reports/:kind/latest", async (request) => {
+    const { kind } = z.object({ kind: z.enum(["morning", "intraday-selection", "close"]) }).parse(request.params);
+    const dataRoots = [path.resolve(process.cwd(), "dist-web", "data"), path.resolve(process.cwd(), "data")];
+    for (const dataRoot of dataRoots) {
+      const artifact = await readReportArtifact(dataRoot, kind);
+      if (artifact) return artifact;
+    }
+    return app.httpErrors.notFound(`${kind} report not found`);
+  });
+
+  app.post("/api/inbox/weixin", async (request) => {
+    const item = await appendWeixinInboundMessage(request.body ?? {});
+    return {
+      ok: true,
+      item
+    };
+  });
+
+  app.get("/api/inbox/weixin/latest", async (request) => {
+    const query = weixinInboxQuerySchema.parse(request.query ?? {});
+    const items = await readLatestWeixinInboundMessages(query.limit);
+    return {
+      items
     };
   });
 

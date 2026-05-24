@@ -20,4 +20,17 @@ describe("strategy compiler", () => {
     expect(dsl.templates).toContain("ma_breakout");
     expect(dsl.params.sectorTopN).toBe(3);
   });
+
+  it("remembers the limit-up pullback strategy template", () => {
+    const result = compileStrategyLocally("涨停回调策略，最近10天内有涨停，今天阴线缩量，没跌破涨停价，收盘站上五日线或十日线，最近20天涨幅不要超过25%，呈多头排列", ["main"], "short_term");
+
+    expect(result.dsl.strategyTemplates).toContain("limit_up_pullback");
+    expect(result.dsl.filters.recentLimitUpDays).toBe(10);
+    expect(result.dsl.filters.requireBearishCandle).toBe(true);
+    expect(result.dsl.filters.requireHoldLimitUpPrice).toBe(true);
+    expect(result.dsl.filters.requireAboveMa).toBe("ma5_or_ma10");
+    expect(result.dsl.filters.requireVolumeContraction).toBe(true);
+    expect(result.dsl.filters.maxTwentyDayGainPct).toBe(25);
+    expect(result.dsl.filters.requireBullishMaAlignment).toBe(true);
+  });
 });

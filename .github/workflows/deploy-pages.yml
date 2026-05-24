@@ -5,8 +5,21 @@ on:
     branches:
       - dev
   schedule:
-    - cron: "30 8 * * 1-5"
+    - cron: "0 1 * * 1-5"
+    - cron: "50 6 * * 1-5"
+    - cron: "0 8 * * 1-5"
   workflow_dispatch:
+    inputs:
+      report_kind:
+        description: "Report kind to generate"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - morning
+          - intraday-selection
+          - close
 
 permissions:
   contents: write
@@ -22,6 +35,19 @@ jobs:
     steps:
       - name: Checkout dev
         uses: actions/checkout@v4
+        with:
+          path: source
+
+      - name: Checkout previous Pages data
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: main
+          path: previous-main
+
+      - name: Enter source tree
+        run: pwd
+        working-directory: source
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,27 +55,59 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
+        working-directory: source
         run: |
           corepack enable
           corepack prepare yarn@1.22.22 --activate
           yarn install --non-interactive --no-lockfile
 
       - name: Generate Prisma client
+        working-directory: source
         run: yarn prisma:generate
 
       - name: Build static site
+        working-directory: source
         run: yarn build
 
       - name: Install Python data dependencies
-        run: python3 -m pip install --user akshare pandas
+        run: python3 -m pip install --user akshare pandas efinance baostock yfinance
 
       - name: Export static market data
+        working-directory: source
         run: yarn export:static-data
         env:
           PYTHON_BIN: python3
           ALLOW_SAMPLE_DATA: "false"
+          PREVIOUS_STATIC_DATA_DIR: "../previous-main/data"
+
+      - name: Generate scheduled report
+        working-directory: source
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "0 1 * * 1-5" ]; then
+            KIND=morning
+          elif [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "50 6 * * 1-5" ]; then
+            KIND=intraday-selection
+          elif [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "0 8 * * 1-5" ]; then
+            KIND=close
+          else
+            KIND="${{ inputs.report_kind || 'all' }}"
+          fi
+          yarn reports:run --kind="$KIND"
+        env:
+          PYTHON_BIN: python3
+          ALLOW_SAMPLE_DATA: "false"
+          PREVIOUS_STATIC_DATA_DIR: "../previous-main/data"
+          INTRADAY_STRATEGY_PROMPT: ${{ vars.INTRADAY_STRATEGY_PROMPT }}
+          HERMES_ANALYSIS_COMMAND: ${{ vars.HERMES_ANALYSIS_COMMAND }}
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          FEISHU_WEBHOOK_SECRET: ${{ secrets.FEISHU_WEBHOOK_SECRET }}
+          FEISHU_WEBHOOK_MODE: ${{ vars.FEISHU_WEBHOOK_MODE }}
+          FEISHU_WEBHOOK_KEYWORD: ${{ vars.FEISHU_WEBHOOK_KEYWORD }}
+          HERMES_DELIVERY_COMMAND: ${{ vars.HERMES_DELIVERY_COMMAND }}
+          HERMES_DELIVERY_WEBHOOK_URL: ${{ secrets.HERMES_DELIVERY_WEBHOOK_URL }}
 
       - name: Disable Jekyll
+        working-directory: source
         run: |
           touch dist-web/.nojekyll
           mkdir -p dist-web/.github/workflows
@@ -60,7 +118,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: main
-          publish_dir: ./dist-web
+          publish_dir: ./source/dist-web
           force_orphan: true
           user_name: github-actions[bot]
           user_email: 41898282+github-actions[bot]@users.noreply.github.com

@@ -1,8 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createDefaultStrategy } from "../core/defaults.js";
+import { buildCloseReportFromDataset } from "../core/reports.js";
 import { rankSectors, rankStocks } from "../core/scoring.js";
 import { fetchMarketDataset } from "../data/akshareClient.js";
+import { writeReportArtifact } from "./reportArtifacts.js";
 
 const outputRoot = path.resolve(process.cwd(), "dist-web", "data");
 const tradeDate = process.argv.find((arg) => arg.startsWith("--trade-date="))?.split("=")[1];
@@ -23,6 +25,7 @@ await fs.mkdir(path.join(outputRoot, "limit-up"), { recursive: true });
 await fs.mkdir(path.join(outputRoot, "sectors"), { recursive: true });
 await fs.mkdir(path.join(outputRoot, "watchlist"), { recursive: true });
 await fs.mkdir(path.join(outputRoot, "stocks"), { recursive: true });
+await fs.mkdir(path.join(outputRoot, "reports"), { recursive: true });
 
 await writeJson("manifest.json", {
   tradeDate: dataset.tradeDate,
@@ -63,6 +66,8 @@ await writeJson("watchlist/triggers.json", {
   warnings: [],
   triggers: []
 });
+
+await writeReportArtifact(outputRoot, await buildCloseReportFromDataset(dataset));
 
 for (const stock of dataset.stocks) {
   const stockLimitUps = dataset.limitUps.filter((item) => item.code === stock.code);

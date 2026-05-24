@@ -9,6 +9,7 @@ data/*.db
 data/*.db-journal
 data/*.sqlite
 data/*.sqlite-journal
+data/inbox/*.jsonl
 coverage/
 __pycache__/
 *.pyc

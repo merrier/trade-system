@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Activity, BellRing, CandlestickChart, Layers3, Play, Plus, RefreshCw, Search, ShieldAlert, Star } from "lucide-react";
+import { Activity, BellRing, CandlestickChart, Clock3, FileText, Layers3, Play, Plus, RefreshCw, Search, ShieldAlert, Star, Sun } from "lucide-react";
 import "./styles.css";
 
 type Recommendation = {
@@ -52,6 +52,19 @@ type DataStatus = {
   dataAsOf?: string;
 };
 
+type ReportArtifact = {
+  id: string;
+  kind: "morning" | "intraday-selection" | "close";
+  tradeDate: string;
+  dataAsOf: string;
+  provider: string;
+  warnings: string[];
+  payload: any;
+  analysis: string;
+  rankingNarrative?: string;
+  pushMessage: string;
+};
+
 const api = {
   async get<T>(url: string): Promise<T> {
     if (isStaticMode() && url === "/api/watchlist") {
@@ -97,6 +110,9 @@ function staticDataUrl(path: string) {
   if (path === "/api/limit-up/ladder") return "./data/limit-up/ladder.json";
   if (path === "/api/sectors/ladder") return "./data/sectors/ladder.json";
   if (path === "/api/watchlist/triggers") return "./data/watchlist/triggers.json";
+  if (path === "/api/reports/morning/latest") return "./data/reports/morning/latest.json";
+  if (path === "/api/reports/intraday-selection/latest") return "./data/reports/intraday-selection/latest.json";
+  if (path === "/api/reports/close/latest") return "./data/reports/close/latest.json";
   if (path.startsWith("/api/stocks/") && path.endsWith("/analysis")) {
     const code = path.replace("/api/stocks/", "").replace("/analysis", "");
     return `./data/stocks/${code}.json`;
@@ -124,6 +140,20 @@ function createStoredWatchItem(body: unknown): WatchItem {
   };
 }
 
+async function loadReports(): Promise<Partial<Record<ReportArtifact["kind"], ReportArtifact>>> {
+  const entries = await Promise.all(
+    (["morning", "intraday-selection", "close"] as const).map(async (kind) => {
+      try {
+        const report = await api.get<ReportArtifact>(`/api/reports/${kind}/latest`);
+        return [kind, report] as const;
+      } catch {
+        return [kind, undefined] as const;
+      }
+    })
+  );
+  return Object.fromEntries(entries.filter(([, report]) => Boolean(report))) as Partial<Record<ReportArtifact["kind"], ReportArtifact>>;
+}
+
 function App() {
   const [tab, setTab] = useState("recommend");
   const [prompt, setPrompt] = useState("主板里找连板强、龙虎榜净买入高、所属板块热度靠前、炸板少的短线票");
@@ -132,6 +162,7 @@ function App() {
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [watchlist, setWatchlist] = useState<WatchItem[]>([]);
   const [triggers, setTriggers] = useState<any[]>([]);
+  const [reports, setReports] = useState<Partial<Record<ReportArtifact["kind"], ReportArtifact>>>({});
   const [analysisCode, setAnalysisCode] = useState("603000");
   const [analysis, setAnalysis] = useState<any>(null);
   const [watchForm, setWatchForm] = useState({ code: "603000", name: "人民网", thesis: "主观看好 AI 应用主线", conditionPrompt: "所属概念进入前三且个股放量突破5日线" });
@@ -156,6 +187,8 @@ function App() {
       setSectors(sectorLadder.items ?? []);
       setWatchlist(watch.items ?? []);
       setTriggers(triggerData.triggers ?? []);
+      const loadedReports = await loadReports();
+      setReports(loadedReports);
       setDataStatus({ source: latest.source, tradeDate: latest.tradeDate, dataAsOf: latest.dataAsOf, warnings: latest.warnings ?? [] });
       setMessage(isStaticMode() ? "静态盘后数据已刷新" : "数据已刷新");
     } catch (error) {
@@ -236,11 +269,14 @@ function App() {
   }, []);
 
   const visiblePanel = useMemo(() => {
+    if (tab === "morning") return <ReportPanel title="9:00 晨报" report={reports.morning} />;
+    if (tab === "intradayReport") return <IntradayReportPanel report={reports["intraday-selection"]} />;
+    if (tab === "closeReport") return <CloseReportPanel report={reports.close} />;
     if (tab === "ladder") return <LadderPanel limitUps={limitUps} sectors={sectors} />;
     if (tab === "stock") return <StockPanel analysisCode={analysisCode} setAnalysisCode={setAnalysisCode} loadAnalysis={loadAnalysis} analysis={analysis} />;
     if (tab === "watch") return <WatchPanel watchlist={watchlist} triggers={triggers} watchForm={watchForm} setWatchForm={setWatchForm} addWatchItem={addWatchItem} />;
     return <RecommendationPanel prompt={prompt} setPrompt={setPrompt} runRecommendation={runRecommendation} recommendations={recommendations} />;
-  }, [tab, prompt, recommendations, limitUps, sectors, analysisCode, analysis, watchlist, triggers, watchForm]);
+  }, [tab, prompt, recommendations, limitUps, sectors, analysisCode, analysis, watchlist, triggers, watchForm, reports]);
 
   return (
     <main className="app-shell">
@@ -254,6 +290,9 @@ function App() {
         </div>
         <nav>
           <TabButton active={tab === "recommend"} icon={<Star size={18} />} label="推荐榜" onClick={() => setTab("recommend")} />
+          <TabButton active={tab === "morning"} icon={<Sun size={18} />} label="9点晨报" onClick={() => setTab("morning")} />
+          <TabButton active={tab === "intradayReport"} icon={<Clock3 size={18} />} label="14:50选股" onClick={() => setTab("intradayReport")} />
+          <TabButton active={tab === "closeReport"} icon={<FileText size={18} />} label="16点复盘" onClick={() => setTab("closeReport")} />
           <TabButton active={tab === "ladder"} icon={<Layers3 size={18} />} label="天梯" onClick={() => setTab("ladder")} />
           <TabButton active={tab === "stock"} icon={<Search size={18} />} label="个股分析" onClick={() => setTab("stock")} />
           <TabButton active={tab === "watch"} icon={<BellRing size={18} />} label="监控池" onClick={() => setTab("watch")} />
@@ -289,7 +328,7 @@ function App() {
 }
 
 function SourceBadge({ status }: { status: DataStatus }) {
-  const label = status.source === "sample" ? "样例数据" : status.source === "akshare" ? "AKShare真实数据" : status.source === "akshare_partial" ? "AKShare部分数据" : "数据源待确认";
+  const label = status.source === "sample" ? "样例数据" : status.source === "akshare" ? "AKShare真实数据" : status.source === "akshare_partial" ? "AKShare部分数据" : status.source === "efinance" ? "efinance数据" : status.source === "baostock" ? "BaoStock数据" : "数据源待确认";
   return (
     <div className={status.source === "sample" ? "source-badge sample" : "source-badge"}>
       <strong>{label}</strong>
@@ -304,6 +343,97 @@ function TabButton({ active, icon, label, onClick }: { active: boolean; icon: Re
       {icon}
       {label}
     </button>
+  );
+}
+
+function ReportPanel({ title, report }: { title: string; report?: ReportArtifact }) {
+  if (!report) return <div className="empty">暂无{title}数据。</div>;
+  return (
+    <div className="report-layout">
+      <section className="table-section">
+        <div className="section-title">
+          <FileText size={18} />
+          <h2>{title}</h2>
+        </div>
+        <div className="report-meta">
+          <span>{report.tradeDate}</span>
+          <span>{report.provider}</span>
+          <span>{new Date(report.dataAsOf).toLocaleString()}</span>
+        </div>
+        <p className="report-text">{report.analysis}</p>
+        <p className="report-push">{report.pushMessage}</p>
+      </section>
+      <section className="table-section">
+        <div className="section-title">
+          <Activity size={18} />
+          <h2>关键线索</h2>
+        </div>
+        <div className="metric-grid">
+          {(report.payload?.aShareReadThrough ?? []).map((item: string, index: number) => <p key={index}>{item}</p>)}
+          {report.warnings.map((item, index) => <p key={`warning-${index}`}>{item}</p>)}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function IntradayReportPanel({ report }: { report?: ReportArtifact }) {
+  if (!report) return <div className="empty">暂无14:50盘中选股报告。</div>;
+  return (
+    <div className="panel-grid">
+      <section className="workbench">
+        <div className="section-title">
+          <Clock3 size={18} />
+          <h2>策略与摘要</h2>
+        </div>
+        <p className="report-text">{report.analysis}</p>
+        {report.rankingNarrative && <p className="report-push">{report.rankingNarrative}</p>}
+        <InfoBlock title="策略" items={[report.payload?.strategy?.prompt ?? "默认策略"]} />
+      </section>
+      <section className="table-section span-2">
+        <RankingTable items={report.payload?.recommendations ?? []} />
+      </section>
+    </div>
+  );
+}
+
+function CloseReportPanel({ report }: { report?: ReportArtifact }) {
+  if (!report) return <div className="empty">暂无16:00收盘复盘。</div>;
+  const breadth = report.payload?.marketBreadth;
+  return (
+    <div className="report-layout">
+      <section className="table-section">
+        <div className="section-title">
+          <FileText size={18} />
+          <h2>收盘复盘</h2>
+        </div>
+        <p className="report-text">{report.analysis}</p>
+        {breadth && (
+          <div className="summary-grid">
+            <Metric label="上涨" value={breadth.up} />
+            <Metric label="下跌" value={breadth.down} />
+            <Metric label="涨停" value={breadth.limitUp} />
+            <Metric label="成交额" value={formatYi(breadth.turnoverAmount)} />
+          </div>
+        )}
+      </section>
+      <section className="table-section">
+        <div className="section-title">
+          <Layers3 size={18} />
+          <h2>板块前排</h2>
+        </div>
+        <InfoBlock title="板块" items={(report.payload?.sectors ?? []).slice(0, 8).map((item: Sector) => `${item.name} 热度 ${Math.round(item.heatScore)}，涨停 ${item.limitUpCount}`)} />
+      </section>
+    </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="metric">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
   );
 }
 

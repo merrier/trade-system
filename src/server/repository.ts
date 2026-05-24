@@ -4,7 +4,7 @@ import { rankSectors, rankStocks } from "../core/scoring.js";
 import { attachRecommendation, evaluateWatchCondition } from "../core/watchlist.js";
 import { fetchMarketDataset } from "../data/akshareClient.js";
 import { createSampleDataset } from "../data/sampleDataset.js";
-import type { MarketDataset, RecommendationResult, RunMode, StrategyDsl, WatchConditionDsl } from "../shared/types.js";
+import type { DailyBar, MarketDataset, RecommendationResult, RunMode, StrategyDsl, WatchConditionDsl } from "../shared/types.js";
 import { fromJsonText, toJsonText } from "./json.js";
 
 export async function persistMarketDataset(prisma: PrismaClient, dataset: MarketDataset): Promise<void> {
@@ -147,9 +147,10 @@ export async function runRecommendation(
   dsl: StrategyDsl,
   mode: RunMode,
   prompt?: string,
-  strategyId?: string
+  strategyId?: string,
+  options: { dailyBars?: DailyBar[] } = {}
 ): Promise<{ runId: string; results: RecommendationResult[] }> {
-  const results = rankStocks(dataset, dsl, mode);
+  const results = rankStocks(dataset, dsl, mode, { dailyBars: options.dailyBars });
   const run = await prisma.recommendationRun.create({
     data: {
       tradeDate: dataset.tradeDate,

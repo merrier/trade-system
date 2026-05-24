@@ -88,6 +88,73 @@ model SectorRecord {
   @@index([tradeDate, heatScore])
 }
 
+model DailyBarRecord {
+  id           String   @id @default(cuid())
+  tradeDate    String
+  code         String
+  name         String
+  market       String
+  open         Float    @default(0)
+  high         Float    @default(0)
+  low          Float    @default(0)
+  close        Float    @default(0)
+  volume       Float    @default(0)
+  amount       Float    @default(0)
+  pctChange    Float    @default(0)
+  turnoverRate Float    @default(0)
+  provider     String
+  createdAt    DateTime @default(now())
+
+  @@unique([tradeDate, code])
+  @@index([code, tradeDate])
+  @@index([tradeDate, market])
+}
+
+model DataProviderRun {
+  id         String   @id @default(cuid())
+  provider   String
+  command    String
+  status     String
+  startedAt  DateTime
+  finishedAt DateTime
+  warnings   String
+  error      String?
+  rowCount   Int?
+  createdAt  DateTime @default(now())
+
+  @@index([command, provider, createdAt])
+}
+
+model ReportRun {
+  id          String   @id @default(cuid())
+  kind        String
+  tradeDate   String
+  provider    String
+  warnings    String
+  dataAsOf    DateTime
+  analysis    String
+  pushMessage String
+  payload     String
+  createdAt   DateTime @default(now())
+
+  artifacts ReportArtifact[]
+
+  @@index([kind, tradeDate, createdAt])
+}
+
+model ReportArtifact {
+  id        String   @id @default(cuid())
+  runId     String
+  kind      String
+  path      String
+  mimeType  String
+  createdAt DateTime @default(now())
+
+  run ReportRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([kind, createdAt])
+}
+
 model Strategy {
   id             String   @id @default(cuid())
   name           String

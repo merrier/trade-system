@@ -15,7 +15,12 @@
     "db:init": "python3 python/init_db.py",
     "prisma:migrate": "npm run db:init && npm run prisma:generate",
     "ingest:post-close": "tsx src/jobs/postCloseIngest.ts",
-    "export:static-data": "tsx src/jobs/exportStaticData.ts"
+    "export:static-data": "tsx src/jobs/exportStaticData.ts",
+    "reports:run": "tsx src/jobs/runReport.ts",
+    "reports:morning": "tsx src/jobs/runReport.ts --kind=morning",
+    "reports:intraday": "tsx src/jobs/runReport.ts --kind=intraday-selection",
+    "reports:close": "tsx src/jobs/runReport.ts --kind=close",
+    "inbox:weixin:test": "python3 scripts/record-weixin-inbox.py --print-path"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",

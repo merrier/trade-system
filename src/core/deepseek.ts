@@ -19,7 +19,7 @@ export async function compileStrategy(prompt: string, markets: Market[], style: 
       {
         role: "system",
         content:
-          "你是A股选股策略编译器。只返回JSON。把用户自然语言转换为StrategyDsl，字段必须包括style, markets, include, exclude, weights, filters, warnings, unsupported。禁止输出交易指令。"
+          "你是A股选股策略编译器。只返回JSON。把用户自然语言转换为StrategyDsl，字段必须包括style, markets, strategyTemplates, include, exclude, weights, filters, warnings, unsupported。strategyTemplates可包含limit_up_pullback；对应filters可包含recentLimitUpDays, requireBearishCandle, requireHoldLimitUpPrice, requireAboveMa, requireVolumeContraction, maxTwentyDayGainPct, requireBullishMaAlignment。禁止输出交易指令。"
       },
       {
         role: "user",
@@ -33,6 +33,18 @@ export async function compileStrategy(prompt: string, markets: Market[], style: 
 
     const raw = JSON.parse(data);
     const dsl = strategyDslSchema.parse(raw.dsl ?? raw);
+    if (fallback.dsl.strategyTemplates?.includes("limit_up_pullback")) {
+      if (!dsl.strategyTemplates?.includes("limit_up_pullback")) {
+        dsl.strategyTemplates = [...(dsl.strategyTemplates ?? []), "limit_up_pullback"];
+      }
+      dsl.filters.recentLimitUpDays ??= fallback.dsl.filters.recentLimitUpDays;
+      dsl.filters.requireBearishCandle ??= fallback.dsl.filters.requireBearishCandle;
+      dsl.filters.requireHoldLimitUpPrice ??= fallback.dsl.filters.requireHoldLimitUpPrice;
+      dsl.filters.requireAboveMa ??= fallback.dsl.filters.requireAboveMa;
+      dsl.filters.requireVolumeContraction ??= fallback.dsl.filters.requireVolumeContraction;
+      dsl.filters.maxTwentyDayGainPct ??= fallback.dsl.filters.maxTwentyDayGainPct;
+      dsl.filters.requireBullishMaAlignment ??= fallback.dsl.filters.requireBullishMaAlignment;
+    }
     return {
       dsl,
       warnings: Array.isArray(raw.warnings) ? raw.warnings.map(String) : fallback.warnings,

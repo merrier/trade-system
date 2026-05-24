@@ -92,6 +92,70 @@ CREATE TABLE IF NOT EXISTS "SectorRecord" (
 CREATE UNIQUE INDEX IF NOT EXISTS "SectorRecord_tradeDate_name_type_key" ON "SectorRecord"("tradeDate", "name", "type");
 CREATE INDEX IF NOT EXISTS "SectorRecord_tradeDate_heatScore_idx" ON "SectorRecord"("tradeDate", "heatScore");
 
+CREATE TABLE IF NOT EXISTS "DailyBarRecord" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "tradeDate" TEXT NOT NULL,
+  "code" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "market" TEXT NOT NULL,
+  "open" REAL NOT NULL DEFAULT 0,
+  "high" REAL NOT NULL DEFAULT 0,
+  "low" REAL NOT NULL DEFAULT 0,
+  "close" REAL NOT NULL DEFAULT 0,
+  "volume" REAL NOT NULL DEFAULT 0,
+  "amount" REAL NOT NULL DEFAULT 0,
+  "pctChange" REAL NOT NULL DEFAULT 0,
+  "turnoverRate" REAL NOT NULL DEFAULT 0,
+  "provider" TEXT NOT NULL,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "DailyBarRecord_tradeDate_code_key" ON "DailyBarRecord"("tradeDate", "code");
+CREATE INDEX IF NOT EXISTS "DailyBarRecord_code_tradeDate_idx" ON "DailyBarRecord"("code", "tradeDate");
+CREATE INDEX IF NOT EXISTS "DailyBarRecord_tradeDate_market_idx" ON "DailyBarRecord"("tradeDate", "market");
+
+CREATE TABLE IF NOT EXISTS "DataProviderRun" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "provider" TEXT NOT NULL,
+  "command" TEXT NOT NULL,
+  "status" TEXT NOT NULL,
+  "startedAt" DATETIME NOT NULL,
+  "finishedAt" DATETIME NOT NULL,
+  "warnings" TEXT NOT NULL,
+  "error" TEXT,
+  "rowCount" INTEGER,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS "DataProviderRun_command_provider_createdAt_idx" ON "DataProviderRun"("command", "provider", "createdAt");
+
+CREATE TABLE IF NOT EXISTS "ReportRun" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "kind" TEXT NOT NULL,
+  "tradeDate" TEXT NOT NULL,
+  "provider" TEXT NOT NULL,
+  "warnings" TEXT NOT NULL,
+  "dataAsOf" DATETIME NOT NULL,
+  "analysis" TEXT NOT NULL,
+  "pushMessage" TEXT NOT NULL,
+  "payload" TEXT NOT NULL,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS "ReportRun_kind_tradeDate_createdAt_idx" ON "ReportRun"("kind", "tradeDate", "createdAt");
+
+CREATE TABLE IF NOT EXISTS "ReportArtifact" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "runId" TEXT NOT NULL,
+  "kind" TEXT NOT NULL,
+  "path" TEXT NOT NULL,
+  "mimeType" TEXT NOT NULL,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "ReportArtifact_runId_fkey" FOREIGN KEY ("runId") REFERENCES "ReportRun" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "ReportArtifact_kind_createdAt_idx" ON "ReportArtifact"("kind", "createdAt");
+
 CREATE TABLE IF NOT EXISTS "Strategy" (
   "id" TEXT NOT NULL PRIMARY KEY,
   "name" TEXT NOT NULL,
