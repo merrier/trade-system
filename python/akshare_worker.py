@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 import contextlib
+import importlib
+import importlib.util
 import io
 import json
 import os
@@ -183,6 +185,84 @@ def efinance_dataset(trade_date: str) -> tuple[dict, list[str]]:
         },
         [],
     )
+
+
+def easyquotation_dataset(trade_date: str) -> tuple[dict, list[str]]:
+    import easyquotation
+
+    quotation = easyquotation.use(os.environ.get("EASYQUOTATION_SOURCE", "sina"))
+    snapshot = quotation.market_snapshot(prefix=True)
+    stocks = normalize_easyquotation_snapshot(snapshot)
+    sectors = derive_sectors_from_stocks(trade_date, stocks)
+    warnings = ["easyquotation 兜底源不提供行业、完整涨停梯队和龙虎榜；涨停池按涨跌幅近似派生。"]
+    return (
+        {
+            "tradeDate": trade_date,
+            "dataAsOf": datetime.now().isoformat(),
+            "source": "easyquotation",
+            "warnings": warnings,
+            "stocks": stocks,
+            "limitUps": derive_limit_ups_from_stocks(trade_date, stocks),
+            "dragonTiger": [],
+            "sectors": sectors,
+        },
+        warnings,
+    )
+
+
+def normalize_easyquotation_snapshot(snapshot: dict) -> list[dict]:
+    stocks: list[dict] = []
+    for raw_code, row in snapshot.items():
+        code = normalize_stock_code(raw_code)
+        if not code or not is_main_board(code):
+            continue
+        now = number(row.get("now", row.get("price", 0)))
+        name = str(row.get("name", code) or code)
+        is_suspended = now <= 0
+        prev_close = number(row.get("close", 0))
+        pct_change = ((now - prev_close) / prev_close * 100) if prev_close else 0
+        amount = number(row.get("volume", row.get("amount", 0)))
+        turnover = number(row.get("turnover", row.get("turnoverVolume", 0)))
+        stocks.append(
+            {
+                "code": code,
+                "name": name,
+                "market": market_from_code(code),
+                "industry": "",
+                "concepts": [],
+                "pctChange": pct_change,
+                "turnoverAmount": amount,
+                "turnoverRate": 0,
+                "volumeRatio": 1,
+                "close": now,
+                "open": number(row.get("open", 0)),
+                "high": number(row.get("high", 0)),
+                "low": number(row.get("low", 0)),
+                "volume": turnover,
+                "ma5": None,
+                "listedDays": 999,
+                "mainNetInflow": 0,
+                "isST": "ST" in name.upper(),
+                "isSuspended": is_suspended,
+            }
+        )
+    if not stocks:
+        raise RuntimeError("easyquotation returned no main-board stocks")
+    return stocks
+
+
+def normalize_stock_code(raw_code: Any) -> str:
+    code = str(raw_code).strip().lower().replace(".", "")
+    if code.startswith("sh"):
+        stripped = code[2:8]
+        return stripped if stripped.startswith(("600", "601", "603", "605")) else ""
+    if code.startswith("sz"):
+        stripped = code[2:8]
+        return stripped if stripped.startswith(("000", "001", "002")) else ""
+    if code.startswith("bj"):
+        return ""
+    digits = "".join(char for char in code if char.isdigit())
+    return digits[:6] if len(digits) >= 6 else code
 
 
 def normalize_spot_rows(df: Any, provider: str) -> list[dict]:
@@ -393,7 +473,15 @@ def daily_bars(provider: str, trade_date: str, days: int) -> list[dict]:
         return akshare_daily_bars(trade_date, days)
     if provider == "baostock":
         return baostock_daily_bars(trade_date, days)
+    if provider == "ashare":
+        return ashare_daily_bars(trade_date, days)
     raise RuntimeError(f"{provider} does not implement daily-bars")
+
+
+def minute_bars(provider: str, trade_date: str, count: int, frequency: str, codes: list[str]) -> list[dict]:
+    if provider == "ashare":
+        return ashare_minute_bars(trade_date, count, frequency, codes)
+    raise RuntimeError(f"{provider} does not implement minute-bars")
 
 
 def efinance_daily_bars(trade_date: str, days: int) -> list[dict]:
@@ -546,6 +634,170 @@ def tushare_turnover_rates(pro: Any, trade_date: str) -> dict[str, float]:
     if df is None or getattr(df, "empty", True):
         return {}
     return {str(row.get("ts_code", "")).strip(): number(row.get("turnover_rate", 0)) for _, row in df.iterrows()}
+
+
+def ashare_daily_bars(trade_date: str, days: int) -> list[dict]:
+    get_price = load_ashare_get_price()
+    names = ashare_code_universe(trade_date, days)
+    if not names:
+        raise RuntimeError("Ashare has no code universe")
+
+    bars: list[dict] = []
+    end_date = datetime.strptime(trade_date, "%Y%m%d").strftime("%Y-%m-%d")
+    for code, name in sorted(names.items()):
+        try:
+            df = get_price(ashare_symbol(code), frequency="1d", count=max(days + 5, 35), end_date=end_date)
+        except Exception:
+            continue
+        if df is None or getattr(df, "empty", True):
+            continue
+        previous_close = 0.0
+        rows = list(df.iterrows())
+        first_output_index = max(0, len(rows) - days)
+        for row_index, (index, row) in enumerate(rows):
+            date_text = str(getattr(index, "date", lambda: index)()).replace("-", "")
+            if len(date_text) >= 10:
+                date_text = date_text[:10].replace("-", "")
+            if not date_text or date_text > trade_date:
+                continue
+            close = number(row.get("close", 0))
+            volume = number(row.get("volume", 0))
+            pct_change = ((close - previous_close) / previous_close * 100) if previous_close else 0
+            previous_close = close or previous_close
+            if row_index < first_output_index:
+                continue
+            bars.append(
+                {
+                    "tradeDate": date_text,
+                    "code": code,
+                    "name": name,
+                    "market": market_from_code(code),
+                    "open": number(row.get("open", 0)),
+                    "high": number(row.get("high", 0)),
+                    "low": number(row.get("low", 0)),
+                    "close": close,
+                    "volume": volume,
+                    "amount": volume * close,
+                    "pctChange": pct_change,
+                    "turnoverRate": 0,
+                    "provider": "ashare",
+                }
+            )
+    if not bars:
+        raise RuntimeError("Ashare returned no daily bars")
+    return bars
+
+
+def ashare_minute_bars(trade_date: str, count: int, frequency: str, codes: list[str]) -> list[dict]:
+    if frequency not in ("1m", "5m", "15m", "30m", "60m"):
+        raise RuntimeError(f"Ashare unsupported minute frequency: {frequency}")
+
+    get_price = load_ashare_get_price()
+    names = resolve_minute_code_names(trade_date, codes)
+    if not names:
+        raise RuntimeError("Ashare minute-bars requires codes or a recent limit-up universe")
+
+    max_codes = max(1, integer(os.environ.get("ASHARE_MINUTE_MAX_CODES"), 80))
+    max_count = max(1, integer(os.environ.get("ASHARE_MINUTE_MAX_COUNT"), 120))
+    count = min(max(1, count), max_count)
+    end_date = datetime.strptime(trade_date, "%Y%m%d").strftime("%Y-%m-%d")
+    bars: list[dict] = []
+    for code, name in sorted(names.items())[:max_codes]:
+        try:
+            df = get_price(ashare_symbol(code), frequency=frequency, count=count, end_date=end_date)
+        except Exception:
+            continue
+        if df is None or getattr(df, "empty", True):
+            continue
+        rows = list(df.iterrows())[-count:]
+        for index, row in rows:
+            trade_time, bar_date = ashare_trade_time(index, trade_date)
+            if bar_date > trade_date:
+                continue
+            close = number(row.get("close", 0))
+            volume = number(row.get("volume", 0))
+            bars.append(
+                {
+                    "tradeDate": bar_date,
+                    "tradeTime": trade_time,
+                    "code": code,
+                    "name": name,
+                    "market": market_from_code(code),
+                    "open": number(row.get("open", 0)),
+                    "high": number(row.get("high", 0)),
+                    "low": number(row.get("low", 0)),
+                    "close": close,
+                    "volume": volume,
+                    "amount": volume * close,
+                    "frequency": frequency,
+                    "provider": "ashare",
+                }
+            )
+    if not bars:
+        raise RuntimeError("Ashare returned no minute bars")
+    return bars
+
+
+def resolve_minute_code_names(trade_date: str, codes: list[str]) -> dict[str, str]:
+    code_names = load_code_names()
+    names: dict[str, str] = {}
+    for raw_code in codes:
+        code = normalize_stock_code(raw_code)
+        if code and is_main_board(code):
+            names[code] = code_names.get(code, code)
+    if names:
+        return names
+    return recent_limit_up_names(trade_date, 3)
+
+
+def ashare_trade_time(index: Any, fallback_trade_date: str) -> tuple[str, str]:
+    if hasattr(index, "to_pydatetime"):
+        value = index.to_pydatetime()
+        return value.strftime("%Y-%m-%d %H:%M:%S"), value.strftime("%Y%m%d")
+    text = str(index)
+    if len(text) >= 16:
+        trade_time = text[:19] if len(text) >= 19 else f"{text[:16]}:00"
+        return trade_time, text[:10].replace("-", "")
+    return f"{fallback_trade_date[:4]}-{fallback_trade_date[4:6]}-{fallback_trade_date[6:]} 00:00:00", fallback_trade_date
+
+
+def load_ashare_get_price() -> Any:
+    module_path = os.environ.get("ASHARE_MODULE_PATH", "").strip()
+    if module_path:
+        spec = importlib.util.spec_from_file_location("Ashare", module_path)
+        if spec is None or spec.loader is None:
+            raise RuntimeError(f"cannot load Ashare module from {module_path}")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module.get_price
+    return importlib.import_module("Ashare").get_price
+
+
+def ashare_code_universe(trade_date: str, days: int) -> dict[str, str]:
+    if os.environ.get("DAILY_BARS_LIMIT_UP_UNIVERSE", "").lower() == "true":
+        names = recent_limit_up_names(trade_date, min(10, days))
+        if names:
+            return names
+
+    try:
+        import easyquotation
+
+        snapshot = easyquotation.use(os.environ.get("EASYQUOTATION_SOURCE", "sina")).market_snapshot(prefix=True)
+        names = {}
+        for raw_code, row in snapshot.items():
+            code = normalize_stock_code(raw_code)
+            if code and is_main_board(code):
+                names[code] = str(row.get("name", code) or code)
+        if names:
+            return names
+    except Exception:
+        pass
+
+    return load_code_names()
+
+
+def ashare_symbol(code: str) -> str:
+    return f"sh{code}" if code.startswith(("600", "601", "603", "605")) else f"sz{code}"
 
 
 def akshare_daily_bars(trade_date: str, days: int) -> list[dict]:
@@ -725,12 +977,14 @@ def yfinance_us_market_brief() -> dict:
     return brief
 
 
-def run_command(command: str, provider: str, trade_date: str, mode: str, days: int, allow_sample: bool) -> dict:
+def run_command(command: str, provider: str, trade_date: str, mode: str, days: int, count: int, frequency: str, codes: list[str], allow_sample: bool) -> dict:
     if command in ("intraday-snapshot", "limit-up-ladder", "sector-flow"):
         if provider == "akshare":
             dataset, warnings = akshare_dataset(trade_date, "intraday" if command == "intraday-snapshot" else mode)
         elif provider == "efinance":
             dataset, warnings = efinance_dataset(trade_date)
+        elif provider == "easyquotation" and command == "intraday-snapshot":
+            dataset, warnings = easyquotation_dataset(trade_date)
         elif provider == "sample" and allow_sample:
             dataset, warnings = sample_dataset(trade_date), ["使用样例数据。"]
         else:
@@ -738,6 +992,8 @@ def run_command(command: str, provider: str, trade_date: str, mode: str, days: i
         return envelope(provider, command, dataset, warnings)
     if command == "daily-bars":
         return envelope(provider, command, daily_bars(provider, trade_date, days))
+    if command == "minute-bars":
+        return envelope(provider, command, minute_bars(provider, trade_date, count, frequency, codes))
     if command == "us-market-brief":
         return envelope(provider, command, us_market_brief(provider))
     raise RuntimeError(f"unknown command: {command}")
@@ -750,12 +1006,16 @@ def main() -> None:
     parser.add_argument("--mode", default="post_close")
     parser.add_argument("--trade-date", default=datetime.now().strftime("%Y%m%d"))
     parser.add_argument("--days", type=int, default=30)
+    parser.add_argument("--count", type=int, default=60)
+    parser.add_argument("--frequency", default="5m")
+    parser.add_argument("--codes", default="")
     parser.add_argument("--allow-sample", action="store_true")
     args = parser.parse_args()
     command = args.command or ("intraday-snapshot" if args.mode == "intraday" else "limit-up-ladder")
+    codes = [item.strip() for item in args.codes.split(",") if item.strip()]
 
     try:
-        result = run_command(command, args.provider, args.trade_date, args.mode, args.days, args.allow_sample)
+        result = run_command(command, args.provider, args.trade_date, args.mode, args.days, args.count, args.frequency, codes, args.allow_sample)
     except Exception as exc:
         print(json.dumps({"provider": args.provider, "command": command, "status": "failed", "error": f"{type(exc).__name__}: {exc}", "warnings": []}, ensure_ascii=False), file=sys.stderr)
         raise

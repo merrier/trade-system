@@ -10,10 +10,14 @@
 | --- | --- | --- | --- | --- |
 | 1 | [AKShare](https://akshare.akfamily.xyz/data/stock/stock.html) / 东方财富 | 实时快照、涨停池、板块资金流、历史日线 | open、close、volume、amount、pctChange、turnoverRate、涨停梯队、板块 | 非关键接口失败时保留部分数据并写入 warning；关键接口失败切下个源 |
 | 2 | [efinance](https://github.com/Micro-sheep/efinance) | 实时行情兜底 | 最新价、涨跌幅、成交额、换手率 | 不提供完整连板/龙虎榜时写 warning，继续用于盘中选股 |
-| 3 | [BaoStock](http://baostock.com/baostock/index.php/Python_API%E6%96%87%E6%A1%A3) | 历史日线兜底 | open、high、low、close、volume、amount、pctChange、turnoverRate | 主要用于 30 天滑窗缓存补历史 |
+| 3 | [easyquotation](https://github.com/shidenggui/easyquotation) | 盘中实时快照兜底 | name、open、high、low、now、成交量、成交额 | 通过新浪/腾讯免费行情补 `intraday-snapshot`；不提供完整板块/龙虎榜时写 warning |
+| 4 | [BaoStock](http://baostock.com/baostock/index.php/Python_API%E6%96%87%E6%A1%A3) | 历史日线兜底 | open、high、low、close、volume、amount、pctChange、turnoverRate | 主要用于 30 天滑窗缓存补历史 |
 | 可选优先 | [Tushare](https://tushare.pro/document/2) | 30 天日线滑窗缓存 | open、high、low、close、volume、amount、pctChange、turnoverRate、股票中文名 | 配置 `TUSHARE_TOKEN` 后优先用于 `daily-bars`；未配置时不参与链路 |
+| 可选兜底 | [Ashare](https://github.com/mpquant/Ashare) | 日线/分钟线 K 线兜底 | open、high、low、close、volume | 通过 `ASHARE_MODULE_PATH` 加载单文件模块；接入 `daily-bars` 和按代码拉取的 `minute-bars` |
 
-Tushare 当前接入 [日线行情接口](https://tushare.pro/document/2?doc_id=27)，用于 14:50 涨停回调策略所需的近 30 个交易日 K 线窗口；实时快照、涨停池和板块热度仍由 AKShare/efinance/BaoStock 链路提供。
+Tushare 当前接入 [日线行情接口](https://tushare.pro/document/2?doc_id=27)，用于 14:50 涨停回调策略所需的近 30 个交易日 K 线窗口；实时快照、涨停池和板块热度仍由 AKShare/efinance/easyquotation/BaoStock 链路提供。
+
+Ashare 当前作为 `daily-bars` 末级兜底：当 Tushare、BaoStock、efinance、AKShare 日线都失败时，系统用 Ashare 的日线 K 线补窗口；由于 Ashare 日线不直接给成交额和换手率，成交额会用 `close * volume` 近似，换手率记为 `0` 并通过 provider warning/报告风险提示暴露。分钟线通过 `minute-bars` 按股票代码拉取，支持 `1m/5m/15m/30m/60m`，主要给后续盘中细化和小范围候选验证使用，避免全市场分钟线请求过重。
 
 ## 外盘晨报
 

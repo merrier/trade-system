@@ -2,12 +2,12 @@ import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createSampleDataset } from "./sampleDataset.js";
-import type { DailyBar, DataProviderRun, MarketDataset, RunMode, UsMarketBrief } from "../shared/types.js";
+import type { DailyBar, DataProviderRun, MarketDataset, MinuteBar, RunMode, UsMarketBrief } from "../shared/types.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 
-export type WorkerCommand = "intraday-snapshot" | "limit-up-ladder" | "sector-flow" | "daily-bars" | "us-market-brief";
+export type WorkerCommand = "intraday-snapshot" | "limit-up-ladder" | "sector-flow" | "daily-bars" | "minute-bars" | "us-market-brief";
 
 export interface WorkerEnvelope<T> {
   provider: string;
@@ -25,13 +25,12 @@ export interface ProviderAttempt<T> {
 
 export type WorkerRunner<T> = (provider: string, command: WorkerCommand) => Promise<WorkerEnvelope<T>>;
 
-const datasetProviders = ["akshare", "efinance", "baostock"];
 const usBriefProviders = ["yfinance", "stooq", "alpha_vantage"];
 
 export async function fetchMarketDataset(mode: RunMode = "post_close", tradeDate?: string): Promise<MarketDataset> {
   const command: WorkerCommand = mode === "intraday" ? "intraday-snapshot" : "limit-up-ladder";
   try {
-    const attempt = await runProviderFailover<MarketDataset>(command, datasetProviders, { mode, tradeDate });
+    const attempt = await runProviderFailover<MarketDataset>(command, getDatasetProviders(mode), { mode, tradeDate });
     const dataset = normalizeDataset(attempt.envelope.data, attempt.envelope.provider, attempt.runs);
     if (!dataset.stocks.length || !dataset.sectors.length) {
       throw new Error("provider chain returned empty dataset");
@@ -51,6 +50,11 @@ export async function fetchMarketDataset(mode: RunMode = "post_close", tradeDate
   }
 }
 
+export function getDatasetProviders(mode: RunMode): string[] {
+  if (mode === "intraday") return ["akshare", "efinance", "easyquotation", "baostock"];
+  return ["akshare", "efinance", "baostock"];
+}
+
 export async function fetchDailyBars(tradeDate?: string, days = 30): Promise<{ bars: DailyBar[]; provider: string; warnings: string[]; runs: DataProviderRun[] }> {
   const attempt = await runProviderFailover<DailyBar[]>("daily-bars", getDailyBarProviders(), { tradeDate, days });
   return {
@@ -61,12 +65,35 @@ export async function fetchDailyBars(tradeDate?: string, days = 30): Promise<{ b
   };
 }
 
+export async function fetchMinuteBars(
+  codes: string[],
+  tradeDate?: string,
+  options: { count?: number; frequency?: "1m" | "5m" | "15m" | "30m" | "60m" } = {}
+): Promise<{ bars: MinuteBar[]; provider: string; warnings: string[]; runs: DataProviderRun[] }> {
+  const attempt = await runProviderFailover<MinuteBar[]>("minute-bars", getMinuteBarProviders(), {
+    tradeDate,
+    codes,
+    count: options.count ?? 60,
+    frequency: options.frequency ?? "5m"
+  });
+  return {
+    bars: attempt.envelope.data.filter((bar) => isMainBoardCode(bar.code)),
+    provider: attempt.envelope.provider,
+    warnings: mergeWarnings(attempt.envelope.warnings, attempt.runs),
+    runs: attempt.runs
+  };
+}
+
 export function getDailyBarProviders(): string[] {
   const baseProviders = process.env.DAILY_BARS_LIMIT_UP_UNIVERSE === "true"
-    ? ["baostock", "efinance", "akshare"]
-    : ["efinance", "akshare", "baostock"];
+    ? ["baostock", "efinance", "akshare", "ashare"]
+    : ["efinance", "akshare", "baostock", "ashare"];
   if (process.env.TUSHARE_TOKEN?.trim()) return ["tushare", ...baseProviders];
   return baseProviders;
+}
+
+export function getMinuteBarProviders(): string[] {
+  return ["ashare"];
 }
 
 export async function fetchUsMarketBrief(): Promise<{ brief: UsMarketBrief; provider: string; warnings: string[]; runs: DataProviderRun[] }> {
@@ -82,7 +109,7 @@ export async function fetchUsMarketBrief(): Promise<{ brief: UsMarketBrief; prov
 export async function runProviderFailover<T>(
   command: WorkerCommand,
   providers: string[],
-  options: { mode?: RunMode; tradeDate?: string; days?: number },
+  options: { mode?: RunMode; tradeDate?: string; days?: number; codes?: string[]; count?: number; frequency?: string },
   runner: WorkerRunner<T> = (provider, cmd) => runPythonWorker<T>(provider, cmd, options)
 ): Promise<ProviderAttempt<T>> {
   const runs: DataProviderRun[] = [];
@@ -135,7 +162,11 @@ function isMainBoardCode(code: string): boolean {
   return /^(000|001|002|600|601|603|605)/.test(code);
 }
 
-function runPythonWorker<T>(provider: string, command: WorkerCommand, options: { mode?: RunMode; tradeDate?: string; days?: number }): Promise<WorkerEnvelope<T>> {
+function runPythonWorker<T>(
+  provider: string,
+  command: WorkerCommand,
+  options: { mode?: RunMode; tradeDate?: string; days?: number; codes?: string[]; count?: number; frequency?: string }
+): Promise<WorkerEnvelope<T>> {
   return new Promise((resolve, reject) => {
     const worker = process.env.AKSHARE_WORKER ?? "python/akshare_worker.py";
     const workerPath = path.isAbsolute(worker) ? worker : path.join(repoRoot, worker);
@@ -144,6 +175,9 @@ function runPythonWorker<T>(provider: string, command: WorkerCommand, options: {
     if (options.mode) args.push("--mode", options.mode);
     if (options.tradeDate) args.push("--trade-date", options.tradeDate);
     if (options.days) args.push("--days", String(options.days));
+    if (options.codes?.length) args.push("--codes", options.codes.join(","));
+    if (options.count) args.push("--count", String(options.count));
+    if (options.frequency) args.push("--frequency", options.frequency);
     if (process.env.ALLOW_SAMPLE_DATA === "true") args.push("--allow-sample");
 
     const child = spawn(pythonBin, args, {

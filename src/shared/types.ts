@@ -3,7 +3,7 @@ export type RunMode = "intraday" | "post_close";
 export type SectorType = "industry" | "concept";
 export type StrategyStyle = "short_term" | "stable" | "custom";
 export type StrategyTemplate = "limit_up_pullback";
-export type MarketDataSource = "akshare" | "akshare_partial" | "efinance" | "baostock" | "tushare" | "provider_chain" | "sample";
+export type MarketDataSource = "akshare" | "akshare_partial" | "efinance" | "easyquotation" | "baostock" | "tushare" | "ashare" | "provider_chain" | "sample";
 export type ReportKind = "morning" | "intraday-selection" | "close";
 
 export interface StrategyDsl {
@@ -90,6 +90,22 @@ export interface DailyBar {
   amount: number;
   pctChange: number;
   turnoverRate: number;
+  provider: string;
+}
+
+export interface MinuteBar {
+  tradeDate: string;
+  tradeTime: string;
+  code: string;
+  name: string;
+  market: Market;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  amount: number;
+  frequency: string;
   provider: string;
 }
 

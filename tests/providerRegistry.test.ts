@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getDailyBarProviders, runProviderFailover, type WorkerEnvelope } from "../src/data/akshareClient.js";
+import { getDailyBarProviders, getDatasetProviders, getMinuteBarProviders, runProviderFailover, type WorkerEnvelope } from "../src/data/akshareClient.js";
 import type { DailyBar } from "../src/shared/types.js";
 
 describe("provider failover", () => {
@@ -56,7 +56,7 @@ describe("provider failover", () => {
       process.env.TUSHARE_TOKEN = "test-token";
       process.env.DAILY_BARS_LIMIT_UP_UNIVERSE = "true";
 
-      expect(getDailyBarProviders()).toEqual(["tushare", "baostock", "efinance", "akshare"]);
+      expect(getDailyBarProviders()).toEqual(["tushare", "baostock", "efinance", "akshare", "ashare"]);
     } finally {
       if (previousToken === undefined) {
         delete process.env.TUSHARE_TOKEN;
@@ -69,5 +69,14 @@ describe("provider failover", () => {
         process.env.DAILY_BARS_LIMIT_UP_UNIVERSE = previousUniverse;
       }
     }
+  });
+
+  it("uses easyquotation as an intraday snapshot fallback only", () => {
+    expect(getDatasetProviders("intraday")).toEqual(["akshare", "efinance", "easyquotation", "baostock"]);
+    expect(getDatasetProviders("post_close")).toEqual(["akshare", "efinance", "baostock"]);
+  });
+
+  it("uses Ashare as the minute bar fallback", () => {
+    expect(getMinuteBarProviders()).toEqual(["ashare"]);
   });
 });

@@ -70,7 +70,27 @@ jobs:
         run: yarn build
 
       - name: Install Python data dependencies
-        run: python3 -m pip install --user akshare pandas efinance baostock yfinance tushare
+        run: python3 -m pip install --user akshare pandas efinance baostock yfinance tushare easyquotation
+
+      - name: Install optional Ashare provider
+        continue-on-error: true
+        working-directory: source
+        run: |
+          mkdir -p .providers
+          python3 - <<'PY'
+          import base64
+          import json
+          import urllib.request
+
+          request = urllib.request.Request(
+              "https://api.github.com/repos/mpquant/Ashare/contents/Ashare.py",
+              headers={"Accept": "application/vnd.github+json"},
+          )
+          with urllib.request.urlopen(request, timeout=30) as response:
+              payload = json.load(response)
+          with open(".providers/Ashare.py", "wb") as file:
+              file.write(base64.b64decode(payload["content"]))
+          PY
 
       - name: Export static market data
         working-directory: source
@@ -81,6 +101,7 @@ jobs:
           DATA_PROVIDER_TIMEOUT_MS: "240000"
           PREVIOUS_STATIC_DATA_DIR: "../previous-main/data"
           TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
+          ASHARE_MODULE_PATH: ".providers/Ashare.py"
 
       - name: Generate scheduled report
         working-directory: source
@@ -101,6 +122,7 @@ jobs:
           DATA_PROVIDER_TIMEOUT_MS: "240000"
           PREVIOUS_STATIC_DATA_DIR: "../previous-main/data"
           TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
+          ASHARE_MODULE_PATH: ".providers/Ashare.py"
           INTRADAY_STRATEGY_PROMPT: ${{ vars.INTRADAY_STRATEGY_PROMPT }}
           HERMES_ANALYSIS_COMMAND: ${{ vars.HERMES_ANALYSIS_COMMAND }}
           FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
