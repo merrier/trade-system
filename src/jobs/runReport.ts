@@ -10,7 +10,8 @@ const outputRoot = path.resolve(process.cwd(), "dist-web", "data");
 const previousRoot = path.resolve(process.cwd(), process.env.PREVIOUS_STATIC_DATA_DIR ?? "data");
 const kind = (process.argv.find((arg) => arg.startsWith("--kind="))?.split("=")[1] ?? "close") as ReportKind | "all";
 const tradeDate = process.argv.find((arg) => arg.startsWith("--trade-date="))?.split("=")[1];
-const strategyPrompt = process.argv.find((arg) => arg.startsWith("--strategy-prompt="))?.slice("--strategy-prompt=".length) ?? defaultStrategyPrompt;
+const strategyArg = process.argv.find((arg) => arg.startsWith("--strategy-prompt="))?.slice("--strategy-prompt=".length).trim();
+const strategyPrompt = strategyArg || defaultStrategyPrompt;
 const forceNonTrading = process.env.FORCE_REPORT_ON_NON_TRADING_DAY === "true" || process.argv.includes("--force-non-trading");
 
 const kinds: ReportKind[] = kind === "all" ? ["morning", "intraday-selection", "close"] : [kind];

@@ -78,6 +78,7 @@ jobs:
         env:
           PYTHON_BIN: python3
           ALLOW_SAMPLE_DATA: "false"
+          DATA_PROVIDER_TIMEOUT_MS: "240000"
           PREVIOUS_STATIC_DATA_DIR: "../previous-main/data"
 
       - name: Generate scheduled report
@@ -96,6 +97,7 @@ jobs:
         env:
           PYTHON_BIN: python3
           ALLOW_SAMPLE_DATA: "false"
+          DATA_PROVIDER_TIMEOUT_MS: "240000"
           PREVIOUS_STATIC_DATA_DIR: "../previous-main/data"
           INTRADAY_STRATEGY_PROMPT: ${{ vars.INTRADAY_STRATEGY_PROMPT }}
           HERMES_ANALYSIS_COMMAND: ${{ vars.HERMES_ANALYSIS_COMMAND }}

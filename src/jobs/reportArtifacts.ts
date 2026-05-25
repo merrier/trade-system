@@ -5,7 +5,7 @@ import { buildCloseReport, buildIntradaySelectionReport, buildMorningReport, val
 import { LIMIT_UP_PULLBACK_PROMPT } from "../core/defaults.js";
 import type { DailyBar, ReportArtifact, ReportKind } from "../shared/types.js";
 
-export const defaultStrategyPrompt = process.env.INTRADAY_STRATEGY_PROMPT ?? LIMIT_UP_PULLBACK_PROMPT;
+export const defaultStrategyPrompt = process.env.INTRADAY_STRATEGY_PROMPT?.trim() || LIMIT_UP_PULLBACK_PROMPT;
 
 export async function buildReport(
   kind: ReportKind,
