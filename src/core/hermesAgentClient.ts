@@ -33,7 +33,7 @@ export class HermesAgentClient {
     }
   }
 
-  async deliver(artifact: { kind: string; pushMessage: string; id: string }): Promise<string[]> {
+  async deliver(artifact: { kind: string; pushMessage: string; id: string; tradeDate?: string }): Promise<string[]> {
     const warnings: string[] = [];
     const feishuWebhookUrl = process.env.FEISHU_WEBHOOK_URL || process.env.HERMES_FEISHU_WEBHOOK_URL;
     if (feishuWebhookUrl) {

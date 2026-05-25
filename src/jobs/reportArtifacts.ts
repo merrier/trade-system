@@ -41,6 +41,6 @@ export async function readReportArtifact(dataRoot: string, kind: ReportKind): Pr
 
 export async function deliverReport(report: ReportArtifact): Promise<ReportArtifact> {
   const hermes = new HermesAgentClient();
-  const deliveryWarnings = await hermes.deliver({ kind: report.kind, pushMessage: report.pushMessage, id: report.id });
+  const deliveryWarnings = await hermes.deliver({ kind: report.kind, pushMessage: report.pushMessage, id: report.id, tradeDate: report.tradeDate });
   return deliveryWarnings.length ? { ...report, warnings: [...new Set([...report.warnings, ...deliveryWarnings])] } : report;
 }

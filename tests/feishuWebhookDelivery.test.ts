@@ -46,8 +46,9 @@ describe("feishu webhook delivery", () => {
 
   it("builds a signed message request for relay webhooks", () => {
     const artifact = {
-      id: "intraday-selection-20260522",
+      id: "intraday-selection-2026-05-26",
       kind: "intraday-selection",
+      tradeDate: "2026-05-26",
       pushMessage: "# 14:50 主板选股 20260522\n\n## 推荐排名\n- **1. 603090 宏盛股份**：47 分"
     };
     const request = buildFeishuWebhookRequest(artifact, {
@@ -55,13 +56,31 @@ describe("feishu webhook delivery", () => {
       secret: "relay-secret"
     });
     const expectedBody = JSON.stringify({
-      title: "14:50 主板选股 20260522",
+      title: "2026-05-26 盘中选股",
       content: "## 推荐排名\n- **1. 603090 宏盛股份**：47 分"
     });
 
     expect(request.body).toBe(expectedBody);
     expect(request.headers["Content-Type"]).toBe("application/json");
     expect(request.headers["X-Hub-Signature-256"]).toBe(signHubWebhook(expectedBody, "relay-secret"));
+  });
+
+  it("uses a date and report type title for morning relay messages", () => {
+    const request = buildFeishuWebhookRequest(
+      {
+        id: "morning-20260526",
+        kind: "morning",
+        pushMessage: "# A股晨报 20260526\n\n## 核心摘要\n外盘线索已更新。"
+      },
+      {
+        webhookUrl: "https://relay.example.invalid/webhooks/feishu-group"
+      }
+    );
+
+    expect(JSON.parse(request.body)).toEqual({
+      title: "2026-05-26 早报",
+      content: "## 核心摘要\n外盘线索已更新。"
+    });
   });
 
   it("signs payloads when a webhook secret is configured", () => {

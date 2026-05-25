@@ -3,6 +3,7 @@ import { createHmac } from "node:crypto";
 export interface FeishuWebhookArtifact {
   id: string;
   kind: string;
+  tradeDate?: string;
   pushMessage: string;
 }
 
@@ -46,7 +47,7 @@ export async function deliverFeishuWebhook(artifact: FeishuWebhookArtifact, opti
 export function buildFeishuWebhookRequest(artifact: FeishuWebhookArtifact, options: FeishuWebhookOptions): { headers: Record<string, string>; body: string } {
   const mode = resolveWebhookMode(options);
   if (mode === "signed-message") {
-    const message = splitTitleAndContent(withKeyword(artifact.pushMessage, options.keyword), artifact.kind);
+    const message = buildSignedMessagePayload(artifact, options);
     const body = JSON.stringify(message);
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     const secret = options.secret?.trim();
@@ -119,18 +120,53 @@ function titleFromMarkdown(markdown: string): string | null {
   return firstHeading?.replace(/^#\s+/, "").trim() || null;
 }
 
-function splitTitleAndContent(markdown: string, kind: string): { title: string; content: string } {
+function buildSignedMessagePayload(artifact: FeishuWebhookArtifact, options: FeishuWebhookOptions): { title: string; content: string } {
+  const markdown = withKeyword(artifact.pushMessage, options.keyword);
+  return {
+    title: deliveryTitle(artifact, options.now),
+    content: stripFirstHeading(markdown)
+  };
+}
+
+function stripFirstHeading(markdown: string): string {
   const lines = markdown.trim().split(/\r?\n/);
   const headingIndex = lines.findIndex((line) => /^#\s+/.test(line.trim()));
   if (headingIndex >= 0) {
-    const title = lines[headingIndex].trim().replace(/^#\s+/, "").trim();
     const content = [...lines.slice(0, headingIndex), ...lines.slice(headingIndex + 1)].join("\n").trim();
-    return { title, content: content || title };
+    return content || "报告已生成。";
   }
-  return {
-    title: `trade-system ${kind}`,
-    content: markdown.trim() || "报告已生成。"
-  };
+  return markdown.trim() || "报告已生成。";
+}
+
+function deliveryTitle(artifact: FeishuWebhookArtifact, now?: Date): string {
+  const tradeDate = normalizeTradeDate(artifact.tradeDate) ?? normalizeTradeDate(artifact.id) ?? formatLocalDate(now ?? new Date());
+  return `${tradeDate} ${deliveryKindName(artifact.kind)}`;
+}
+
+function deliveryKindName(kind: string): string {
+  if (kind === "morning") return "早报";
+  if (kind === "intraday-selection") return "盘中选股";
+  if (kind === "close") return "收盘复盘";
+  return kind;
+}
+
+function normalizeTradeDate(input?: string): string | null {
+  if (!input) return null;
+  const dashed = input.match(/\d{4}-\d{2}-\d{2}/)?.[0];
+  if (dashed) return dashed;
+  const compact = input.match(/\d{8}/)?.[0];
+  if (compact) return `${compact.slice(0, 4)}-${compact.slice(4, 6)}-${compact.slice(6, 8)}`;
+  return null;
+}
+
+function formatLocalDate(date: Date): string {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+  return formatter.format(date);
 }
 
 function withKeyword(markdown: string, keyword?: string): string {
