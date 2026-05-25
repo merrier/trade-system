@@ -46,7 +46,8 @@ export async function deliverFeishuWebhook(artifact: FeishuWebhookArtifact, opti
 export function buildFeishuWebhookRequest(artifact: FeishuWebhookArtifact, options: FeishuWebhookOptions): { headers: Record<string, string>; body: string } {
   const mode = resolveWebhookMode(options);
   if (mode === "signed-message") {
-    const body = JSON.stringify({ message: withKeyword(artifact.pushMessage, options.keyword) });
+    const message = splitTitleAndContent(withKeyword(artifact.pushMessage, options.keyword), artifact.kind);
+    const body = JSON.stringify(message);
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     const secret = options.secret?.trim();
     if (secret) {
@@ -116,6 +117,20 @@ function resolveWebhookMode(options: FeishuWebhookOptions): "feishu-card" | "sig
 function titleFromMarkdown(markdown: string): string | null {
   const firstHeading = markdown.split(/\r?\n/).find((line) => /^#\s+/.test(line.trim()));
   return firstHeading?.replace(/^#\s+/, "").trim() || null;
+}
+
+function splitTitleAndContent(markdown: string, kind: string): { title: string; content: string } {
+  const lines = markdown.trim().split(/\r?\n/);
+  const headingIndex = lines.findIndex((line) => /^#\s+/.test(line.trim()));
+  if (headingIndex >= 0) {
+    const title = lines[headingIndex].trim().replace(/^#\s+/, "").trim();
+    const content = [...lines.slice(0, headingIndex), ...lines.slice(headingIndex + 1)].join("\n").trim();
+    return { title, content: content || title };
+  }
+  return {
+    title: `trade-system ${kind}`,
+    content: markdown.trim() || "报告已生成。"
+  };
 }
 
 function withKeyword(markdown: string, keyword?: string): string {

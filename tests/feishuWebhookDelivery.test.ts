@@ -48,13 +48,16 @@ describe("feishu webhook delivery", () => {
     const artifact = {
       id: "intraday-selection-20260522",
       kind: "intraday-selection",
-      pushMessage: "# 14:50 主板选股 20260522"
+      pushMessage: "# 14:50 主板选股 20260522\n\n## 推荐排名\n- **1. 603090 宏盛股份**：47 分"
     };
     const request = buildFeishuWebhookRequest(artifact, {
       webhookUrl: "https://relay.example.invalid/webhooks/feishu-group",
       secret: "relay-secret"
     });
-    const expectedBody = JSON.stringify({ message: artifact.pushMessage });
+    const expectedBody = JSON.stringify({
+      title: "14:50 主板选股 20260522",
+      content: "## 推荐排名\n- **1. 603090 宏盛股份**：47 分"
+    });
 
     expect(request.body).toBe(expectedBody);
     expect(request.headers["Content-Type"]).toBe("application/json");
