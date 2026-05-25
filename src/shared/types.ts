@@ -33,6 +33,7 @@ export interface StrategyDsl {
     requireBearishCandle?: boolean;
     requireHoldLimitUpPrice?: boolean;
     requireAboveMa?: "ma5_or_ma10";
+    maxMaDistancePct?: number;
     requireVolumeContraction?: boolean;
     maxTwentyDayGainPct?: number;
     requireBullishMaAlignment?: boolean;

@@ -40,18 +40,20 @@ describe("ranking", () => {
       source: "sample",
       warnings: [],
       stocks: [
-        stock("600001", "缩量回调", 11.8, 120_000_000),
-        stock("600002", "放量回调", 11.8, 120_000_000),
-        stock("600003", "涨幅过热", 11.8, 120_000_000)
+        stock("600001", "缩量回调", 11.6, 120_000_000),
+        stock("600002", "放量回调", 11.6, 120_000_000),
+        stock("600003", "涨幅过热", 11.6, 120_000_000),
+        stock("600004", "离均线过远", 12.8, 120_000_000)
       ],
       limitUps: [],
       dragonTiger: [],
       sectors: []
     };
     const bars = [
-      ...pullbackBars("600001", 800),
-      ...pullbackBars("600002", 1500),
-      ...pullbackBars("600003", 800, { firstClose: 8.8 })
+      ...pullbackBars("600001", 800, { currentClose: 11.6 }),
+      ...pullbackBars("600002", 1500, { currentClose: 11.6 }),
+      ...pullbackBars("600003", 800, { firstClose: 8.8, currentClose: 11.6 }),
+      ...pullbackBars("600004", 800, { firstClose: 10.3, currentOpen: 13.2, currentClose: 12.8, currentLow: 12.7 })
     ];
 
     const results = rankStocks(dataset, createLimitUpPullbackStrategy(["main"]), "intraday", { dailyBars: bars });
@@ -59,8 +61,10 @@ describe("ranking", () => {
     expect(results.map((item) => item.code)).toEqual(["600001"]);
     expect(results[0].factors.pullbackMatch).toBeGreaterThan(70);
     expect(results[0].factors.twentyDayGain).toBeLessThanOrEqual(25);
+    expect(results[0].factors.maDistancePct).toBeLessThanOrEqual(3);
     expect(results[0].factors.bullishMaAlignment).toBe(100);
     expect(results[0].reasons.join(" ")).toContain("阴线缩量");
+    expect(results[0].reasons.join(" ")).toContain("贴近");
     expect(results[0].reasons.join(" ")).toContain("均线多头排列");
   });
 });
@@ -86,7 +90,7 @@ function stock(code: string, name: string, close: number, turnoverAmount: number
   };
 }
 
-function pullbackBars(code: string, currentVolume: number, options: { firstClose?: number } = {}): DailyBar[] {
+function pullbackBars(code: string, currentVolume: number, options: { firstClose?: number; currentOpen?: number; currentClose?: number; currentLow?: number } = {}): DailyBar[] {
   const dates = [
     "20260422",
     "20260423",
@@ -113,15 +117,15 @@ function pullbackBars(code: string, currentVolume: number, options: { firstClose
     const isLimitUp = tradeDate === "20260515";
     const isCurrent = tradeDate === "20260522";
     const trendClose = options.firstClose !== undefined && index === 0 ? options.firstClose : 10 + index * 0.08;
-    const close = isLimitUp ? 11.2 : isCurrent ? 11.8 : trendClose;
+    const close = isLimitUp ? 11.2 : isCurrent ? options.currentClose ?? 11.8 : trendClose;
     return {
       tradeDate,
       code,
       name: code,
       market: "main" as const,
-      open: isLimitUp ? 10.1 : isCurrent ? 12 : close - 0.02,
-      high: isCurrent ? 12.2 : close + 0.08,
-      low: isCurrent ? 11.3 : close - 0.12,
+      open: isLimitUp ? 10.1 : isCurrent ? options.currentOpen ?? 12 : close - 0.02,
+      high: isCurrent ? Math.max(options.currentOpen ?? 12, close) + 0.2 : close + 0.08,
+      low: isCurrent ? options.currentLow ?? 11.3 : close - 0.12,
       close,
       volume: isCurrent ? currentVolume : tradeDate === "20260521" ? 1200 : 1000,
       amount: 100_000_000,

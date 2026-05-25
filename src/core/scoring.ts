@@ -228,11 +228,21 @@ function evaluateLimitUpPullback(stock: StockSnapshot, dsl: StrategyDsl, dailyBa
   const hasRecentLimitUp = Boolean(recentLimitUp);
   const bearish = !dsl.filters.requireBearishCandle || current.close < current.open;
   const holdsLimitPrice = !dsl.filters.requireHoldLimitUpPrice || Boolean(recentLimitUp && current.low >= recentLimitUp.close);
-  const aboveMa = dsl.filters.requireAboveMa !== "ma5_or_ma10" || current.close >= ma5 || current.close >= ma10;
+  const maProximity = closestMaProximity(current.close, ma5, ma10);
+  const maxMaDistancePct = dsl.filters.maxMaDistancePct;
+  const aboveMa = dsl.filters.requireAboveMa !== "ma5_or_ma10" || Boolean(maProximity);
+  const nearMa = maxMaDistancePct === undefined || Boolean(maProximity && maProximity.distancePct <= maxMaDistancePct);
   const volumeContraction = !dsl.filters.requireVolumeContraction || Boolean(previous && current.volume > 0 && previous.volume > 0 && current.volume < previous.volume);
   const withinTwentyDayGain = maxTwentyDayGainPct === undefined || (twentyDayGainPct !== undefined && twentyDayGainPct <= maxTwentyDayGainPct);
   const bullishMaAlignment = !dsl.filters.requireBullishMaAlignment || Boolean(ma5 > 0 && ma10 > 0 && ma20 > 0 && ma5 > ma10 && ma10 > ma20);
-  const matched = hasRecentLimitUp && bearish && holdsLimitPrice && aboveMa && volumeContraction && withinTwentyDayGain && bullishMaAlignment;
+  const matched = hasRecentLimitUp && bearish && holdsLimitPrice && aboveMa && nearMa && volumeContraction && withinTwentyDayGain && bullishMaAlignment;
+  const maFailure = !aboveMa
+    ? "收盘价未站上5日线或10日线"
+    : !nearMa && maProximity
+      ? `收盘价距${maProximity.label} ${round(maProximity.distancePct)}%，超过附近阈值 ${round(maxMaDistancePct ?? 0)}%`
+      : !nearMa
+        ? "收盘价未贴近5日线或10日线"
+        : "";
 
   if (!matched) {
     return {
@@ -243,7 +253,7 @@ function evaluateLimitUpPullback(stock: StockSnapshot, dsl: StrategyDsl, dailyBa
         !hasRecentLimitUp ? `近${recentDays}个交易日未识别到涨停` : "",
         !bearish ? "今日不是阴线" : "",
         !holdsLimitPrice ? "今日低点已跌破最近涨停价" : "",
-        !aboveMa ? "收盘价未站上5日线或10日线" : "",
+        maFailure,
         !volumeContraction ? "阴线未缩量" : "",
         !withinTwentyDayGain
           ? twentyDayGainPct === undefined
@@ -259,7 +269,10 @@ function evaluateLimitUpPullback(stock: StockSnapshot, dsl: StrategyDsl, dailyBa
   const daysAgo = recentLimitUp ? priorBars.length - priorBars.findIndex((bar) => bar.tradeDate === recentLimitUp.tradeDate) : recentDays;
   const shrinkRatio = previous && previous.volume > 0 ? current.volume / previous.volume : 1;
   const holdDistance = recentLimitUp ? ((current.low - recentLimitUp.close) / recentLimitUp.close) * 100 : 0;
-  const maSupport = Math.max(scale(current.close, Math.min(ma5, ma10) * 0.98, Math.max(ma5, ma10) * 1.06), 0);
+  const maDistancePct = maProximity?.distancePct ?? 99;
+  const maSupport = maxMaDistancePct !== undefined
+    ? clamp(scale(maxMaDistancePct - maDistancePct, 0, maxMaDistancePct), 0, 100)
+    : Math.max(scale(current.close, Math.min(ma5, ma10) * 0.98, Math.max(ma5, ma10) * 1.06), 0);
   const gainRoomScore = maxTwentyDayGainPct === undefined || twentyDayGainPct === undefined
     ? 50
     : clamp(scale(maxTwentyDayGainPct - Math.max(twentyDayGainPct, 0), 0, maxTwentyDayGainPct), 0, 100);
@@ -278,11 +291,18 @@ function evaluateLimitUpPullback(stock: StockSnapshot, dsl: StrategyDsl, dailyBa
   const reasons = [
     `近${recentDays}日内 ${recentLimitUp?.tradeDate} 曾涨停，当前未跌破涨停价 ${round(recentLimitUp?.close ?? 0)}`,
     `今日阴线缩量，成交量为前一交易日 ${round(shrinkRatio * 100)}%`,
-    `收盘价 ${round(current.close)} 站上 ${current.close >= ma5 ? `MA5 ${round(ma5)}` : `MA10 ${round(ma10)}`}`,
+    maProximity
+      ? `收盘价 ${round(current.close)} 站上并贴近 ${maProximity.label} ${round(maProximity.value)}，距离 ${round(maDistancePct)}%`
+      : `收盘价 ${round(current.close)} 站上5日线或10日线`,
     `近20日涨幅 ${round(twentyDayGainPct ?? 0)}%，未超过 ${round(maxTwentyDayGainPct ?? 25)}%`,
     `均线多头排列：MA5 ${round(ma5)} > MA10 ${round(ma10)} > MA20 ${round(ma20)}`
   ];
-  const risks = holdDistance < 1 ? ["距离最近涨停价支撑较近，破位需快速降权"] : [];
+  const risks = [
+    holdDistance < 1 ? "距离最近涨停价支撑较近，破位需快速降权" : "",
+    maxMaDistancePct !== undefined && maDistancePct > maxMaDistancePct * 0.75
+      ? `距离${maProximity?.label ?? "均线"}支撑接近阈值，继续上冲而不回踩会降权`
+      : ""
+  ].filter(Boolean);
 
   return {
     matched,
@@ -294,6 +314,7 @@ function evaluateLimitUpPullback(stock: StockSnapshot, dsl: StrategyDsl, dailyBa
       limitUpRecency: round(clamp(scale(recentDays - daysAgo + 1, 0, recentDays), 0, 100)),
       volumeContraction: round(clamp(scale(1 - shrinkRatio, 0, 0.55), 0, 100)),
       maSupport: round(clamp(maSupport, 0, 100)),
+      maDistancePct: round(maDistancePct),
       twentyDayGain: round(twentyDayGainPct ?? 0),
       bullishMaAlignment: bullishMaAlignment ? 100 : 0
     }
@@ -315,6 +336,21 @@ function groupDailyBars(bars: DailyBar[]): Map<string, DailyBar[]> {
 
 function isLimitUpBar(bar: DailyBar): boolean {
   return bar.pctChange >= 9.8 || (bar.open > 0 && ((bar.close - bar.open) / bar.open) * 100 >= 9.8);
+}
+
+function closestMaProximity(close: number, ma5: number, ma10: number): { label: "MA5" | "MA10"; value: number; distancePct: number } | null {
+  const candidates = [
+    { label: "MA5" as const, value: ma5 },
+    { label: "MA10" as const, value: ma10 }
+  ]
+    .filter((item) => item.value > 0 && close >= item.value)
+    .map((item) => ({
+      ...item,
+      distancePct: ((close - item.value) / item.value) * 100
+    }))
+    .sort((a, b) => a.distancePct - b.distancePct);
+
+  return candidates[0] ?? null;
 }
 
 function movingAverage(bars: DailyBar[], days: number): number {

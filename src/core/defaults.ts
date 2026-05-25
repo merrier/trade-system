@@ -1,7 +1,7 @@
 import type { Market, StrategyDsl, StrategyStyle, WatchTemplate } from "../shared/types.js";
 
 export const DEFAULT_MARKETS: Market[] = ["main"];
-export const LIMIT_UP_PULLBACK_PROMPT = "涨停回调策略：主板股票最近10天内有涨停，今天是阴线，但是没有跌破涨停价，收盘价在五日线或十日线上，阴线缩量，最近20天涨幅不超过25%，均线呈多头排列";
+export const LIMIT_UP_PULLBACK_PROMPT = "涨停回调策略：主板股票最近10天内有涨停，今天是阴线，但是没有跌破涨停价，收盘价回调至五日线或十日线附近且距离不超过3%，阴线缩量，最近20天涨幅不超过25%，均线呈多头排列";
 
 export const DEFAULT_STRATEGY_DSL: StrategyDsl = {
   style: "short_term",
@@ -65,8 +65,8 @@ export function createDefaultStrategy(style: StrategyStyle = "short_term", marke
 export function createLimitUpPullbackStrategy(markets: Market[] = DEFAULT_MARKETS): StrategyDsl {
   const dsl = createDefaultStrategy("short_term", markets);
   dsl.strategyTemplates = ["limit_up_pullback"];
-  dsl.include = ["涨停回调", "10日内涨停", "阴线缩量", "未跌破涨停价", "五日线或十日线支撑", "20日涨幅不过热", "均线多头排列"];
-  dsl.exclude = ["ST", "停牌", "跌破涨停价", "放量阴线", "跌破五日线和十日线", "20日涨幅超过25%", "均线未多头排列"];
+  dsl.include = ["涨停回调", "10日内涨停", "阴线缩量", "未跌破涨停价", "五日线或十日线附近支撑", "20日涨幅不过热", "均线多头排列"];
+  dsl.exclude = ["ST", "停牌", "跌破涨停价", "放量阴线", "跌破五日线和十日线", "距离均线过远", "20日涨幅超过25%", "均线未多头排列"];
   dsl.weights.strategyMatch = 36;
   dsl.weights.limitUpStrength = 16;
   dsl.weights.dragonTiger = 4;
@@ -84,6 +84,7 @@ export function createLimitUpPullbackStrategy(markets: Market[] = DEFAULT_MARKET
   dsl.filters.requireBearishCandle = true;
   dsl.filters.requireHoldLimitUpPrice = true;
   dsl.filters.requireAboveMa = "ma5_or_ma10";
+  dsl.filters.maxMaDistancePct = 3;
   dsl.filters.requireVolumeContraction = true;
   dsl.filters.maxTwentyDayGainPct = 25;
   dsl.filters.requireBullishMaAlignment = true;

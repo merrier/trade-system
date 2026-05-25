@@ -29,6 +29,7 @@ describe("strategy compiler", () => {
     expect(result.dsl.filters.requireBearishCandle).toBe(true);
     expect(result.dsl.filters.requireHoldLimitUpPrice).toBe(true);
     expect(result.dsl.filters.requireAboveMa).toBe("ma5_or_ma10");
+    expect(result.dsl.filters.maxMaDistancePct).toBe(3);
     expect(result.dsl.filters.requireVolumeContraction).toBe(true);
     expect(result.dsl.filters.maxTwentyDayGainPct).toBe(25);
     expect(result.dsl.filters.requireBullishMaAlignment).toBe(true);

@@ -32,6 +32,7 @@ export const strategyDslSchema: z.ZodType<StrategyDsl> = z.object({
     requireBearishCandle: z.boolean().optional(),
     requireHoldLimitUpPrice: z.boolean().optional(),
     requireAboveMa: z.enum(["ma5_or_ma10"]).optional(),
+    maxMaDistancePct: z.number().min(0).max(20).optional(),
     requireVolumeContraction: z.boolean().optional(),
     maxTwentyDayGainPct: z.number().min(0).max(100).optional(),
     requireBullishMaAlignment: z.boolean().optional()
@@ -80,6 +81,12 @@ export function compileStrategyLocally(prompt: string, markets: Market[] = ["mai
   }
   if (/多头排列|均线多头/.test(prompt)) {
     dsl.filters.requireBullishMaAlignment = true;
+  }
+  const maDistanceMatch = prompt.match(/(?:均线|五日线|5日线|十日线|10日线).*?(?:距离|乖离|附近|接近|贴近|靠近|回踩).*?(?:不超过|不要超过|小于|低于|<=|≤|在)?\s*(\d+(?:\.\d+)?)\s*%/);
+  if (maDistanceMatch?.[1]) {
+    dsl.filters.maxMaDistancePct = Number(maDistanceMatch[1]);
+  } else if (/附近|接近|贴近|靠近|回踩/.test(prompt) && /五日线|5日线|十日线|10日线|均线/.test(prompt)) {
+    dsl.filters.maxMaDistancePct ??= 3;
   }
 
   if (normalized.includes("稳健") || normalized.includes("低回撤")) {
