@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { runProviderFailover, type WorkerEnvelope } from "../src/data/akshareClient.js";
+import { getDailyBarProviders, runProviderFailover, type WorkerEnvelope } from "../src/data/akshareClient.js";
 import type { DailyBar } from "../src/shared/types.js";
 
 describe("provider failover", () => {
@@ -47,5 +47,27 @@ describe("provider failover", () => {
         throw new Error(`${provider} unavailable`);
       })
     ).rejects.toThrow("all providers failed");
+  });
+
+  it("uses Tushare first for daily bars when a token is configured", () => {
+    const previousToken = process.env.TUSHARE_TOKEN;
+    const previousUniverse = process.env.DAILY_BARS_LIMIT_UP_UNIVERSE;
+    try {
+      process.env.TUSHARE_TOKEN = "test-token";
+      process.env.DAILY_BARS_LIMIT_UP_UNIVERSE = "true";
+
+      expect(getDailyBarProviders()).toEqual(["tushare", "baostock", "efinance", "akshare"]);
+    } finally {
+      if (previousToken === undefined) {
+        delete process.env.TUSHARE_TOKEN;
+      } else {
+        process.env.TUSHARE_TOKEN = previousToken;
+      }
+      if (previousUniverse === undefined) {
+        delete process.env.DAILY_BARS_LIMIT_UP_UNIVERSE;
+      } else {
+        process.env.DAILY_BARS_LIMIT_UP_UNIVERSE = previousUniverse;
+      }
+    }
   });
 });

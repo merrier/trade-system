@@ -61,11 +61,12 @@ export async function fetchDailyBars(tradeDate?: string, days = 30): Promise<{ b
   };
 }
 
-function getDailyBarProviders(): string[] {
-  if (process.env.DAILY_BARS_LIMIT_UP_UNIVERSE === "true") {
-    return ["baostock", "efinance", "akshare"];
-  }
-  return ["efinance", "akshare", "baostock"];
+export function getDailyBarProviders(): string[] {
+  const baseProviders = process.env.DAILY_BARS_LIMIT_UP_UNIVERSE === "true"
+    ? ["baostock", "efinance", "akshare"]
+    : ["efinance", "akshare", "baostock"];
+  if (process.env.TUSHARE_TOKEN?.trim()) return ["tushare", ...baseProviders];
+  return baseProviders;
 }
 
 export async function fetchUsMarketBrief(): Promise<{ brief: UsMarketBrief; provider: string; warnings: string[]; runs: DataProviderRun[] }> {

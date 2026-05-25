@@ -55,12 +55,18 @@ Workflow 会在北京时间交易日 09:00、14:50、16:00 左右自动运行，
 
 ## 数据源
 
-默认通过 `python/akshare_worker.py` 调用多数据源链路：AKShare/东方财富、efinance、BaoStock，Tushare 预留为可选 token provider。系统默认不允许静默展示 sample 数据；只有设置 `ALLOW_SAMPLE_DATA=true` 时，才会在真实数据源不可用时返回开发演示数据。数据源细节见 `docs/data-sources.md`。
+默认通过 `python/akshare_worker.py` 调用多数据源链路：AKShare/东方财富、efinance、BaoStock；配置 `TUSHARE_TOKEN` 后，Tushare 会优先补 30 天日线滑窗缓存。系统默认不允许静默展示 sample 数据；只有设置 `ALLOW_SAMPLE_DATA=true` 时，才会在真实数据源不可用时返回开发演示数据。数据源细节见 `docs/data-sources.md`。
 
 可选安装：
 
 ```bash
-python3 -m pip install akshare pandas efinance baostock yfinance
+python3 -m pip install akshare pandas efinance baostock yfinance tushare
+```
+
+可选数据源：
+
+```bash
+TUSHARE_TOKEN="..."
 ```
 
 如果 `prisma db push` 在本机 SQLite schema engine 上失败，使用 `npm run db:init` 初始化数据库；运行时仍由 Prisma Client 读写。

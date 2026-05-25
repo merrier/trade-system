@@ -70,7 +70,7 @@ jobs:
         run: yarn build
 
       - name: Install Python data dependencies
-        run: python3 -m pip install --user akshare pandas efinance baostock yfinance
+        run: python3 -m pip install --user akshare pandas efinance baostock yfinance tushare
 
       - name: Export static market data
         working-directory: source
@@ -80,6 +80,7 @@ jobs:
           ALLOW_SAMPLE_DATA: "false"
           DATA_PROVIDER_TIMEOUT_MS: "240000"
           PREVIOUS_STATIC_DATA_DIR: "../previous-main/data"
+          TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
 
       - name: Generate scheduled report
         working-directory: source
@@ -99,6 +100,7 @@ jobs:
           ALLOW_SAMPLE_DATA: "false"
           DATA_PROVIDER_TIMEOUT_MS: "240000"
           PREVIOUS_STATIC_DATA_DIR: "../previous-main/data"
+          TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
           INTRADAY_STRATEGY_PROMPT: ${{ vars.INTRADAY_STRATEGY_PROMPT }}
           HERMES_ANALYSIS_COMMAND: ${{ vars.HERMES_ANALYSIS_COMMAND }}
           FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}

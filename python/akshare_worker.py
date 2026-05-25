@@ -385,6 +385,8 @@ def derive_sectors_from_limit_ups(trade_date: str, stocks: list, limit_ups: list
 
 
 def daily_bars(provider: str, trade_date: str, days: int) -> list[dict]:
+    if provider == "tushare":
+        return tushare_daily_bars(trade_date, days)
     if provider == "efinance":
         return efinance_daily_bars(trade_date, days)
     if provider == "akshare":
@@ -451,6 +453,99 @@ def efinance_daily_bars(trade_date: str, days: int) -> list[dict]:
     if not bars:
         raise RuntimeError("efinance returned no daily bars")
     return bars
+
+
+def tushare_daily_bars(trade_date: str, days: int) -> list[dict]:
+    token = os.environ.get("TUSHARE_TOKEN", "").strip()
+    if not token:
+        raise RuntimeError("TUSHARE_TOKEN is not configured")
+
+    import tushare as ts
+
+    pro = ts.pro_api(token)
+    start = (datetime.strptime(trade_date, "%Y%m%d") - timedelta(days=max(45, days * 2))).strftime("%Y%m%d")
+    try:
+        calendar = pro.trade_cal(exchange="", start_date=start, end_date=trade_date, is_open="1", fields="cal_date,is_open")
+    except Exception:
+        calendar = None
+    if calendar is not None and not getattr(calendar, "empty", True):
+        trade_dates = sorted(str(row.get("cal_date", "")).strip() for _, row in calendar.iterrows() if str(row.get("cal_date", "")).strip())
+        trade_dates = trade_dates[-days:] or recent_weekday_dates(trade_date, days)
+    else:
+        trade_dates = recent_weekday_dates(trade_date, days)
+
+    names = tushare_code_names(pro)
+    bars: list[dict] = []
+    for day in trade_dates:
+        df = pro.daily(
+            trade_date=day,
+            fields="ts_code,trade_date,open,high,low,close,pct_chg,vol,amount",
+        )
+        if df is None or getattr(df, "empty", True):
+            continue
+        turnover_rates = tushare_turnover_rates(pro, day)
+        for _, row in df.iterrows():
+            ts_code = str(row.get("ts_code", "")).strip()
+            code = ts_code.split(".")[0]
+            if not code or not is_main_board(code):
+                continue
+            bars.append(
+                {
+                    "tradeDate": str(row.get("trade_date", day)).strip(),
+                    "code": code,
+                    "name": names.get(code, code),
+                    "market": market_from_code(code),
+                    "open": number(row.get("open", 0)),
+                    "high": number(row.get("high", 0)),
+                    "low": number(row.get("low", 0)),
+                    "close": number(row.get("close", 0)),
+                    "volume": number(row.get("vol", 0)) * 100,
+                    "amount": number(row.get("amount", 0)) * 1000,
+                    "pctChange": number(row.get("pct_chg", 0)),
+                    "turnoverRate": turnover_rates.get(ts_code, 0),
+                    "provider": "tushare",
+                }
+            )
+    if not bars:
+        raise RuntimeError("Tushare returned no daily bars")
+    return bars
+
+
+def recent_weekday_dates(trade_date: str, days: int) -> list[str]:
+    current = datetime.strptime(trade_date, "%Y%m%d")
+    dates: list[str] = []
+    for offset in range(0, max(45, days * 3)):
+        day = current - timedelta(days=offset)
+        if day.weekday() < 5:
+            dates.append(yyyymmdd(day))
+        if len(dates) >= days:
+            break
+    return sorted(dates)
+
+
+def tushare_code_names(pro: Any) -> dict[str, str]:
+    try:
+        df = pro.stock_basic(exchange="", list_status="L", fields="ts_code,symbol,name")
+    except Exception:
+        return {}
+    if df is None or getattr(df, "empty", True):
+        return {}
+    names: dict[str, str] = {}
+    for _, row in df.iterrows():
+        code = str(row.get("symbol", "")).strip()
+        if code and is_main_board(code):
+            names[code] = str(row.get("name", code) or code)
+    return names
+
+
+def tushare_turnover_rates(pro: Any, trade_date: str) -> dict[str, float]:
+    try:
+        df = pro.daily_basic(trade_date=trade_date, fields="ts_code,turnover_rate")
+    except Exception:
+        return {}
+    if df is None or getattr(df, "empty", True):
+        return {}
+    return {str(row.get("ts_code", "")).strip(): number(row.get("turnover_rate", 0)) for _, row in df.iterrows()}
 
 
 def akshare_daily_bars(trade_date: str, days: int) -> list[dict]:

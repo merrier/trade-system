@@ -11,7 +11,9 @@
 | 1 | [AKShare](https://akshare.akfamily.xyz/data/stock/stock.html) / 东方财富 | 实时快照、涨停池、板块资金流、历史日线 | open、close、volume、amount、pctChange、turnoverRate、涨停梯队、板块 | 非关键接口失败时保留部分数据并写入 warning；关键接口失败切下个源 |
 | 2 | [efinance](https://github.com/Micro-sheep/efinance) | 实时行情兜底 | 最新价、涨跌幅、成交额、换手率 | 不提供完整连板/龙虎榜时写 warning，继续用于盘中选股 |
 | 3 | [BaoStock](http://baostock.com/baostock/index.php/Python_API%E6%96%87%E6%A1%A3) | 历史日线兜底 | open、high、low、close、volume、amount、pctChange、turnoverRate | 主要用于 30 天滑窗缓存补历史 |
-| 可选 | [Tushare](https://tushare.pro/document/2) | 后续 token 源 | 日线、基础信息、资金流、指数 | 通过 token provider 接入，未配置时不参与默认链路 |
+| 可选优先 | [Tushare](https://tushare.pro/document/2) | 30 天日线滑窗缓存 | open、high、low、close、volume、amount、pctChange、turnoverRate、股票中文名 | 配置 `TUSHARE_TOKEN` 后优先用于 `daily-bars`；未配置时不参与链路 |
+
+Tushare 当前接入 [日线行情接口](https://tushare.pro/document/2?doc_id=27)，用于 14:50 涨停回调策略所需的近 30 个交易日 K 线窗口；实时快照、涨停池和板块热度仍由 AKShare/efinance/BaoStock 链路提供。
 
 ## 外盘晨报
 
