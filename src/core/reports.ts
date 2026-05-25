@@ -102,13 +102,29 @@ async function fetchIntradayDatasetWithDailyBarFallback(tradeDate: string | unde
   try {
     return await fetchMarketDataset("intraday", tradeDate);
   } catch (error) {
-    if (!dailyBars.length) throw error;
+    const errorSummary = summarizeProviderError(error);
+    if (!dailyBars.length) {
+      try {
+        const fallback = await fetchMarketDataset("post_close", tradeDate);
+        return {
+          ...fallback,
+          warnings: [
+            `盘中快照源不可用，已使用涨停池/静态市场数据生成盘中降级视图：${errorSummary}`,
+            ...fallback.warnings
+          ]
+        };
+      } catch {
+        throw error;
+      }
+    }
     const resolvedTradeDate = tradeDate ?? dailyBars.at(-1)?.tradeDate ?? currentTradeDate();
+    const availableDates = [...new Set(dailyBars.filter((bar) => bar.tradeDate <= resolvedTradeDate).map((bar) => bar.tradeDate))].sort();
+    const latestDailyBarDate = availableDates.includes(resolvedTradeDate) ? resolvedTradeDate : availableDates.at(-1);
     const latestByCode = new Map<string, DailyBar>();
     for (const bar of dailyBars) {
-      if (bar.tradeDate <= resolvedTradeDate) latestByCode.set(bar.code, bar);
+      if (bar.tradeDate <= (latestDailyBarDate ?? resolvedTradeDate)) latestByCode.set(bar.code, bar);
     }
-    const latestBars = [...latestByCode.values()].filter((bar) => bar.tradeDate === resolvedTradeDate);
+    const latestBars = latestDailyBarDate ? [...latestByCode.values()].filter((bar) => bar.tradeDate === latestDailyBarDate) : [];
     const stocks = latestBars.map((bar) => ({
       code: bar.code,
       name: bar.name,
@@ -132,7 +148,10 @@ async function fetchIntradayDatasetWithDailyBarFallback(tradeDate: string | unde
       tradeDate: resolvedTradeDate,
       dataAsOf: new Date().toISOString(),
       source: "baostock",
-      warnings: [`盘中快照源不可用，已使用日线缓存构造历史回测视图：${error instanceof Error ? error.message : String(error)}`],
+      warnings: [
+        `盘中快照源不可用，已使用日线缓存构造盘中降级视图：${errorSummary}`,
+        latestDailyBarDate && latestDailyBarDate !== resolvedTradeDate ? `日线缓存最新交易日为 ${latestDailyBarDate}，非 ${resolvedTradeDate}。` : ""
+      ].filter(Boolean),
       stocks,
       limitUps: latestBars
         .filter((bar) => bar.pctChange >= 9.8)
@@ -172,6 +191,12 @@ async function fetchIntradayDatasetWithDailyBarFallback(tradeDate: string | unde
       ]
     };
   }
+}
+
+function summarizeProviderError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  const normalized = message.replace(/\s+/g, " ").trim();
+  return normalized.length > 360 ? `${normalized.slice(0, 357)}...` : normalized;
 }
 
 export async function buildCloseReport(hermes = new HermesAgentClient(), tradeDate?: string): Promise<ReportArtifact<CloseReportPayload>> {

@@ -174,7 +174,7 @@ function runPythonWorker<T>(provider: string, command: WorkerCommand, options: {
         return;
       }
       try {
-        resolve(JSON.parse(stdout.trim()) as WorkerEnvelope<T>);
+        resolve(parseWorkerEnvelope<T>(stdout));
       } catch (error) {
         reject(error);
       }
@@ -182,13 +182,30 @@ function runPythonWorker<T>(provider: string, command: WorkerCommand, options: {
   });
 }
 
-function extractWorkerError(stderr: string): string {
-  const firstLine = stderr.trim().split("\n")[0];
-  if (!firstLine) return "";
+function parseWorkerEnvelope<T>(stdout: string): WorkerEnvelope<T> {
+  const trimmed = stdout.trim();
   try {
-    const parsed = JSON.parse(firstLine) as { error?: string };
-    return parsed.error ?? firstLine;
+    return JSON.parse(trimmed) as WorkerEnvelope<T>;
   } catch {
-    return firstLine;
+    const start = trimmed.indexOf("{\"provider\"");
+    const end = trimmed.lastIndexOf("}");
+    if (start >= 0 && end > start) {
+      return JSON.parse(trimmed.slice(start, end + 1)) as WorkerEnvelope<T>;
+    }
+    throw new Error("worker returned non-JSON output");
   }
+}
+
+function extractWorkerError(stderr: string): string {
+  const lines = stderr.trim().split("\n").map((line) => line.trim()).filter(Boolean);
+  for (const line of lines) {
+    if (!line.startsWith("{")) continue;
+    try {
+      const parsed = JSON.parse(line) as { error?: string };
+      if (parsed.error) return parsed.error;
+    } catch {
+      // Ignore non-JSON diagnostic lines from provider libraries.
+    }
+  }
+  return lines.find((line) => !line.includes("NotOpenSSLWarning") && !line.startsWith("warnings.warn(")) ?? lines[0] ?? "";
 }
