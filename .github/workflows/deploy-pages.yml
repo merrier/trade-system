@@ -36,6 +36,7 @@ jobs:
       - name: Checkout dev
         uses: actions/checkout@v4
         with:
+          ref: dev
           path: source
 
       - name: Checkout previous Pages data

@@ -33,6 +33,8 @@ API 默认运行在 `http://localhost:8787`，Web 看板默认运行在 `http://
 
 GitHub Pages 只能托管静态页面，不能运行 Fastify API。当前免费部署模式不需要 `PAGES_API_BASE_URL`，页面会直接读取 `data/*.json`。本地开发仍然通过 Vite proxy 请求 `http://localhost:8787/api`。
 
+仓库默认分支应保持为 `dev`，因为 GitHub Actions 的 `schedule` 只会从默认分支读取 workflow；`main` 只作为 GitHub Pages 静态发布分支。
+
 Workflow 会在北京时间交易日 09:00、14:50、16:00 左右自动运行，也可以在 GitHub Actions 页面手动触发。页面会读取静态镜像：
 
 - `data/reports/morning/latest.json`
