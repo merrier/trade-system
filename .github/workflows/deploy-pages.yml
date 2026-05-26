@@ -132,6 +132,7 @@ jobs:
           FEISHU_WEBHOOK_KEYWORD: ${{ vars.FEISHU_WEBHOOK_KEYWORD }}
           HERMES_DELIVERY_COMMAND: ${{ vars.HERMES_DELIVERY_COMMAND }}
           HERMES_DELIVERY_WEBHOOK_URL: ${{ secrets.HERMES_DELIVERY_WEBHOOK_URL }}
+          SKIP_REPORT_DELIVERY: ${{ github.event_name == 'push' }}
 
       - name: Disable Jekyll
         working-directory: source

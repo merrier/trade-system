@@ -13,6 +13,7 @@ const tradeDate = process.argv.find((arg) => arg.startsWith("--trade-date="))?.s
 const strategyArg = process.argv.find((arg) => arg.startsWith("--strategy-prompt="))?.slice("--strategy-prompt=".length).trim();
 const strategyPrompt = strategyArg || defaultStrategyPrompt;
 const forceNonTrading = process.env.FORCE_REPORT_ON_NON_TRADING_DAY === "true" || process.argv.includes("--force-non-trading");
+const skipDelivery = process.env.SKIP_REPORT_DELIVERY === "true" || process.argv.includes("--skip-delivery");
 
 const kinds: ReportKind[] = kind === "all" ? ["morning", "intraday-selection", "close"] : [kind];
 if (/涨停.*回调|阴线.*缩量/.test(strategyPrompt)) {
@@ -51,9 +52,10 @@ try {
 
 const reports = [];
 for (const reportKind of kinds) {
-  const report = await deliverReport(await buildReport(reportKind, strategyPrompt, tradingDay.tradeDate, { dailyBars: dailyBarsForReport, dailyBarWarnings }));
+  const builtReport = await buildReport(reportKind, strategyPrompt, tradingDay.tradeDate, { dailyBars: dailyBarsForReport, dailyBarWarnings });
+  const report = skipDelivery ? builtReport : await deliverReport(builtReport);
   await writeReportArtifact(outputRoot, report);
   reports.push({ kind: report.kind, tradeDate: report.tradeDate, provider: report.provider, warnings: report.warnings.length });
 }
 
-console.log(JSON.stringify({ tradeDate: tradingDay.tradeDate, reports, cache: cacheSummary }, null, 2));
+console.log(JSON.stringify({ tradeDate: tradingDay.tradeDate, reports, cache: cacheSummary, deliverySkipped: skipDelivery }, null, 2));
