@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "603808",
+    "name": "歌力思",
+    "market": "main",
+    "industry": "服装家纺",
+    "concepts": [],
+    "pctChange": 10.033076286315918,
+    "turnoverAmount": 114680805,
+    "turnoverRate": 3.2725725173950195,
+    "volumeRatio": 1,
+    "close": 9.98,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 49,
+    "code": "603808",
+    "name": "歌力思",
+    "market": "main",
+    "score": 36.94,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 0 次，封单 1.26 亿",
+      "行业：服装家纺"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 40.74,
+      "dragonTiger": 30,
+      "sectorHeat": 48,
+      "moneyFlow": 33.33,
+      "liquidity": 1.81,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603808",
+      "name": "歌力思",
+      "market": "main",
+      "industry": "服装家纺",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "134722",
+      "lastLimitTime": "134722",
+      "openCount": 0,
+      "sealedAmount": 126357778,
+      "turnoverRate": 3.2725725173950195,
+      "pctChange": 10.033076286315918
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "服装家纺",
+      "type": "industry",
+      "pctChange": 10.000132242838541,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 348303776,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "603808",
+      "leaderName": "歌力思",
+      "leaderPctChange": 10.033076286315918,
+      "heatScore": 59.75,
+      "trend": [],
+      "reasons": [
+        "主力净流入 3.48 亿",
+        "3 只涨停",
+        "领涨 歌力思 10.03%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

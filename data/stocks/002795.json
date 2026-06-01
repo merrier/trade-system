@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002795",
+    "name": "永和智控",
+    "market": "main",
+    "industry": "通用设备",
+    "concepts": [],
+    "pctChange": 9.947644233703613,
+    "turnoverAmount": 192440559,
+    "turnoverRate": 5.3557939529418945,
+    "volumeRatio": 1,
+    "close": 8.4,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002795",
+      "name": "永和智控",
+      "market": "main",
+      "industry": "通用设备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093148",
+      "lastLimitTime": "094951",
+      "openCount": 1,
+      "sealedAmount": 130853016,
+      "turnoverRate": 5.3557939529418945,
+      "pctChange": 9.947644233703613
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "通用设备",
+      "type": "industry",
+      "pctChange": 9.968852043151855,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 302112114,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "002795",
+      "leaderName": "永和智控",
+      "leaderPctChange": 9.947644233703613,
+      "heatScore": 56.2,
+      "trend": [],
+      "reasons": [
+        "主力净流入 3.02 亿",
+        "2 只涨停",
+        "领涨 永和智控 9.95%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

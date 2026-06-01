@@ -1,0 +1,93 @@
+{
+  "stock": {
+    "code": "605589",
+    "name": "圣泉集团",
+    "market": "main",
+    "industry": "塑料",
+    "concepts": [],
+    "pctChange": 10.002155303955078,
+    "turnoverAmount": 3159605472,
+    "turnoverRate": 7.51654052734375,
+    "volumeRatio": 1,
+    "close": 51.03,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 38,
+    "code": "605589",
+    "name": "圣泉集团",
+    "market": "main",
+    "score": 40.98,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 3 次，封单 1.47 亿",
+      "行业：塑料"
+    ],
+    "risks": [
+      "涨停开板次数较多，封板稳定性一般"
+    ],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 31.51,
+      "dragonTiger": 30,
+      "sectorHeat": 56,
+      "moneyFlow": 33.33,
+      "liquidity": 100,
+      "riskPenalty": 16
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "605589",
+      "name": "圣泉集团",
+      "market": "main",
+      "industry": "塑料",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "131013",
+      "lastLimitTime": "131443",
+      "openCount": 3,
+      "sealedAmount": 147032841,
+      "turnoverRate": 7.51654052734375,
+      "pctChange": 10.002155303955078
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "塑料",
+      "type": "industry",
+      "pctChange": 9.985501289367676,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3242838599,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "605589",
+      "leaderName": "圣泉集团",
+      "leaderPctChange": 10.002155303955078,
+      "heatScore": 59.97,
+      "trend": [],
+      "reasons": [
+        "主力净流入 32.43 亿",
+        "2 只涨停",
+        "领涨 圣泉集团 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002235",
+    "name": "安妮股份",
+    "market": "main",
+    "industry": "造纸",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 243175154,
+    "turnoverRate": 4.086720943450928,
+    "volumeRatio": 1,
+    "close": 11,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002235",
+      "name": "安妮股份",
+      "market": "main",
+      "industry": "造纸",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093739",
+      "lastLimitTime": "093739",
+      "openCount": 0,
+      "sealedAmount": 173113325,
+      "turnoverRate": 4.086720943450928,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "造纸",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 243175154,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002235",
+      "leaderName": "安妮股份",
+      "leaderPctChange": 10,
+      "heatScore": 52.74,
+      "trend": [],
+      "reasons": [
+        "主力净流入 2.43 亿",
+        "1 只涨停",
+        "领涨 安妮股份 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

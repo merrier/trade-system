@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "002527",
+    "name": "新时达",
+    "market": "main",
+    "industry": "专用设备",
+    "concepts": [],
+    "pctChange": 10.035587310791016,
+    "turnoverAmount": 646959344,
+    "turnoverRate": 8.128091812133789,
+    "volumeRatio": 1,
+    "close": 15.46,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 45,
+    "code": "002527",
+    "name": "新时达",
+    "market": "main",
+    "score": 37.84,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 0 次，封单 2.16 亿",
+      "行业：专用设备"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 44.11,
+      "dragonTiger": 30,
+      "sectorHeat": 36,
+      "moneyFlow": 33.33,
+      "liquidity": 29.53,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002527",
+      "name": "新时达",
+      "market": "main",
+      "industry": "专用设备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "100618",
+      "lastLimitTime": "100618",
+      "openCount": 0,
+      "sealedAmount": 216158859,
+      "turnoverRate": 8.128091812133789,
+      "pctChange": 10.035587310791016
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "专用设备",
+      "type": "industry",
+      "pctChange": 10.013781070709229,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1555203504,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "603011",
+      "leaderName": "合锻智能",
+      "leaderPctChange": 9.991974830627441,
+      "heatScore": 57.82,
+      "trend": [],
+      "reasons": [
+        "主力净流入 15.55 亿",
+        "2 只涨停",
+        "领涨 合锻智能 9.99%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

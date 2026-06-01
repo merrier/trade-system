@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "603991",
+    "name": "领先股份",
+    "market": "main",
+    "industry": "半导体",
+    "concepts": [],
+    "pctChange": 10.004837989807129,
+    "turnoverAmount": 259321170,
+    "turnoverRate": 3.137989044189453,
+    "volumeRatio": 1,
+    "close": 113.69,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603991",
+      "name": "领先股份",
+      "market": "main",
+      "industry": "半导体",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "095613",
+      "lastLimitTime": "095613",
+      "openCount": 0,
+      "sealedAmount": 117009748,
+      "turnoverRate": 3.137989044189453,
+      "pctChange": 10.004837989807129
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "半导体",
+      "type": "industry",
+      "pctChange": 10.004837989807129,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 259321170,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603991",
+      "leaderName": "领先股份",
+      "leaderPctChange": 10.004837989807129,
+      "heatScore": 52.76,
+      "trend": [],
+      "reasons": [
+        "主力净流入 2.59 亿",
+        "1 只涨停",
+        "领涨 领先股份 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

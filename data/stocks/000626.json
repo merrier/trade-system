@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "000626",
+    "name": "远大控股",
+    "market": "main",
+    "industry": "物流",
+    "concepts": [],
+    "pctChange": 10.067113876342773,
+    "turnoverAmount": 102233109,
+    "turnoverRate": 2.5484230518341064,
+    "volumeRatio": 1,
+    "close": 8.2,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "000626",
+      "name": "远大控股",
+      "market": "main",
+      "industry": "物流",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "100739",
+      "lastLimitTime": "100739",
+      "openCount": 0,
+      "sealedAmount": 116634340,
+      "turnoverRate": 2.5484230518341064,
+      "pctChange": 10.067113876342773
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "物流",
+      "type": "industry",
+      "pctChange": 10.067113876342773,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 102233109,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "000626",
+      "leaderName": "远大控股",
+      "leaderPctChange": 10.067113876342773,
+      "heatScore": 52.61,
+      "trend": [],
+      "reasons": [
+        "主力净流入 1.02 亿",
+        "1 只涨停",
+        "领涨 远大控股 10.07%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

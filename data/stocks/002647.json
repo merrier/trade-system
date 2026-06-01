@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002647",
+    "name": "仁东控股",
+    "market": "main",
+    "industry": "多元金融",
+    "concepts": [],
+    "pctChange": 9.965636253356934,
+    "turnoverAmount": 616482896,
+    "turnoverRate": 4.872048377990723,
+    "volumeRatio": 1,
+    "close": 12.8,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002647",
+      "name": "仁东控股",
+      "market": "main",
+      "industry": "多元金融",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "130606",
+      "lastLimitTime": "130606",
+      "openCount": 0,
+      "sealedAmount": 259729920,
+      "turnoverRate": 4.872048377990723,
+      "pctChange": 9.965636253356934
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "多元金融",
+      "type": "industry",
+      "pctChange": 9.965636253356934,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 616482896,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002647",
+      "leaderName": "仁东控股",
+      "leaderPctChange": 9.965636253356934,
+      "heatScore": 53.18,
+      "trend": [],
+      "reasons": [
+        "主力净流入 6.16 亿",
+        "1 只涨停",
+        "领涨 仁东控股 9.97%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

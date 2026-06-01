@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "603533",
+    "name": "掌阅科技",
+    "market": "main",
+    "industry": "数字媒体",
+    "concepts": [],
+    "pctChange": 9.983360290527344,
+    "turnoverAmount": 561523536,
+    "turnoverRate": 4.9426445960998535,
+    "volumeRatio": 1,
+    "close": 26.44,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603533",
+      "name": "掌阅科技",
+      "market": "main",
+      "industry": "数字媒体",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093959",
+      "lastLimitTime": "094432",
+      "openCount": 1,
+      "sealedAmount": 175677936,
+      "turnoverRate": 4.9426445960998535,
+      "pctChange": 9.983360290527344
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "数字媒体",
+      "type": "industry",
+      "pctChange": 9.994108200073242,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1561965920,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "000681",
+      "leaderName": "视觉中国",
+      "leaderPctChange": 10.00485610961914,
+      "heatScore": 57.84,
+      "trend": [],
+      "reasons": [
+        "主力净流入 15.62 亿",
+        "2 只涨停",
+        "领涨 视觉中国 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

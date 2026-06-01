@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002933",
+    "name": "新兴装备",
+    "market": "main",
+    "industry": "航空装备",
+    "concepts": [],
+    "pctChange": 9.992706298828125,
+    "turnoverAmount": 97248717,
+    "turnoverRate": 2.8653371334075928,
+    "volumeRatio": 1,
+    "close": 30.16,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002933",
+      "name": "新兴装备",
+      "market": "main",
+      "industry": "航空装备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "130512",
+      "lastLimitTime": "130512",
+      "openCount": 0,
+      "sealedAmount": 54502136,
+      "turnoverRate": 2.8653371334075928,
+      "pctChange": 9.992706298828125
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "航空装备",
+      "type": "industry",
+      "pctChange": 9.992706298828125,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 97248717,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002933",
+      "leaderName": "新兴装备",
+      "leaderPctChange": 9.992706298828125,
+      "heatScore": 52.55,
+      "trend": [],
+      "reasons": [
+        "主力净流入 0.97 亿",
+        "1 只涨停",
+        "领涨 新兴装备 9.99%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

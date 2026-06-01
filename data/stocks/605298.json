@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "605298",
+    "name": "必得科技",
+    "market": "main",
+    "industry": "轨交设备",
+    "concepts": [],
+    "pctChange": 10.003825187683105,
+    "turnoverAmount": 126550366,
+    "turnoverRate": 1.2134699821472168,
+    "volumeRatio": 1,
+    "close": 57.51,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "605298",
+      "name": "必得科技",
+      "market": "main",
+      "industry": "轨交设备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "104613",
+      "lastLimitTime": "104613",
+      "openCount": 0,
+      "sealedAmount": 88950717,
+      "turnoverRate": 1.2134699821472168,
+      "pctChange": 10.003825187683105
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "轨交设备",
+      "type": "industry",
+      "pctChange": 10.003825187683105,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 126550366,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "605298",
+      "leaderName": "必得科技",
+      "leaderPctChange": 10.003825187683105,
+      "heatScore": 52.59,
+      "trend": [],
+      "reasons": [
+        "主力净流入 1.27 亿",
+        "1 只涨停",
+        "领涨 必得科技 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

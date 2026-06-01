@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "600152",
+    "name": "维科技术",
+    "market": "main",
+    "industry": "电池",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 538807136,
+    "turnoverRate": 8.259369850158691,
+    "volumeRatio": 1,
+    "close": 12.54,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 39,
+    "code": "600152",
+    "name": "维科技术",
+    "market": "main",
+    "score": 40.3,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 1 次，封单 2.35 亿",
+      "行业：电池"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 34.8,
+      "dragonTiger": 30,
+      "sectorHeat": 64,
+      "moneyFlow": 33.33,
+      "liquidity": 23.9,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "600152",
+      "name": "维科技术",
+      "market": "main",
+      "industry": "电池",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093742",
+      "lastLimitTime": "132657",
+      "openCount": 1,
+      "sealedAmount": 234746292,
+      "turnoverRate": 8.259369850158691,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "电池",
+      "type": "industry",
+      "pctChange": 9.995863596598307,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1974297084,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "002580",
+      "leaderName": "圣阳股份",
+      "leaderPctChange": 10.008237838745117,
+      "heatScore": 61.79,
+      "trend": [],
+      "reasons": [
+        "主力净流入 19.74 亿",
+        "3 只涨停",
+        "领涨 圣阳股份 10.01%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

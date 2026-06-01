@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "000681",
+    "name": "视觉中国",
+    "market": "main",
+    "industry": "数字媒体",
+    "concepts": [],
+    "pctChange": 10.00485610961914,
+    "turnoverAmount": 1000442384,
+    "turnoverRate": 6.658965587615967,
+    "volumeRatio": 1,
+    "close": 22.65,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 37,
+    "code": "000681",
+    "name": "视觉中国",
+    "market": "main",
+    "score": 40.99,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 0 次，封单 3.08 亿",
+      "行业：数字媒体"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 47.57,
+      "dragonTiger": 30,
+      "sectorHeat": 40,
+      "moneyFlow": 33.33,
+      "liquidity": 47.94,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "000681",
+      "name": "视觉中国",
+      "market": "main",
+      "industry": "数字媒体",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093924",
+      "lastLimitTime": "093924",
+      "openCount": 0,
+      "sealedAmount": 308415990,
+      "turnoverRate": 6.658965587615967,
+      "pctChange": 10.00485610961914
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "数字媒体",
+      "type": "industry",
+      "pctChange": 9.994108200073242,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1561965920,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "000681",
+      "leaderName": "视觉中国",
+      "leaderPctChange": 10.00485610961914,
+      "heatScore": 57.84,
+      "trend": [],
+      "reasons": [
+        "主力净流入 15.62 亿",
+        "2 只涨停",
+        "领涨 视觉中国 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

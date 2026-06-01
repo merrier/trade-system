@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "000048",
+    "name": "京基智农",
+    "market": "main",
+    "industry": "养殖业",
+    "concepts": [],
+    "pctChange": 9.968101501464844,
+    "turnoverAmount": 106616118,
+    "turnoverRate": 1.5050104856491089,
+    "volumeRatio": 1,
+    "close": 13.79,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "000048",
+      "name": "京基智农",
+      "market": "main",
+      "industry": "养殖业",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093745",
+      "lastLimitTime": "093745",
+      "openCount": 0,
+      "sealedAmount": 102202392,
+      "turnoverRate": 1.5050104856491089,
+      "pctChange": 9.968101501464844
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "养殖业",
+      "type": "industry",
+      "pctChange": 9.968101501464844,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 106616118,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "000048",
+      "leaderName": "京基智农",
+      "leaderPctChange": 9.968101501464844,
+      "heatScore": 52.54,
+      "trend": [],
+      "reasons": [
+        "主力净流入 1.07 亿",
+        "1 只涨停",
+        "领涨 京基智农 9.97%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

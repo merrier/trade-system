@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "600798",
+    "name": "宁波海运",
+    "market": "main",
+    "industry": "航运港口",
+    "concepts": [],
+    "pctChange": 10.115607261657715,
+    "turnoverAmount": 256325942,
+    "turnoverRate": 5.704185962677002,
+    "volumeRatio": 1,
+    "close": 3.81,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "600798",
+      "name": "宁波海运",
+      "market": "main",
+      "industry": "航运港口",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "104210",
+      "lastLimitTime": "104425",
+      "openCount": 2,
+      "sealedAmount": 46039796,
+      "turnoverRate": 5.704185962677002,
+      "pctChange": 10.115607261657715
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "航运港口",
+      "type": "industry",
+      "pctChange": 10.115607261657715,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 256325942,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600798",
+      "leaderName": "宁波海运",
+      "leaderPctChange": 10.115607261657715,
+      "heatScore": 52.85,
+      "trend": [],
+      "reasons": [
+        "主力净流入 2.56 亿",
+        "1 只涨停",
+        "领涨 宁波海运 10.12%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

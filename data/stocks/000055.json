@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "000055",
+    "name": "方大集团",
+    "market": "main",
+    "industry": "装修建材",
+    "concepts": [],
+    "pctChange": 10.115607261657715,
+    "turnoverAmount": 103940804,
+    "turnoverRate": 4.0956292152404785,
+    "volumeRatio": 1,
+    "close": 3.81,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "000055",
+      "name": "方大集团",
+      "market": "main",
+      "industry": "装修建材",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093415",
+      "lastLimitTime": "094403",
+      "openCount": 1,
+      "sealedAmount": 88569961,
+      "turnoverRate": 4.0956292152404785,
+      "pctChange": 10.115607261657715
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "装修建材",
+      "type": "industry",
+      "pctChange": 10.057803630828857,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 289463249,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "000055",
+      "leaderName": "方大集团",
+      "leaderPctChange": 10.115607261657715,
+      "heatScore": 56.32,
+      "trend": [],
+      "reasons": [
+        "主力净流入 2.89 亿",
+        "2 只涨停",
+        "领涨 方大集团 10.12%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

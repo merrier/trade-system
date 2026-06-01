@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "000031",
+    "name": "大悦城",
+    "market": "main",
+    "industry": "房地产开",
+    "concepts": [],
+    "pctChange": 9.961685180664062,
+    "turnoverAmount": 147062178,
+    "turnoverRate": 1.234259009361267,
+    "volumeRatio": 1,
+    "close": 2.87,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 43,
+    "code": "000031",
+    "name": "大悦城",
+    "market": "main",
+    "score": 38.21,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 0 次，封单 1.67 亿",
+      "行业：房地产开"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 42.27,
+      "dragonTiger": 30,
+      "sectorHeat": 52,
+      "moneyFlow": 33.33,
+      "liquidity": 3.49,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "000031",
+      "name": "大悦城",
+      "market": "main",
+      "industry": "房地产开",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "095230",
+      "lastLimitTime": "095230",
+      "openCount": 0,
+      "sealedAmount": 167088817,
+      "turnoverRate": 1.234259009361267,
+      "pctChange": 9.961685180664062
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "房地产开",
+      "type": "industry",
+      "pctChange": 10.064215977986654,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 406772309,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "000031",
+      "leaderName": "大悦城",
+      "leaderPctChange": 9.961685180664062,
+      "heatScore": 59.77,
+      "trend": [],
+      "reasons": [
+        "主力净流入 4.07 亿",
+        "3 只涨停",
+        "领涨 大悦城 9.96%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

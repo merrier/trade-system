@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002700",
+    "name": "万憬能源",
+    "market": "main",
+    "industry": "燃气Ⅱ",
+    "concepts": [],
+    "pctChange": 10.043041229248047,
+    "turnoverAmount": 179455251,
+    "turnoverRate": 11.155269622802734,
+    "volumeRatio": 1,
+    "close": 7.67,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002700",
+      "name": "万憬能源",
+      "market": "main",
+      "industry": "燃气Ⅱ",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "132954",
+      "lastLimitTime": "132954",
+      "openCount": 0,
+      "sealedAmount": 127470031,
+      "turnoverRate": 11.155269622802734,
+      "pctChange": 10.043041229248047
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "燃气Ⅱ",
+      "type": "industry",
+      "pctChange": 9.961640357971191,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 340153308,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "002700",
+      "leaderName": "万憬能源",
+      "leaderPctChange": 10.043041229248047,
+      "heatScore": 56.32,
+      "trend": [],
+      "reasons": [
+        "主力净流入 3.4 亿",
+        "2 只涨停",
+        "领涨 万憬能源 10.04%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "600981",
+    "name": "苏豪汇鸿",
+    "market": "main",
+    "industry": "贸易Ⅱ",
+    "concepts": [],
+    "pctChange": 10.12145709991455,
+    "turnoverAmount": 68280346,
+    "turnoverRate": 1.1639955043792725,
+    "volumeRatio": 1,
+    "close": 2.72,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "600981",
+      "name": "苏豪汇鸿",
+      "market": "main",
+      "industry": "贸易Ⅱ",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "095559",
+      "lastLimitTime": "095559",
+      "openCount": 0,
+      "sealedAmount": 102128656,
+      "turnoverRate": 1.1639955043792725,
+      "pctChange": 10.12145709991455
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "贸易Ⅱ",
+      "type": "industry",
+      "pctChange": 10.12145709991455,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 68280346,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600981",
+      "leaderName": "苏豪汇鸿",
+      "leaderPctChange": 10.12145709991455,
+      "heatScore": 52.61,
+      "trend": [],
+      "reasons": [
+        "主力净流入 0.68 亿",
+        "1 只涨停",
+        "领涨 苏豪汇鸿 10.12%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

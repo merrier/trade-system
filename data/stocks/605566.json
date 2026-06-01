@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "605566",
+    "name": "福莱蒽特",
+    "market": "main",
+    "industry": "化学制品",
+    "concepts": [],
+    "pctChange": 10.013175010681152,
+    "turnoverAmount": 433877616,
+    "turnoverRate": 7.979184150695801,
+    "volumeRatio": 1,
+    "close": 41.75,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "605566",
+      "name": "福莱蒽特",
+      "market": "main",
+      "industry": "化学制品",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "094822",
+      "lastLimitTime": "104149",
+      "openCount": 5,
+      "sealedAmount": 104200777,
+      "turnoverRate": 7.979184150695801,
+      "pctChange": 10.013175010681152
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "化学制品",
+      "type": "industry",
+      "pctChange": 10.011340856552124,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 4021778340,
+      "companyCount": 4,
+      "limitUpCount": 4,
+      "leaderCode": "600160",
+      "leaderName": "巨化股份",
+      "leaderPctChange": 9.993943214416504,
+      "heatScore": 67.81,
+      "trend": [],
+      "reasons": [
+        "主力净流入 40.22 亿",
+        "4 只涨停",
+        "领涨 巨化股份 9.99%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

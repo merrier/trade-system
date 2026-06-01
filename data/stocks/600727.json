@@ -1,0 +1,92 @@
+{
+  "stock": {
+    "code": "600727",
+    "name": "鲁北化工",
+    "market": "main",
+    "industry": "化学原料",
+    "concepts": [],
+    "pctChange": 9.950248718261719,
+    "turnoverAmount": 337002016,
+    "turnoverRate": 7.390847682952881,
+    "volumeRatio": 1,
+    "close": 8.84,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 40,
+    "code": "600727",
+    "name": "鲁北化工",
+    "market": "main",
+    "score": 40.14,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 2 次，封单 0.72 亿",
+      "所属板块热度高，板块分 76",
+      "行业：化学原料"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 28.7,
+      "dragonTiger": 30,
+      "sectorHeat": 76,
+      "moneyFlow": 33.33,
+      "liquidity": 13.39,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "600727",
+      "name": "鲁北化工",
+      "market": "main",
+      "industry": "化学原料",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "102504",
+      "lastLimitTime": "103046",
+      "openCount": 2,
+      "sealedAmount": 71961065,
+      "turnoverRate": 7.390847682952881,
+      "pctChange": 9.950248718261719
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "化学原料",
+      "type": "industry",
+      "pctChange": 9.99506950378418,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1619517296,
+      "companyCount": 4,
+      "limitUpCount": 4,
+      "leaderCode": "000510",
+      "leaderName": "新金路",
+      "leaderPctChange": 10.030029296875,
+      "heatScore": 64.79,
+      "trend": [],
+      "reasons": [
+        "主力净流入 16.2 亿",
+        "4 只涨停",
+        "领涨 新金路 10.03%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

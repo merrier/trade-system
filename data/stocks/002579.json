@@ -1,0 +1,93 @@
+{
+  "stock": {
+    "code": "002579",
+    "name": "中京电子",
+    "market": "main",
+    "industry": "元件",
+    "concepts": [],
+    "pctChange": 10.029153823852539,
+    "turnoverAmount": 3573273344,
+    "turnoverRate": 33.44060134887695,
+    "volumeRatio": 1,
+    "close": 18.87,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 47,
+    "code": "002579",
+    "name": "中京电子",
+    "market": "main",
+    "score": 37.53,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 3 次，封单 2.59 亿",
+      "行业：元件"
+    ],
+    "risks": [
+      "涨停开板次数较多，封板稳定性一般"
+    ],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 35.71,
+      "dragonTiger": 30,
+      "sectorHeat": 32,
+      "moneyFlow": 33.33,
+      "liquidity": 100,
+      "riskPenalty": 16
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002579",
+      "name": "中京电子",
+      "market": "main",
+      "industry": "元件",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "095309",
+      "lastLimitTime": "112851",
+      "openCount": 3,
+      "sealedAmount": 258852999,
+      "turnoverRate": 33.44060134887695,
+      "pctChange": 10.029153823852539
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "元件",
+      "type": "industry",
+      "pctChange": 10.029153823852539,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3573273344,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002579",
+      "leaderName": "中京电子",
+      "leaderPctChange": 10.029153823852539,
+      "heatScore": 56.98,
+      "trend": [],
+      "reasons": [
+        "主力净流入 35.73 亿",
+        "1 只涨停",
+        "领涨 中京电子 10.03%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

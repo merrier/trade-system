@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002629",
+    "name": "仁智股份",
+    "market": "main",
+    "industry": "油服工程",
+    "concepts": [],
+    "pctChange": 9.980806350708008,
+    "turnoverAmount": 148699106,
+    "turnoverRate": 7.4313063621521,
+    "volumeRatio": 1,
+    "close": 5.73,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002629",
+      "name": "仁智股份",
+      "market": "main",
+      "industry": "油服工程",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "100318",
+      "lastLimitTime": "100318",
+      "openCount": 0,
+      "sealedAmount": 103569177,
+      "turnoverRate": 7.4313063621521,
+      "pctChange": 9.980806350708008
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "油服工程",
+      "type": "industry",
+      "pctChange": 9.980806350708008,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 148699106,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002629",
+      "leaderName": "仁智股份",
+      "leaderPctChange": 9.980806350708008,
+      "heatScore": 52.6,
+      "trend": [],
+      "reasons": [
+        "主力净流入 1.49 亿",
+        "1 只涨停",
+        "领涨 仁智股份 9.98%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

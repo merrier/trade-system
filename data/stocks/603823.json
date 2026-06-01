@@ -1,0 +1,94 @@
+{
+  "stock": {
+    "code": "603823",
+    "name": "百合花",
+    "market": "main",
+    "industry": "化学制品",
+    "concepts": [],
+    "pctChange": 9.992162704467773,
+    "turnoverAmount": 540421888,
+    "turnoverRate": 4.679699897766113,
+    "volumeRatio": 1,
+    "close": 28.07,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 42,
+    "code": "603823",
+    "name": "百合花",
+    "market": "main",
+    "score": 38.72,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 4 次，封单 1.02 亿",
+      "所属板块热度高，板块分 80",
+      "行业：化学制品"
+    ],
+    "risks": [
+      "涨停开板次数较多，封板稳定性一般"
+    ],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 29.81,
+      "dragonTiger": 30,
+      "sectorHeat": 80,
+      "moneyFlow": 33.33,
+      "liquidity": 23.98,
+      "riskPenalty": 16
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603823",
+      "name": "百合花",
+      "market": "main",
+      "industry": "化学制品",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093823",
+      "lastLimitTime": "105111",
+      "openCount": 4,
+      "sealedAmount": 101616207,
+      "turnoverRate": 4.679699897766113,
+      "pctChange": 9.992162704467773
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "化学制品",
+      "type": "industry",
+      "pctChange": 10.011340856552124,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 4021778340,
+      "companyCount": 4,
+      "limitUpCount": 4,
+      "leaderCode": "600160",
+      "leaderName": "巨化股份",
+      "leaderPctChange": 9.993943214416504,
+      "heatScore": 67.81,
+      "trend": [],
+      "reasons": [
+        "主力净流入 40.22 亿",
+        "4 只涨停",
+        "领涨 巨化股份 9.99%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

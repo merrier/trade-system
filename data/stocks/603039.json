@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "603039",
+    "name": "泛微网络",
+    "market": "main",
+    "industry": "软件开发",
+    "concepts": [],
+    "pctChange": 9.989082336425781,
+    "turnoverAmount": 487551776,
+    "turnoverRate": 4.073714733123779,
+    "volumeRatio": 1,
+    "close": 40.3,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 30,
+    "code": "603039",
+    "name": "泛微网络",
+    "market": "main",
+    "score": 43.03,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 0 次，封单 2.03 亿",
+      "行业：软件开发"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 43.61,
+      "dragonTiger": 30,
+      "sectorHeat": 68,
+      "moneyFlow": 33.33,
+      "liquidity": 21.23,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603039",
+      "name": "泛微网络",
+      "market": "main",
+      "industry": "软件开发",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "131032",
+      "lastLimitTime": "131032",
+      "openCount": 0,
+      "sealedAmount": 202980501,
+      "turnoverRate": 4.073714733123779,
+      "pctChange": 9.989082336425781
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "软件开发",
+      "type": "industry",
+      "pctChange": 10.03106657663981,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 2036776016,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "600588",
+      "leaderName": "用友网络",
+      "leaderPctChange": 10.028929710388184,
+      "heatScore": 61.89,
+      "trend": [],
+      "reasons": [
+        "主力净流入 20.37 亿",
+        "3 只涨停",
+        "领涨 用友网络 10.03%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

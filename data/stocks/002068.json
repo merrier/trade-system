@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002068",
+    "name": "黑猫股份",
+    "market": "main",
+    "industry": "橡胶",
+    "concepts": [],
+    "pctChange": 10.042283058166504,
+    "turnoverAmount": 309406928,
+    "turnoverRate": 4.204529285430908,
+    "volumeRatio": 1,
+    "close": 10.41,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002068",
+      "name": "黑猫股份",
+      "market": "main",
+      "industry": "橡胶",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "131154",
+      "lastLimitTime": "131154",
+      "openCount": 0,
+      "sealedAmount": 192620185,
+      "turnoverRate": 4.204529285430908,
+      "pctChange": 10.042283058166504
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "橡胶",
+      "type": "industry",
+      "pctChange": 10.042283058166504,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 309406928,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002068",
+      "leaderName": "黑猫股份",
+      "leaderPctChange": 10.042283058166504,
+      "heatScore": 52.85,
+      "trend": [],
+      "reasons": [
+        "主力净流入 3.09 亿",
+        "1 只涨停",
+        "领涨 黑猫股份 10.04%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

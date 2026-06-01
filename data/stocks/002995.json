@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "002995",
+    "name": "天地在线",
+    "market": "main",
+    "industry": "广告营销",
+    "concepts": [],
+    "pctChange": 9.986859321594238,
+    "turnoverAmount": 695349616,
+    "turnoverRate": 25.949485778808594,
+    "volumeRatio": 1,
+    "close": 25.11,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 12,
+    "code": "002995",
+    "name": "天地在线",
+    "market": "main",
+    "score": 47.56,
+    "confidence": 66,
+    "reasons": [
+      "3 连板，开板 0 次，封单 1.1 亿",
+      "行业：广告营销"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 76.13,
+      "dragonTiger": 30,
+      "sectorHeat": 44,
+      "moneyFlow": 33.33,
+      "liquidity": 32.05,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002995",
+      "name": "天地在线",
+      "market": "main",
+      "industry": "广告营销",
+      "concepts": [],
+      "consecutive": 3,
+      "firstLimitTime": "101109",
+      "lastLimitTime": "101109",
+      "openCount": 0,
+      "sealedAmount": 110180169,
+      "turnoverRate": 25.949485778808594,
+      "pctChange": 9.986859321594238
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "广告营销",
+      "type": "industry",
+      "pctChange": 9.986620426177979,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1655821408,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "002995",
+      "leaderName": "天地在线",
+      "leaderPctChange": 9.986859321594238,
+      "heatScore": 57.94,
+      "trend": [],
+      "reasons": [
+        "主力净流入 16.56 亿",
+        "2 只涨停",
+        "领涨 天地在线 9.99%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

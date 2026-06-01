@@ -1,0 +1,92 @@
+{
+  "stock": {
+    "code": "002766",
+    "name": "索菱股份",
+    "market": "main",
+    "industry": "汽车零部",
+    "concepts": [],
+    "pctChange": 9.978307723999023,
+    "turnoverAmount": 281372048,
+    "turnoverRate": 6.715378761291504,
+    "volumeRatio": 1,
+    "close": 5.07,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 35,
+    "code": "002766",
+    "name": "索菱股份",
+    "market": "main",
+    "score": 41.46,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 2 次，封单 0.78 亿",
+      "所属板块热度高，板块分 84",
+      "行业：汽车零部"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 28.91,
+      "dragonTiger": 30,
+      "sectorHeat": 84,
+      "moneyFlow": 33.33,
+      "liquidity": 10.49,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002766",
+      "name": "索菱股份",
+      "market": "main",
+      "industry": "汽车零部",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "094803",
+      "lastLimitTime": "095124",
+      "openCount": 2,
+      "sealedAmount": 77655907,
+      "turnoverRate": 6.715378761291504,
+      "pctChange": 9.978307723999023
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "汽车零部",
+      "type": "industry",
+      "pctChange": 9.997775650024414,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1522671504,
+      "companyCount": 5,
+      "limitUpCount": 5,
+      "leaderCode": "600841",
+      "leaderName": "动力新科",
+      "leaderPctChange": 10.055096626281738,
+      "heatScore": 68.12,
+      "trend": [],
+      "reasons": [
+        "主力净流入 15.23 亿",
+        "5 只涨停",
+        "领涨 动力新科 10.06%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

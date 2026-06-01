@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "600280",
+    "name": "中央商场",
+    "market": "main",
+    "industry": "一般零售",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 287115616,
+    "turnoverRate": 7.349609375,
+    "volumeRatio": 1,
+    "close": 3.52,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "600280",
+      "name": "中央商场",
+      "market": "main",
+      "industry": "一般零售",
+      "concepts": [],
+      "consecutive": 2,
+      "firstLimitTime": "093208",
+      "lastLimitTime": "093423",
+      "openCount": 2,
+      "sealedAmount": 45661792,
+      "turnoverRate": 7.349609375,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "一般零售",
+      "type": "industry",
+      "pctChange": 10.033556938171387,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 419861841,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "600280",
+      "leaderName": "中央商场",
+      "leaderPctChange": 10,
+      "heatScore": 56.39,
+      "trend": [],
+      "reasons": [
+        "主力净流入 4.2 亿",
+        "2 只涨停",
+        "领涨 中央商场 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

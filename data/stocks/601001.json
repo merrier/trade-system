@@ -1,0 +1,92 @@
+{
+  "stock": {
+    "code": "601001",
+    "name": "晋控煤业",
+    "market": "main",
+    "industry": "煤炭开采",
+    "concepts": [],
+    "pctChange": 10.0217866897583,
+    "turnoverAmount": 672224848,
+    "turnoverRate": 2.0738959312438965,
+    "volumeRatio": 1,
+    "close": 20.2,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 17,
+    "code": "601001",
+    "name": "晋控煤业",
+    "market": "main",
+    "score": 46.56,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 0 次，封单 0.95 亿",
+      "所属板块热度高，板块分 88",
+      "行业：煤炭开采"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 39.56,
+      "dragonTiger": 30,
+      "sectorHeat": 88,
+      "moneyFlow": 33.33,
+      "liquidity": 30.85,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "601001",
+      "name": "晋控煤业",
+      "market": "main",
+      "industry": "煤炭开采",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "110314",
+      "lastLimitTime": "110314",
+      "openCount": 0,
+      "sealedAmount": 94918305,
+      "turnoverRate": 2.0738959312438965,
+      "pctChange": 10.0217866897583
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "煤炭开采",
+      "type": "industry",
+      "pctChange": 10.044844245910644,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3214939960,
+      "companyCount": 5,
+      "limitUpCount": 5,
+      "leaderCode": "601101",
+      "leaderName": "昊华能源",
+      "leaderPctChange": 10.033166885375977,
+      "heatScore": 70.24,
+      "trend": [],
+      "reasons": [
+        "主力净流入 32.15 亿",
+        "5 只涨停",
+        "领涨 昊华能源 10.03%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

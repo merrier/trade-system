@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "600539",
+    "name": "狮头股份",
+    "market": "main",
+    "industry": "互联网电",
+    "concepts": [],
+    "pctChange": 10.027472496032715,
+    "turnoverAmount": 358585248,
+    "turnoverRate": 10.259419441223145,
+    "volumeRatio": 1,
+    "close": 16.02,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "600539",
+      "name": "狮头股份",
+      "market": "main",
+      "industry": "互联网电",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "130109",
+      "lastLimitTime": "130109",
+      "openCount": 0,
+      "sealedAmount": 189019980,
+      "turnoverRate": 10.259419441223145,
+      "pctChange": 10.027472496032715
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "互联网电",
+      "type": "industry",
+      "pctChange": 10.027472496032715,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 358585248,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600539",
+      "leaderName": "狮头股份",
+      "leaderPctChange": 10.027472496032715,
+      "heatScore": 52.9,
+      "trend": [],
+      "reasons": [
+        "主力净流入 3.59 亿",
+        "1 只涨停",
+        "领涨 狮头股份 10.03%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

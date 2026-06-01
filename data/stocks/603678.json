@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "603678",
+    "name": "火炬电子",
+    "market": "main",
+    "industry": "军工电子",
+    "concepts": [],
+    "pctChange": 9.991743087768555,
+    "turnoverAmount": 1511117504,
+    "turnoverRate": 6.05941915512085,
+    "volumeRatio": 1,
+    "close": 53.28,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603678",
+      "name": "火炬电子",
+      "market": "main",
+      "industry": "军工电子",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093222",
+      "lastLimitTime": "093640",
+      "openCount": 4,
+      "sealedAmount": 185620913,
+      "turnoverRate": 6.05941915512085,
+      "pctChange": 9.991743087768555
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "军工电子",
+      "type": "industry",
+      "pctChange": 9.991743087768555,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1511117504,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603678",
+      "leaderName": "火炬电子",
+      "leaderPctChange": 9.991743087768555,
+      "heatScore": 54.34,
+      "trend": [],
+      "reasons": [
+        "主力净流入 15.11 亿",
+        "1 只涨停",
+        "领涨 火炬电子 9.99%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

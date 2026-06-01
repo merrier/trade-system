@@ -1,0 +1,92 @@
+{
+  "stock": {
+    "code": "603773",
+    "name": "沃格光电",
+    "market": "main",
+    "industry": "光学光电",
+    "concepts": [],
+    "pctChange": 10.001921653747559,
+    "turnoverAmount": 1328686160,
+    "turnoverRate": 5.216314315795898,
+    "volumeRatio": 1,
+    "close": 114.49,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 5,
+    "code": "603773",
+    "name": "沃格光电",
+    "market": "main",
+    "score": 50.66,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 0 次，封单 5.48 亿",
+      "所属板块热度高，板块分 72",
+      "行业：光学光电"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 56.56,
+      "dragonTiger": 30,
+      "sectorHeat": 72,
+      "moneyFlow": 33.33,
+      "liquidity": 65.04,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603773",
+      "name": "沃格光电",
+      "market": "main",
+      "industry": "光学光电",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093422",
+      "lastLimitTime": "093422",
+      "openCount": 0,
+      "sealedAmount": 548184531,
+      "turnoverRate": 5.216314315795898,
+      "pctChange": 10.001921653747559
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "光学光电",
+      "type": "industry",
+      "pctChange": 9.959209442138672,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 2534725377,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "603773",
+      "leaderName": "沃格光电",
+      "leaderPctChange": 10.001921653747559,
+      "heatScore": 62.5,
+      "trend": [],
+      "reasons": [
+        "主力净流入 25.35 亿",
+        "3 只涨停",
+        "领涨 沃格光电 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

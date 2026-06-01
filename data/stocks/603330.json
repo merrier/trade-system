@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "603330",
+    "name": "天洋新材",
+    "market": "main",
+    "industry": "塑料",
+    "concepts": [],
+    "pctChange": 9.968847274780273,
+    "turnoverAmount": 83233127,
+    "turnoverRate": 2.939199209213257,
+    "volumeRatio": 1,
+    "close": 7.06,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 48,
+    "code": "603330",
+    "name": "天洋新材",
+    "market": "main",
+    "score": 37.37,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 0 次，封单 0.27 亿",
+      "行业：塑料"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 37,
+      "dragonTiger": 30,
+      "sectorHeat": 56,
+      "moneyFlow": 33.33,
+      "liquidity": 0.17,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603330",
+      "name": "天洋新材",
+      "market": "main",
+      "industry": "塑料",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093638",
+      "lastLimitTime": "093638",
+      "openCount": 0,
+      "sealedAmount": 26754773,
+      "turnoverRate": 2.939199209213257,
+      "pctChange": 9.968847274780273
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "塑料",
+      "type": "industry",
+      "pctChange": 9.985501289367676,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3242838599,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "605589",
+      "leaderName": "圣泉集团",
+      "leaderPctChange": 10.002155303955078,
+      "heatScore": 59.97,
+      "trend": [],
+      "reasons": [
+        "主力净流入 32.43 亿",
+        "2 只涨停",
+        "领涨 圣泉集团 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

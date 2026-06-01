@@ -1,0 +1,92 @@
+{
+  "stock": {
+    "code": "600403",
+    "name": "大有能源",
+    "market": "main",
+    "industry": "煤炭开采",
+    "concepts": [],
+    "pctChange": 10.099010467529297,
+    "turnoverAmount": 232195816,
+    "turnoverRate": 1.8006222248077393,
+    "volumeRatio": 1,
+    "close": 5.56,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 34,
+    "code": "600403",
+    "name": "大有能源",
+    "market": "main",
+    "score": 42.34,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 2 次，封单 1.14 亿",
+      "所属板块热度高，板块分 88",
+      "行业：煤炭开采"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 30.28,
+      "dragonTiger": 30,
+      "sectorHeat": 88,
+      "moneyFlow": 33.33,
+      "liquidity": 7.93,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "600403",
+      "name": "大有能源",
+      "market": "main",
+      "industry": "煤炭开采",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "105707",
+      "lastLimitTime": "110119",
+      "openCount": 2,
+      "sealedAmount": 114225196,
+      "turnoverRate": 1.8006222248077393,
+      "pctChange": 10.099010467529297
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "煤炭开采",
+      "type": "industry",
+      "pctChange": 10.044844245910644,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3214939960,
+      "companyCount": 5,
+      "limitUpCount": 5,
+      "leaderCode": "601101",
+      "leaderName": "昊华能源",
+      "leaderPctChange": 10.033166885375977,
+      "heatScore": 70.24,
+      "trend": [],
+      "reasons": [
+        "主力净流入 32.15 亿",
+        "5 只涨停",
+        "领涨 昊华能源 10.03%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

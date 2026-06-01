@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002356",
+    "name": "赫美集团",
+    "market": "main",
+    "industry": "一般零售",
+    "concepts": [],
+    "pctChange": 10.067113876342773,
+    "turnoverAmount": 132746225,
+    "turnoverRate": 3.09915828704834,
+    "volumeRatio": 1,
+    "close": 3.28,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002356",
+      "name": "赫美集团",
+      "market": "main",
+      "industry": "一般零售",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093033",
+      "lastLimitTime": "093557",
+      "openCount": 1,
+      "sealedAmount": 137654515,
+      "turnoverRate": 3.09915828704834,
+      "pctChange": 10.067113876342773
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "一般零售",
+      "type": "industry",
+      "pctChange": 10.033556938171387,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 419861841,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "600280",
+      "leaderName": "中央商场",
+      "leaderPctChange": 10,
+      "heatScore": 56.39,
+      "trend": [],
+      "reasons": [
+        "主力净流入 4.2 亿",
+        "2 只涨停",
+        "领涨 中央商场 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

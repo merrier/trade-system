@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "603045",
+    "name": "福达合金",
+    "market": "main",
+    "industry": "金属新材",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 1042909600,
+    "turnoverRate": 11.4929838180542,
+    "volumeRatio": 1,
+    "close": 68.42,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603045",
+      "name": "福达合金",
+      "market": "main",
+      "industry": "金属新材",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "094446",
+      "lastLimitTime": "110534",
+      "openCount": 5,
+      "sealedAmount": 76859059,
+      "turnoverRate": 11.4929838180542,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "金属新材",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1042909600,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603045",
+      "leaderName": "福达合金",
+      "leaderPctChange": 10,
+      "heatScore": 53.75,
+      "trend": [],
+      "reasons": [
+        "主力净流入 10.43 亿",
+        "1 只涨停",
+        "领涨 福达合金 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

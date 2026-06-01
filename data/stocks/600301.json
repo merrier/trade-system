@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "600301",
+    "name": "华锡有色",
+    "market": "main",
+    "industry": "小金属",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 754849680,
+    "turnoverRate": 4.596643924713135,
+    "volumeRatio": 1,
+    "close": 60.5,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "600301",
+      "name": "华锡有色",
+      "market": "main",
+      "industry": "小金属",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "094220",
+      "lastLimitTime": "094220",
+      "openCount": 0,
+      "sealedAmount": 354590500,
+      "turnoverRate": 4.596643924713135,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "小金属",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 754849680,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600301",
+      "leaderName": "华锡有色",
+      "leaderPctChange": 10,
+      "heatScore": 53.39,
+      "trend": [],
+      "reasons": [
+        "主力净流入 7.55 亿",
+        "1 只涨停",
+        "领涨 华锡有色 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "603344",
+    "name": "星德胜",
+    "market": "main",
+    "industry": "电机Ⅱ",
+    "concepts": [],
+    "pctChange": 9.989630699157715,
+    "turnoverAmount": 176709515,
+    "turnoverRate": 10.532037734985352,
+    "volumeRatio": 1,
+    "close": 31.82,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603344",
+      "name": "星德胜",
+      "market": "main",
+      "industry": "电机Ⅱ",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "100756",
+      "lastLimitTime": "134850",
+      "openCount": 2,
+      "sealedAmount": 47367252,
+      "turnoverRate": 10.532037734985352,
+      "pctChange": 9.989630699157715
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "电机Ⅱ",
+      "type": "industry",
+      "pctChange": 10.010738849639893,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 336360975,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "603819",
+      "leaderName": "神力股份",
+      "leaderPctChange": 10.03184700012207,
+      "heatScore": 56.31,
+      "trend": [],
+      "reasons": [
+        "主力净流入 3.36 亿",
+        "2 只涨停",
+        "领涨 神力股份 10.03%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

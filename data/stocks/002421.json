@@ -1,0 +1,92 @@
+{
+  "stock": {
+    "code": "002421",
+    "name": "达实智能",
+    "market": "main",
+    "industry": "IT服务Ⅱ",
+    "concepts": [],
+    "pctChange": 9.975668907165527,
+    "turnoverAmount": 1586341936,
+    "turnoverRate": 18.240962982177734,
+    "volumeRatio": 1,
+    "close": 4.52,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 2,
+    "code": "002421",
+    "name": "达实智能",
+    "market": "main",
+    "score": 55.52,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 0 次，封单 4.67 亿",
+      "所属板块热度高，板块分 96",
+      "行业：IT服务Ⅱ"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 53.51,
+      "dragonTiger": 30,
+      "sectorHeat": 96,
+      "moneyFlow": 33.33,
+      "liquidity": 78.46,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002421",
+      "name": "达实智能",
+      "market": "main",
+      "industry": "IT服务Ⅱ",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "094148",
+      "lastLimitTime": "094148",
+      "openCount": 0,
+      "sealedAmount": 467045091,
+      "turnoverRate": 18.240962982177734,
+      "pctChange": 9.975668907165527
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "IT服务Ⅱ",
+      "type": "industry",
+      "pctChange": 10.003599166870117,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 2872012757,
+      "companyCount": 7,
+      "limitUpCount": 7,
+      "leaderCode": "002421",
+      "leaderName": "达实智能",
+      "leaderPctChange": 9.975668907165527,
+      "heatScore": 76.62,
+      "trend": [],
+      "reasons": [
+        "主力净流入 28.72 亿",
+        "7 只涨停",
+        "领涨 达实智能 9.98%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "000037",
+    "name": "深南电A",
+    "market": "main",
+    "industry": "电力",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 1176398544,
+    "turnoverRate": 28.33049774169922,
+    "volumeRatio": 1,
+    "close": 12.65,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "000037",
+      "name": "深南电A",
+      "market": "main",
+      "industry": "电力",
+      "concepts": [],
+      "consecutive": 2,
+      "firstLimitTime": "095212",
+      "lastLimitTime": "102139",
+      "openCount": 8,
+      "sealedAmount": 28741837,
+      "turnoverRate": 28.33049774169922,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "电力",
+      "type": "industry",
+      "pctChange": 10.014299583435058,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 11049148764,
+      "companyCount": 5,
+      "limitUpCount": 5,
+      "leaderCode": "000539",
+      "leaderName": "粤电力Ａ",
+      "leaderPctChange": 10.022522926330566,
+      "heatScore": 80.16,
+      "trend": [],
+      "reasons": [
+        "主力净流入 110.49 亿",
+        "5 只涨停",
+        "领涨 粤电力Ａ 10.02%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

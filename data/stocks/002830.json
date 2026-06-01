@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002830",
+    "name": "名雕股份",
+    "market": "main",
+    "industry": "装修装饰",
+    "concepts": [],
+    "pctChange": 10.023529052734375,
+    "turnoverAmount": 63958862,
+    "turnoverRate": 4.181852340698242,
+    "volumeRatio": 1,
+    "close": 23.38,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002830",
+      "name": "名雕股份",
+      "market": "main",
+      "industry": "装修装饰",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "094015",
+      "lastLimitTime": "094015",
+      "openCount": 0,
+      "sealedAmount": 86580816,
+      "turnoverRate": 4.181852340698242,
+      "pctChange": 10.023529052734375
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "装修装饰",
+      "type": "industry",
+      "pctChange": 10.04423189163208,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 4167123902,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "002081",
+      "leaderName": "金 螳 螂",
+      "leaderPctChange": 10.064934730529785,
+      "heatScore": 61.19,
+      "trend": [],
+      "reasons": [
+        "主力净流入 41.67 亿",
+        "2 只涨停",
+        "领涨 金 螳 螂 10.06%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

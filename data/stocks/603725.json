@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "603725",
+    "name": "天安新材",
+    "market": "main",
+    "industry": "家居用品",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 108850746,
+    "turnoverRate": 3.2119898796081543,
+    "volumeRatio": 1,
+    "close": 12.21,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603725",
+      "name": "天安新材",
+      "market": "main",
+      "industry": "家居用品",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "094416",
+      "lastLimitTime": "094416",
+      "openCount": 0,
+      "sealedAmount": 112333269,
+      "turnoverRate": 3.2119898796081543,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "家居用品",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 108850746,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603725",
+      "leaderName": "天安新材",
+      "leaderPctChange": 10,
+      "heatScore": 52.57,
+      "trend": [],
+      "reasons": [
+        "主力净流入 1.09 亿",
+        "1 只涨停",
+        "领涨 天安新材 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

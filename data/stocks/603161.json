@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "603161",
+    "name": "科华控股",
+    "market": "main",
+    "industry": "汽车零部",
+    "concepts": [],
+    "pctChange": 10.015772819519043,
+    "turnoverAmount": 53845764,
+    "turnoverRate": 2.073786497116089,
+    "volumeRatio": 1,
+    "close": 13.95,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "603161",
+      "name": "科华控股",
+      "market": "main",
+      "industry": "汽车零部",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "100208",
+      "lastLimitTime": "100208",
+      "openCount": 0,
+      "sealedAmount": 33880365,
+      "turnoverRate": 2.073786497116089,
+      "pctChange": 10.015772819519043
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "汽车零部",
+      "type": "industry",
+      "pctChange": 9.997775650024414,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1522671504,
+      "companyCount": 5,
+      "limitUpCount": 5,
+      "leaderCode": "600841",
+      "leaderName": "动力新科",
+      "leaderPctChange": 10.055096626281738,
+      "heatScore": 68.12,
+      "trend": [],
+      "reasons": [
+        "主力净流入 15.23 亿",
+        "5 只涨停",
+        "领涨 动力新科 10.06%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

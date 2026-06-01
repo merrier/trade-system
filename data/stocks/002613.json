@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002613",
+    "name": "北玻股份",
+    "market": "main",
+    "industry": "玻璃玻纤",
+    "concepts": [],
+    "pctChange": 9.932279586791992,
+    "turnoverAmount": 705724400,
+    "turnoverRate": 19.50248908996582,
+    "volumeRatio": 1,
+    "close": 4.87,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002613",
+      "name": "北玻股份",
+      "market": "main",
+      "industry": "玻璃玻纤",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "094403",
+      "lastLimitTime": "112433",
+      "openCount": 2,
+      "sealedAmount": 86502108,
+      "turnoverRate": 19.50248908996582,
+      "pctChange": 9.932279586791992
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "玻璃玻纤",
+      "type": "industry",
+      "pctChange": 9.932279586791992,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 705724400,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002613",
+      "leaderName": "北玻股份",
+      "leaderPctChange": 9.932279586791992,
+      "heatScore": 53.27,
+      "trend": [],
+      "reasons": [
+        "主力净流入 7.06 亿",
+        "1 只涨停",
+        "领涨 北玻股份 9.93%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

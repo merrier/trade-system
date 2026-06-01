@@ -1,0 +1,92 @@
+{
+  "stock": {
+    "code": "002925",
+    "name": "盈趣科技",
+    "market": "main",
+    "industry": "消费电子",
+    "concepts": [],
+    "pctChange": 10.020986557006836,
+    "turnoverAmount": 345492144,
+    "turnoverRate": 2.327225923538208,
+    "volumeRatio": 1,
+    "close": 20.97,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 8,
+    "code": "002925",
+    "name": "盈趣科技",
+    "market": "main",
+    "score": 48.67,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 0 次，封单 3.91 亿",
+      "所属板块热度高，板块分 92",
+      "行业：消费电子"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 50.67,
+      "dragonTiger": 30,
+      "sectorHeat": 92,
+      "moneyFlow": 33.33,
+      "liquidity": 13.83,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-01T05:52:44.826065"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260601",
+      "code": "002925",
+      "name": "盈趣科技",
+      "market": "main",
+      "industry": "消费电子",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "112003",
+      "lastLimitTime": "112003",
+      "openCount": 0,
+      "sealedAmount": 391114175,
+      "turnoverRate": 2.327225923538208,
+      "pctChange": 10.020986557006836
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260601",
+      "name": "消费电子",
+      "type": "industry",
+      "pctChange": 9.989745616912842,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 4185029102,
+      "companyCount": 6,
+      "limitUpCount": 6,
+      "leaderCode": "603890",
+      "leaderName": "春秋电子",
+      "leaderPctChange": 9.995969772338867,
+      "heatScore": 74.87,
+      "trend": [],
+      "reasons": [
+        "主力净流入 41.85 亿",
+        "6 只涨停",
+        "领涨 春秋电子 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-01T05:52:44.826065",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}
