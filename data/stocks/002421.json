@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002421",
+    "name": "达实智能",
+    "market": "main",
+    "industry": "IT服务Ⅱ",
+    "concepts": [],
+    "pctChange": 9.91561222076416,
+    "turnoverAmount": 4003760016,
+    "turnoverRate": 38.89703369140625,
+    "volumeRatio": 1,
+    "close": 5.21,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "002421",
+      "name": "达实智能",
+      "market": "main",
+      "industry": "IT服务Ⅱ",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093109",
+      "lastLimitTime": "112906",
+      "openCount": 6,
+      "sealedAmount": 69194880,
+      "turnoverRate": 38.89703369140625,
+      "pctChange": 9.91561222076416
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "IT服务Ⅱ",
+      "type": "industry",
+      "pctChange": 9.9553804397583,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 5096079584,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "002421",
+      "leaderName": "达实智能",
+      "leaderPctChange": 9.91561222076416,
+      "heatScore": 70.93,
+      "trend": [],
+      "reasons": [
+        "主力净流入 50.96 亿",
+        "2 只涨停",
+        "领涨 达实智能 9.92%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

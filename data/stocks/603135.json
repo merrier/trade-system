@@ -1,0 +1,92 @@
+{
+  "stock": {
+    "code": "603135",
+    "name": "中重科技",
+    "market": "main",
+    "industry": "专用设备",
+    "concepts": [],
+    "pctChange": 10.039215087890625,
+    "turnoverAmount": 464075568,
+    "turnoverRate": 5.619645118713379,
+    "volumeRatio": 1,
+    "close": 14.03,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 1,
+    "code": "603135",
+    "name": "中重科技",
+    "market": "main",
+    "score": 56.56,
+    "confidence": 78,
+    "reasons": [
+      "3 连板，开板 0 次，封单 0.58 亿",
+      "所属板块热度高，板块分 100",
+      "行业：专用设备"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 74.16,
+      "dragonTiger": 30,
+      "sectorHeat": 100,
+      "moneyFlow": 33.33,
+      "liquidity": 20,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "603135",
+      "name": "中重科技",
+      "market": "main",
+      "industry": "专用设备",
+      "concepts": [],
+      "consecutive": 3,
+      "firstLimitTime": "104309",
+      "lastLimitTime": "104309",
+      "openCount": 0,
+      "sealedAmount": 57615808,
+      "turnoverRate": 5.619645118713379,
+      "pctChange": 10.039215087890625
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "专用设备",
+      "type": "industry",
+      "pctChange": 9.994407335917154,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1693152752,
+      "companyCount": 6,
+      "limitUpCount": 6,
+      "leaderCode": "603135",
+      "leaderName": "中重科技",
+      "leaderPctChange": 10.039215087890625,
+      "heatScore": 77.68,
+      "trend": [],
+      "reasons": [
+        "主力净流入 16.93 亿",
+        "6 只涨停",
+        "领涨 中重科技 10.04%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

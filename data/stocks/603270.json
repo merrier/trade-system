@@ -1,0 +1,92 @@
+{
+  "stock": {
+    "code": "603270",
+    "name": "金帝股份",
+    "market": "main",
+    "industry": "通用设备",
+    "concepts": [],
+    "pctChange": 10.014781951904297,
+    "turnoverAmount": 212883106,
+    "turnoverRate": 10.740133285522461,
+    "volumeRatio": 1,
+    "close": 29.77,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 5,
+    "code": "603270",
+    "name": "金帝股份",
+    "market": "main",
+    "score": 45.62,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 0 次，封单 0.47 亿",
+      "所属板块热度高，板块分 96",
+      "行业：通用设备"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 37.77,
+      "dragonTiger": 30,
+      "sectorHeat": 96,
+      "moneyFlow": 33.33,
+      "liquidity": 6.92,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "603270",
+      "name": "金帝股份",
+      "market": "main",
+      "industry": "通用设备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "135404",
+      "lastLimitTime": "135404",
+      "openCount": 0,
+      "sealedAmount": 47280773,
+      "turnoverRate": 10.740133285522461,
+      "pctChange": 10.014781951904297
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "通用设备",
+      "type": "industry",
+      "pctChange": 10.023123025894165,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 2944536008,
+      "companyCount": 4,
+      "limitUpCount": 4,
+      "leaderCode": "002903",
+      "leaderName": "宇环数控",
+      "leaderPctChange": 10.011480331420898,
+      "heatScore": 73.1,
+      "trend": [],
+      "reasons": [
+        "主力净流入 29.45 亿",
+        "4 只涨停",
+        "领涨 宇环数控 10.01%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

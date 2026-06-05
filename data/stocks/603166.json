@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "603166",
+    "name": "福达股份",
+    "market": "main",
+    "industry": "汽车零部",
+    "concepts": [],
+    "pctChange": 9.975469589233398,
+    "turnoverAmount": 197998235,
+    "turnoverRate": 2.4168694019317627,
+    "volumeRatio": 1,
+    "close": 13.45,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 17,
+    "code": "603166",
+    "name": "福达股份",
+    "market": "main",
+    "score": 39.26,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 0 次，封单 0.15 亿",
+      "行业：汽车零部"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 36.58,
+      "dragonTiger": 30,
+      "sectorHeat": 64,
+      "moneyFlow": 33.33,
+      "liquidity": 6.15,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "603166",
+      "name": "福达股份",
+      "market": "main",
+      "industry": "汽车零部",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "131452",
+      "lastLimitTime": "131452",
+      "openCount": 0,
+      "sealedAmount": 15343760,
+      "turnoverRate": 2.4168694019317627,
+      "pctChange": 9.975469589233398
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "汽车零部",
+      "type": "industry",
+      "pctChange": 9.987199783325195,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1221466103,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "603048",
+      "leaderName": "浙江黎明",
+      "leaderPctChange": 10,
+      "heatScore": 64.36,
+      "trend": [],
+      "reasons": [
+        "主力净流入 12.21 亿",
+        "3 只涨停",
+        "领涨 浙江黎明 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

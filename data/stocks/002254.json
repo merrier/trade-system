@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002254",
+    "name": "泰和新材",
+    "market": "main",
+    "industry": "化学纤维",
+    "concepts": [],
+    "pctChange": 9.985836029052734,
+    "turnoverAmount": 1271458816,
+    "turnoverRate": 9.94754695892334,
+    "volumeRatio": 1,
+    "close": 15.53,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "002254",
+      "name": "泰和新材",
+      "market": "main",
+      "industry": "化学纤维",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "101242",
+      "lastLimitTime": "145421",
+      "openCount": 13,
+      "sealedAmount": 4777028,
+      "turnoverRate": 9.94754695892334,
+      "pctChange": 9.985836029052734
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "化学纤维",
+      "type": "industry",
+      "pctChange": 10.012998580932617,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3734813984,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "600063",
+      "leaderName": "皖维高新",
+      "leaderPctChange": 10.0401611328125,
+      "heatScore": 67.29,
+      "trend": [],
+      "reasons": [
+        "主力净流入 37.35 亿",
+        "2 只涨停",
+        "领涨 皖维高新 10.04%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

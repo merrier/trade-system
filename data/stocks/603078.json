@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "603078",
+    "name": "江化微",
+    "market": "main",
+    "industry": "电子化学",
+    "concepts": [],
+    "pctChange": 10.005293846130371,
+    "turnoverAmount": 2337235520,
+    "turnoverRate": 15.204099655151367,
+    "volumeRatio": 1,
+    "close": 41.56,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "603078",
+      "name": "江化微",
+      "market": "main",
+      "industry": "电子化学",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "104451",
+      "lastLimitTime": "144542",
+      "openCount": 7,
+      "sealedAmount": 24812151,
+      "turnoverRate": 15.204099655151367,
+      "pctChange": 10.005293846130371
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "电子化学",
+      "type": "industry",
+      "pctChange": 10.005293846130371,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 2337235520,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603078",
+      "leaderName": "江化微",
+      "leaderPctChange": 10.005293846130371,
+      "heatScore": 59.43,
+      "trend": [],
+      "reasons": [
+        "主力净流入 23.37 亿",
+        "1 只涨停",
+        "领涨 江化微 10.01%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

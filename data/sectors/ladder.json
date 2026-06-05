@@ -1,0 +1,682 @@
+{
+  "tradeDate": "20260605",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ],
+  "items": [
+    {
+      "tradeDate": "20260605",
+      "name": "专用设备",
+      "type": "industry",
+      "pctChange": 9.994407335917154,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1693152752,
+      "companyCount": 6,
+      "limitUpCount": 6,
+      "leaderCode": "603135",
+      "leaderName": "中重科技",
+      "leaderPctChange": 10.039215087890625,
+      "heatScore": 77.68,
+      "trend": [],
+      "reasons": [
+        "主力净流入 16.93 亿",
+        "6 只涨停",
+        "领涨 中重科技 10.04%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "通用设备",
+      "type": "industry",
+      "pctChange": 10.023123025894165,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 2944536008,
+      "companyCount": 4,
+      "limitUpCount": 4,
+      "leaderCode": "002903",
+      "leaderName": "宇环数控",
+      "leaderPctChange": 10.011480331420898,
+      "heatScore": 73.1,
+      "trend": [],
+      "reasons": [
+        "主力净流入 29.45 亿",
+        "4 只涨停",
+        "领涨 宇环数控 10.01%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "光学光电",
+      "type": "industry",
+      "pctChange": 9.988280296325684,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3987894801,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "002983",
+      "leaderName": "芯瑞达",
+      "leaderPctChange": 10.008857727050781,
+      "heatScore": 71.96,
+      "trend": [],
+      "reasons": [
+        "主力净流入 39.88 亿",
+        "3 只涨停",
+        "领涨 芯瑞达 10.01%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "IT服务Ⅱ",
+      "type": "industry",
+      "pctChange": 9.9553804397583,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 5096079584,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "002421",
+      "leaderName": "达实智能",
+      "leaderPctChange": 9.91561222076416,
+      "heatScore": 70.93,
+      "trend": [],
+      "reasons": [
+        "主力净流入 50.96 亿",
+        "2 只涨停",
+        "领涨 达实智能 9.92%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "化学纤维",
+      "type": "industry",
+      "pctChange": 10.012998580932617,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3734813984,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "600063",
+      "leaderName": "皖维高新",
+      "leaderPctChange": 10.0401611328125,
+      "heatScore": 67.29,
+      "trend": [],
+      "reasons": [
+        "主力净流入 37.35 亿",
+        "2 只涨停",
+        "领涨 皖维高新 10.04%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "化学原料",
+      "type": "industry",
+      "pctChange": 9.996245861053467,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3135985376,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "603938",
+      "leaderName": "三孚股份",
+      "leaderPctChange": 9.995835304260254,
+      "heatScore": 65.61,
+      "trend": [],
+      "reasons": [
+        "主力净流入 31.36 亿",
+        "2 只涨停",
+        "领涨 三孚股份 10%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "电网设备",
+      "type": "industry",
+      "pctChange": 9.969547271728516,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1587710103,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "002471",
+      "leaderName": "中超控股",
+      "leaderPctChange": 9.95850658416748,
+      "heatScore": 65.33,
+      "trend": [],
+      "reasons": [
+        "主力净流入 15.88 亿",
+        "3 只涨停",
+        "领涨 中超控股 9.96%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "玻璃玻纤",
+      "type": "industry",
+      "pctChange": 9.992609024047852,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1565242440,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "600293",
+      "leaderName": "三峡新材",
+      "leaderPctChange": 10,
+      "heatScore": 65.3,
+      "trend": [],
+      "reasons": [
+        "主力净流入 15.65 亿",
+        "3 只涨停",
+        "领涨 三峡新材 10%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "元件",
+      "type": "industry",
+      "pctChange": 10.009891510009766,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 4303363840,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002138",
+      "leaderName": "顺络电子",
+      "leaderPctChange": 10.009891510009766,
+      "heatScore": 64.83,
+      "trend": [],
+      "reasons": [
+        "主力净流入 43.03 亿",
+        "1 只涨停",
+        "领涨 顺络电子 10.01%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "汽车零部",
+      "type": "industry",
+      "pctChange": 9.987199783325195,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1221466103,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "603048",
+      "leaderName": "浙江黎明",
+      "leaderPctChange": 10,
+      "heatScore": 64.36,
+      "trend": [],
+      "reasons": [
+        "主力净流入 12.21 亿",
+        "3 只涨停",
+        "领涨 浙江黎明 10%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "家居用品",
+      "type": "industry",
+      "pctChange": 10.023340225219727,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 886117427,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "603992",
+      "leaderName": "松霖科技",
+      "leaderPctChange": 10,
+      "heatScore": 63.43,
+      "trend": [],
+      "reasons": [
+        "主力净流入 8.86 亿",
+        "3 只涨停",
+        "领涨 松霖科技 10%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "化学制品",
+      "type": "industry",
+      "pctChange": 9.990897178649902,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 860347036,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "603020",
+      "leaderName": "爱普股份",
+      "leaderPctChange": 10,
+      "heatScore": 63.36,
+      "trend": [],
+      "reasons": [
+        "主力净流入 8.6 亿",
+        "3 只涨停",
+        "领涨 爱普股份 10%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "房地产开",
+      "type": "industry",
+      "pctChange": 9.931344985961914,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 643114024,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "000668",
+      "leaderName": "荣丰控股",
+      "leaderPctChange": 9.9893159866333,
+      "heatScore": 62.76,
+      "trend": [],
+      "reasons": [
+        "主力净流入 6.43 亿",
+        "3 只涨停",
+        "领涨 荣丰控股 9.99%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "一般零售",
+      "type": "industry",
+      "pctChange": 9.99668025970459,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1985656224,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "002251",
+      "leaderName": "步步高",
+      "leaderPctChange": 9.954751014709473,
+      "heatScore": 62.42,
+      "trend": [],
+      "reasons": [
+        "主力净流入 19.86 亿",
+        "2 只涨停",
+        "领涨 步步高 9.95%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "冶钢原料",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1472748128,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "600516",
+      "leaderName": "方大炭素",
+      "leaderPctChange": 10,
+      "heatScore": 61.05,
+      "trend": [],
+      "reasons": [
+        "主力净流入 14.73 亿",
+        "2 只涨停",
+        "领涨 方大炭素 10%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "塑料",
+      "type": "industry",
+      "pctChange": 10.013089179992676,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 2421921856,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002361",
+      "leaderName": "神剑股份",
+      "leaderPctChange": 10.013089179992676,
+      "heatScore": 59.66,
+      "trend": [],
+      "reasons": [
+        "主力净流入 24.22 亿",
+        "1 只涨停",
+        "领涨 神剑股份 10.01%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "电子化学",
+      "type": "industry",
+      "pctChange": 10.005293846130371,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 2337235520,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603078",
+      "leaderName": "江化微",
+      "leaderPctChange": 10.005293846130371,
+      "heatScore": 59.43,
+      "trend": [],
+      "reasons": [
+        "主力净流入 23.37 亿",
+        "1 只涨停",
+        "领涨 江化微 10.01%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "通信设备",
+      "type": "industry",
+      "pctChange": 9.985334873199463,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 881267248,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "002194",
+      "leaderName": "武汉凡谷",
+      "leaderPctChange": 9.963768005371094,
+      "heatScore": 59.39,
+      "trend": [],
+      "reasons": [
+        "主力净流入 8.81 亿",
+        "2 只涨停",
+        "领涨 武汉凡谷 9.96%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "煤炭开采",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1682166896,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600403",
+      "leaderName": "大有能源",
+      "leaderPctChange": 10,
+      "heatScore": 57.62,
+      "trend": [],
+      "reasons": [
+        "主力净流入 16.82 亿",
+        "1 只涨停",
+        "领涨 大有能源 10%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "贸易Ⅱ",
+      "type": "industry",
+      "pctChange": 10.047096252441406,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1384468192,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002183",
+      "leaderName": "怡 亚 通",
+      "leaderPctChange": 10.047096252441406,
+      "heatScore": 56.84,
+      "trend": [],
+      "reasons": [
+        "主力净流入 13.84 亿",
+        "1 只涨停",
+        "领涨 怡 亚 通 10.05%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "广告营销",
+      "type": "industry",
+      "pctChange": 10.082645416259766,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 831246960,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002354",
+      "leaderName": "天娱数科",
+      "leaderPctChange": 10.082645416259766,
+      "heatScore": 55.35,
+      "trend": [],
+      "reasons": [
+        "主力净流入 8.31 亿",
+        "1 只涨停",
+        "领涨 天娱数科 10.08%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "金属新材",
+      "type": "industry",
+      "pctChange": 9.998035430908203,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 664079728,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603124",
+      "leaderName": "江南新材",
+      "leaderPctChange": 9.998035430908203,
+      "heatScore": 54.82,
+      "trend": [],
+      "reasons": [
+        "主力净流入 6.64 亿",
+        "1 只涨停",
+        "领涨 江南新材 10%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "光伏设备",
+      "type": "industry",
+      "pctChange": 9.938838005065918,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 549680800,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600207",
+      "leaderName": "安彩高科",
+      "leaderPctChange": 9.938838005065918,
+      "heatScore": 54.46,
+      "trend": [],
+      "reasons": [
+        "主力净流入 5.5 亿",
+        "1 只涨停",
+        "领涨 安彩高科 9.94%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "农化制品",
+      "type": "industry",
+      "pctChange": 10.010881423950195,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 500803472,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603360",
+      "leaderName": "百傲化学",
+      "leaderPctChange": 10.010881423950195,
+      "heatScore": 54.38,
+      "trend": [],
+      "reasons": [
+        "主力净流入 5.01 亿",
+        "1 只涨停",
+        "领涨 百傲化学 10.01%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "电视广播",
+      "type": "industry",
+      "pctChange": 9.964829444885254,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 509900768,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600996",
+      "leaderName": "贵广网络",
+      "leaderPctChange": 9.964829444885254,
+      "heatScore": 54.37,
+      "trend": [],
+      "reasons": [
+        "主力净流入 5.1 亿",
+        "1 只涨停",
+        "领涨 贵广网络 9.96%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "电机Ⅱ",
+      "type": "industry",
+      "pctChange": 10.010110855102539,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 329565600,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002892",
+      "leaderName": "科力尔",
+      "leaderPctChange": 10.010110855102539,
+      "heatScore": 53.91,
+      "trend": [],
+      "reasons": [
+        "主力净流入 3.3 亿",
+        "1 只涨停",
+        "领涨 科力尔 10.01%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "商用车",
+      "type": "industry",
+      "pctChange": 10.158730506896973,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 262269161,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600303",
+      "leaderName": "曙光股份",
+      "leaderPctChange": 10.158730506896973,
+      "heatScore": 53.85,
+      "trend": [],
+      "reasons": [
+        "主力净流入 2.62 亿",
+        "1 只涨停",
+        "领涨 曙光股份 10.16%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "综合Ⅱ",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 257858371,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600881",
+      "leaderName": "亚泰集团",
+      "leaderPctChange": 10,
+      "heatScore": 53.71,
+      "trend": [],
+      "reasons": [
+        "主力净流入 2.58 亿",
+        "1 只涨停",
+        "领涨 亚泰集团 10%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "数字媒体",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 193024486,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603888",
+      "leaderName": "新华网",
+      "leaderPctChange": 10,
+      "heatScore": 53.53,
+      "trend": [],
+      "reasons": [
+        "主力净流入 1.93 亿",
+        "1 只涨停",
+        "领涨 新华网 10%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "航运港口",
+      "type": "industry",
+      "pctChange": 10.047846794128418,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 175432181,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "000520",
+      "leaderName": "凤凰航运",
+      "leaderPctChange": 10.047846794128418,
+      "heatScore": 53.52,
+      "trend": [],
+      "reasons": [
+        "主力净流入 1.75 亿",
+        "1 只涨停",
+        "领涨 凤凰航运 10.05%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "家电零部",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 134591831,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603578",
+      "leaderName": "三星新材",
+      "leaderPctChange": 10,
+      "heatScore": 53.37,
+      "trend": [],
+      "reasons": [
+        "主力净流入 1.35 亿",
+        "1 只涨停",
+        "领涨 三星新材 10%"
+      ]
+    },
+    {
+      "tradeDate": "20260605",
+      "name": "轨交设备",
+      "type": "industry",
+      "pctChange": 9.982014656066895,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 65812602,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603500",
+      "leaderName": "祥和实业",
+      "leaderPctChange": 9.982014656066895,
+      "heatScore": 53.17,
+      "trend": [],
+      "reasons": [
+        "主力净流入 0.66 亿",
+        "1 只涨停",
+        "领涨 祥和实业 9.98%"
+      ]
+    }
+  ]
+}

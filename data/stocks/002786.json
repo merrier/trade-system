@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002786",
+    "name": "银宝山新",
+    "market": "main",
+    "industry": "专用设备",
+    "concepts": [],
+    "pctChange": 9.962639808654785,
+    "turnoverAmount": 333092112,
+    "turnoverRate": 7.962112903594971,
+    "volumeRatio": 1,
+    "close": 8.83,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "002786",
+      "name": "银宝山新",
+      "market": "main",
+      "industry": "专用设备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "131851",
+      "lastLimitTime": "145427",
+      "openCount": 12,
+      "sealedAmount": 4184537,
+      "turnoverRate": 7.962112903594971,
+      "pctChange": 9.962639808654785
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "专用设备",
+      "type": "industry",
+      "pctChange": 9.994407335917154,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1693152752,
+      "companyCount": 6,
+      "limitUpCount": 6,
+      "leaderCode": "603135",
+      "leaderName": "中重科技",
+      "leaderPctChange": 10.039215087890625,
+      "heatScore": 77.68,
+      "trend": [],
+      "reasons": [
+        "主力净流入 16.93 亿",
+        "6 只涨停",
+        "领涨 中重科技 10.04%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

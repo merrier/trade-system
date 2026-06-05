@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "600303",
+    "name": "曙光股份",
+    "market": "main",
+    "industry": "商用车",
+    "concepts": [],
+    "pctChange": 10.158730506896973,
+    "turnoverAmount": 262269161,
+    "turnoverRate": 11.75617504119873,
+    "volumeRatio": 1,
+    "close": 3.47,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 38,
+    "code": "600303",
+    "name": "曙光股份",
+    "market": "main",
+    "score": 27.71,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 0 次，封单 0.33 亿",
+      "行业：商用车"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 37.24,
+      "dragonTiger": 30,
+      "sectorHeat": 0,
+      "moneyFlow": 33.33,
+      "liquidity": 9.49,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "600303",
+      "name": "曙光股份",
+      "market": "main",
+      "industry": "商用车",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "130028",
+      "lastLimitTime": "130028",
+      "openCount": 0,
+      "sealedAmount": 33173547,
+      "turnoverRate": 11.75617504119873,
+      "pctChange": 10.158730506896973
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "商用车",
+      "type": "industry",
+      "pctChange": 10.158730506896973,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 262269161,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600303",
+      "leaderName": "曙光股份",
+      "leaderPctChange": 10.158730506896973,
+      "heatScore": 53.85,
+      "trend": [],
+      "reasons": [
+        "主力净流入 2.62 亿",
+        "1 只涨停",
+        "领涨 曙光股份 10.16%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

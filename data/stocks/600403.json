@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "600403",
+    "name": "大有能源",
+    "market": "main",
+    "industry": "煤炭开采",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 1682166896,
+    "turnoverRate": 8.912552833557129,
+    "volumeRatio": 1,
+    "close": 8.14,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "600403",
+      "name": "大有能源",
+      "market": "main",
+      "industry": "煤炭开采",
+      "concepts": [],
+      "consecutive": 5,
+      "firstLimitTime": "093643",
+      "lastLimitTime": "143304",
+      "openCount": 9,
+      "sealedAmount": 16981594,
+      "turnoverRate": 8.912552833557129,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "煤炭开采",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1682166896,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600403",
+      "leaderName": "大有能源",
+      "leaderPctChange": 10,
+      "heatScore": 57.62,
+      "trend": [],
+      "reasons": [
+        "主力净流入 16.82 亿",
+        "1 只涨停",
+        "领涨 大有能源 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

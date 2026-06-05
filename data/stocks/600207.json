@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "600207",
+    "name": "安彩高科",
+    "market": "main",
+    "industry": "光伏设备",
+    "concepts": [],
+    "pctChange": 9.938838005065918,
+    "turnoverAmount": 549680800,
+    "turnoverRate": 7.333527565002441,
+    "volumeRatio": 1,
+    "close": 7.19,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 36,
+    "code": "600207",
+    "name": "安彩高科",
+    "market": "main",
+    "score": 28.64,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 2 次，封单 0.26 亿",
+      "行业：光伏设备"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 26.99,
+      "dragonTiger": 30,
+      "sectorHeat": 12,
+      "moneyFlow": 33.33,
+      "liquidity": 24.46,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "600207",
+      "name": "安彩高科",
+      "market": "main",
+      "industry": "光伏设备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "102049",
+      "lastLimitTime": "103743",
+      "openCount": 2,
+      "sealedAmount": 26303169,
+      "turnoverRate": 7.333527565002441,
+      "pctChange": 9.938838005065918
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "光伏设备",
+      "type": "industry",
+      "pctChange": 9.938838005065918,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 549680800,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600207",
+      "leaderName": "安彩高科",
+      "leaderPctChange": 9.938838005065918,
+      "heatScore": 54.46,
+      "trend": [],
+      "reasons": [
+        "主力净流入 5.5 亿",
+        "1 只涨停",
+        "领涨 安彩高科 9.94%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

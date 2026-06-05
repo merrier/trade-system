@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "603578",
+    "name": "三星新材",
+    "market": "main",
+    "industry": "家电零部",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 134591831,
+    "turnoverRate": 5.032491207122803,
+    "volumeRatio": 1,
+    "close": 15.51,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 39,
+    "code": "603578",
+    "name": "三星新材",
+    "market": "main",
+    "score": 27.5,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 0 次，封单 0.71 亿",
+      "行业：家电零部"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 38.65,
+      "dragonTiger": 30,
+      "sectorHeat": 0,
+      "moneyFlow": 33.33,
+      "liquidity": 2.84,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "603578",
+      "name": "三星新材",
+      "market": "main",
+      "industry": "家电零部",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "142224",
+      "lastLimitTime": "142224",
+      "openCount": 0,
+      "sealedAmount": 70648453,
+      "turnoverRate": 5.032491207122803,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "家电零部",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 134591831,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603578",
+      "leaderName": "三星新材",
+      "leaderPctChange": 10,
+      "heatScore": 53.37,
+      "trend": [],
+      "reasons": [
+        "主力净流入 1.35 亿",
+        "1 只涨停",
+        "领涨 三星新材 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "stock": {
+    "code": "002471",
+    "name": "中超控股",
+    "market": "main",
+    "industry": "电网设备",
+    "concepts": [],
+    "pctChange": 9.95850658416748,
+    "turnoverAmount": 747418128,
+    "turnoverRate": 7.036205768585205,
+    "volumeRatio": 1,
+    "close": 7.95,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 7,
+    "code": "002471",
+    "name": "中超控股",
+    "market": "main",
+    "score": 45.11,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 0 次，封单 1.44 亿",
+      "所属板块热度高，板块分 76",
+      "行业：电网设备"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 41.42,
+      "dragonTiger": 30,
+      "sectorHeat": 76,
+      "moneyFlow": 33.33,
+      "liquidity": 34.76,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "002471",
+      "name": "中超控股",
+      "market": "main",
+      "industry": "电网设备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093130",
+      "lastLimitTime": "093130",
+      "openCount": 0,
+      "sealedAmount": 144489262,
+      "turnoverRate": 7.036205768585205,
+      "pctChange": 9.95850658416748
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "电网设备",
+      "type": "industry",
+      "pctChange": 9.969547271728516,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1587710103,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "002471",
+      "leaderName": "中超控股",
+      "leaderPctChange": 9.95850658416748,
+      "heatScore": 65.33,
+      "trend": [],
+      "reasons": [
+        "主力净流入 15.88 亿",
+        "3 只涨停",
+        "领涨 中超控股 9.96%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "603360",
+    "name": "百傲化学",
+    "market": "main",
+    "industry": "农化制品",
+    "concepts": [],
+    "pctChange": 10.010881423950195,
+    "turnoverAmount": 500803472,
+    "turnoverRate": 3.7180557250976562,
+    "volumeRatio": 1,
+    "close": 20.22,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 33,
+    "code": "603360",
+    "name": "百傲化学",
+    "market": "main",
+    "score": 30.46,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 0 次，封单 0.56 亿",
+      "行业：农化制品"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 38.1,
+      "dragonTiger": 30,
+      "sectorHeat": 8,
+      "moneyFlow": 33.33,
+      "liquidity": 21.92,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "603360",
+      "name": "百傲化学",
+      "market": "main",
+      "industry": "农化制品",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "130130",
+      "lastLimitTime": "130130",
+      "openCount": 0,
+      "sealedAmount": 55963743,
+      "turnoverRate": 3.7180557250976562,
+      "pctChange": 10.010881423950195
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "农化制品",
+      "type": "industry",
+      "pctChange": 10.010881423950195,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 500803472,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603360",
+      "leaderName": "百傲化学",
+      "leaderPctChange": 10.010881423950195,
+      "heatScore": 54.38,
+      "trend": [],
+      "reasons": [
+        "主力净流入 5.01 亿",
+        "1 只涨停",
+        "领涨 百傲化学 10.01%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

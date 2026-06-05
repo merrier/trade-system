@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "000517",
+    "name": "荣安地产",
+    "market": "main",
+    "industry": "房地产开",
+    "concepts": [],
+    "pctChange": 9.844559669494629,
+    "turnoverAmount": 114351278,
+    "turnoverRate": 2.204314947128296,
+    "volumeRatio": 1,
+    "close": 2.12,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 31,
+    "code": "000517",
+    "name": "荣安地产",
+    "market": "main",
+    "score": 34.35,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 1 次，封单 0.37 亿",
+      "行业：房地产开"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 27.38,
+      "dragonTiger": 30,
+      "sectorHeat": 52,
+      "moneyFlow": 33.33,
+      "liquidity": 1.79,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "000517",
+      "name": "荣安地产",
+      "market": "main",
+      "industry": "房地产开",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093251",
+      "lastLimitTime": "093330",
+      "openCount": 1,
+      "sealedAmount": 36755860,
+      "turnoverRate": 2.204314947128296,
+      "pctChange": 9.844559669494629
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "房地产开",
+      "type": "industry",
+      "pctChange": 9.931344985961914,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 643114024,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "000668",
+      "leaderName": "荣丰控股",
+      "leaderPctChange": 9.9893159866333,
+      "heatScore": 62.76,
+      "trend": [],
+      "reasons": [
+        "主力净流入 6.43 亿",
+        "3 只涨停",
+        "领涨 荣丰控股 9.99%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

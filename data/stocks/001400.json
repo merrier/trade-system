@@ -1,0 +1,92 @@
+{
+  "stock": {
+    "code": "001400",
+    "name": "江顺科技",
+    "market": "main",
+    "industry": "专用设备",
+    "concepts": [],
+    "pctChange": 10.004733085632324,
+    "turnoverAmount": 290226400,
+    "turnoverRate": 5.637197494506836,
+    "volumeRatio": 1,
+    "close": 116.22,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 9,
+    "code": "001400",
+    "name": "江顺科技",
+    "market": "main",
+    "score": 44.14,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 1 次，封单 0.4 亿",
+      "所属板块热度高，板块分 100",
+      "行业：专用设备"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 27.49,
+      "dragonTiger": 30,
+      "sectorHeat": 100,
+      "moneyFlow": 33.33,
+      "liquidity": 10.95,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "001400",
+      "name": "江顺科技",
+      "market": "main",
+      "industry": "专用设备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "111109",
+      "lastLimitTime": "111627",
+      "openCount": 1,
+      "sealedAmount": 39793728,
+      "turnoverRate": 5.637197494506836,
+      "pctChange": 10.004733085632324
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "专用设备",
+      "type": "industry",
+      "pctChange": 9.994407335917154,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1693152752,
+      "companyCount": 6,
+      "limitUpCount": 6,
+      "leaderCode": "603135",
+      "leaderName": "中重科技",
+      "leaderPctChange": 10.039215087890625,
+      "heatScore": 77.68,
+      "trend": [],
+      "reasons": [
+        "主力净流入 16.93 亿",
+        "6 只涨停",
+        "领涨 中重科技 10.04%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

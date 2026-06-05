@@ -1,0 +1,10 @@
+{
+  "tradeDate": "20260605",
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ],
+  "generatedAt": "2026-06-05T11:21:58.472Z"
+}

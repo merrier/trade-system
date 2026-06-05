@@ -1,0 +1,93 @@
+{
+  "stock": {
+    "code": "002354",
+    "name": "天娱数科",
+    "market": "main",
+    "industry": "广告营销",
+    "concepts": [],
+    "pctChange": 10.082645416259766,
+    "turnoverAmount": 831246960,
+    "turnoverRate": 7.686609268188477,
+    "volumeRatio": 1,
+    "close": 6.66,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 35,
+    "code": "002354",
+    "name": "天娱数科",
+    "market": "main",
+    "score": 28.74,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 4 次，封单 1.02 亿",
+      "行业：广告营销"
+    ],
+    "risks": [
+      "涨停开板次数较多，封板稳定性一般"
+    ],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 29.83,
+      "dragonTiger": 30,
+      "sectorHeat": 20,
+      "moneyFlow": 33.33,
+      "liquidity": 39.13,
+      "riskPenalty": 16
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "002354",
+      "name": "天娱数科",
+      "market": "main",
+      "industry": "广告营销",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "092500",
+      "lastLimitTime": "103451",
+      "openCount": 4,
+      "sealedAmount": 102169062,
+      "turnoverRate": 7.686609268188477,
+      "pctChange": 10.082645416259766
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "广告营销",
+      "type": "industry",
+      "pctChange": 10.082645416259766,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 831246960,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002354",
+      "leaderName": "天娱数科",
+      "leaderPctChange": 10.082645416259766,
+      "heatScore": 55.35,
+      "trend": [],
+      "reasons": [
+        "主力净流入 8.31 亿",
+        "1 只涨停",
+        "领涨 天娱数科 10.08%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

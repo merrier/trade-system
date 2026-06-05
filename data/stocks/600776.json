@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "600776",
+    "name": "东方通信",
+    "market": "main",
+    "industry": "通信设备",
+    "concepts": [],
+    "pctChange": 10.006901741027832,
+    "turnoverAmount": 449772784,
+    "turnoverRate": 3.0104432106018066,
+    "volumeRatio": 1,
+    "close": 15.94,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 29,
+    "code": "600776",
+    "name": "东方通信",
+    "market": "main",
+    "score": 34.95,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 0 次，封单 0.79 亿",
+      "行业：通信设备"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 38.97,
+      "dragonTiger": 30,
+      "sectorHeat": 32,
+      "moneyFlow": 33.33,
+      "liquidity": 19.26,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "600776",
+      "name": "东方通信",
+      "market": "main",
+      "industry": "通信设备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "094449",
+      "lastLimitTime": "094449",
+      "openCount": 0,
+      "sealedAmount": 79330781,
+      "turnoverRate": 3.0104432106018066,
+      "pctChange": 10.006901741027832
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "通信设备",
+      "type": "industry",
+      "pctChange": 9.985334873199463,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 881267248,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "002194",
+      "leaderName": "武汉凡谷",
+      "leaderPctChange": 9.963768005371094,
+      "heatScore": 59.39,
+      "trend": [],
+      "reasons": [
+        "主力净流入 8.81 亿",
+        "2 只涨停",
+        "领涨 武汉凡谷 9.96%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

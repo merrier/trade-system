@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "603020",
+    "name": "爱普股份",
+    "market": "main",
+    "industry": "化学制品",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 118097061,
+    "turnoverRate": 3.048149347305298,
+    "volumeRatio": 1,
+    "close": 10.67,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 22,
+    "code": "603020",
+    "name": "爱普股份",
+    "market": "main",
+    "score": 37.97,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 0 次，封单 0.75 亿",
+      "行业：化学制品"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 38.81,
+      "dragonTiger": 30,
+      "sectorHeat": 56,
+      "moneyFlow": 33.33,
+      "liquidity": 1.98,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "603020",
+      "name": "爱普股份",
+      "market": "main",
+      "industry": "化学制品",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "134112",
+      "lastLimitTime": "134112",
+      "openCount": 0,
+      "sealedAmount": 74821241,
+      "turnoverRate": 3.048149347305298,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "化学制品",
+      "type": "industry",
+      "pctChange": 9.990897178649902,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 860347036,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "603020",
+      "leaderName": "爱普股份",
+      "leaderPctChange": 10,
+      "heatScore": 63.36,
+      "trend": [],
+      "reasons": [
+        "主力净流入 8.6 亿",
+        "3 只涨停",
+        "领涨 爱普股份 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

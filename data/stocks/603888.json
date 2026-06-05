@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "603888",
+    "name": "新华网",
+    "market": "main",
+    "industry": "数字媒体",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 193024486,
+    "turnoverRate": 1.486094355583191,
+    "volumeRatio": 1,
+    "close": 19.25,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 37,
+    "code": "603888",
+    "name": "新华网",
+    "market": "main",
+    "score": 28.27,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 0 次，封单 1.26 亿",
+      "行业：数字媒体"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 40.71,
+      "dragonTiger": 30,
+      "sectorHeat": 0,
+      "moneyFlow": 33.33,
+      "liquidity": 5.89,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "603888",
+      "name": "新华网",
+      "market": "main",
+      "industry": "数字媒体",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "092501",
+      "lastLimitTime": "092501",
+      "openCount": 0,
+      "sealedAmount": 125547999,
+      "turnoverRate": 1.486094355583191,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "数字媒体",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 193024486,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603888",
+      "leaderName": "新华网",
+      "leaderPctChange": 10,
+      "heatScore": 53.53,
+      "trend": [],
+      "reasons": [
+        "主力净流入 1.93 亿",
+        "1 只涨停",
+        "领涨 新华网 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

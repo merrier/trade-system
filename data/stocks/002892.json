@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002892",
+    "name": "科力尔",
+    "market": "main",
+    "industry": "电机Ⅱ",
+    "concepts": [],
+    "pctChange": 10.010110855102539,
+    "turnoverAmount": 329565600,
+    "turnoverRate": 6.403580188751221,
+    "volumeRatio": 1,
+    "close": 10.88,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "002892",
+      "name": "科力尔",
+      "market": "main",
+      "industry": "电机Ⅱ",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "131515",
+      "lastLimitTime": "133139",
+      "openCount": 5,
+      "sealedAmount": 3681792,
+      "turnoverRate": 6.403580188751221,
+      "pctChange": 10.010110855102539
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "电机Ⅱ",
+      "type": "industry",
+      "pctChange": 10.010110855102539,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 329565600,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "002892",
+      "leaderName": "科力尔",
+      "leaderPctChange": 10.010110855102539,
+      "heatScore": 53.91,
+      "trend": [],
+      "reasons": [
+        "主力净流入 3.3 亿",
+        "1 只涨停",
+        "领涨 科力尔 10.01%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

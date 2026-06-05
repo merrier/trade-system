@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "600516",
+    "name": "方大炭素",
+    "market": "main",
+    "industry": "冶钢原料",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 751947920,
+    "turnoverRate": 3.2273190021514893,
+    "volumeRatio": 1,
+    "close": 5.83,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 27,
+    "code": "600516",
+    "name": "方大炭素",
+    "market": "main",
+    "score": 35.49,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 1 次，封单 0.23 亿",
+      "行业：冶钢原料"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 26.87,
+      "dragonTiger": 30,
+      "sectorHeat": 44,
+      "moneyFlow": 33.33,
+      "liquidity": 35,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "600516",
+      "name": "方大炭素",
+      "market": "main",
+      "industry": "冶钢原料",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093810",
+      "lastLimitTime": "095904",
+      "openCount": 1,
+      "sealedAmount": 23243265,
+      "turnoverRate": 3.2273190021514893,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "冶钢原料",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1472748128,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "600516",
+      "leaderName": "方大炭素",
+      "leaderPctChange": 10,
+      "heatScore": 61.05,
+      "trend": [],
+      "reasons": [
+        "主力净流入 14.73 亿",
+        "2 只涨停",
+        "领涨 方大炭素 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

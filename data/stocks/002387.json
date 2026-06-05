@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002387",
+    "name": "维信诺",
+    "market": "main",
+    "industry": "光学光电",
+    "concepts": [],
+    "pctChange": 9.97624683380127,
+    "turnoverAmount": 826919440,
+    "turnoverRate": 6.471541881561279,
+    "volumeRatio": 1,
+    "close": 9.26,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "002387",
+      "name": "维信诺",
+      "market": "main",
+      "industry": "光学光电",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "095212",
+      "lastLimitTime": "145033",
+      "openCount": 5,
+      "sealedAmount": 15608637,
+      "turnoverRate": 6.471541881561279,
+      "pctChange": 9.97624683380127
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "光学光电",
+      "type": "industry",
+      "pctChange": 9.988280296325684,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3987894801,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "002983",
+      "leaderName": "芯瑞达",
+      "leaderPctChange": 10.008857727050781,
+      "heatScore": 71.96,
+      "trend": [],
+      "reasons": [
+        "主力净流入 39.88 亿",
+        "3 只涨停",
+        "领涨 芯瑞达 10.01%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

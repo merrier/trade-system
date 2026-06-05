@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "603938",
+    "name": "三孚股份",
+    "market": "main",
+    "industry": "化学原料",
+    "concepts": [],
+    "pctChange": 9.995835304260254,
+    "turnoverAmount": 2448427504,
+    "turnoverRate": 12.383955001831055,
+    "volumeRatio": 1,
+    "close": 52.82,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "603938",
+      "name": "三孚股份",
+      "market": "main",
+      "industry": "化学原料",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "094945",
+      "lastLimitTime": "144954",
+      "openCount": 6,
+      "sealedAmount": 47216643,
+      "turnoverRate": 12.383955001831055,
+      "pctChange": 9.995835304260254
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "化学原料",
+      "type": "industry",
+      "pctChange": 9.996245861053467,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3135985376,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "603938",
+      "leaderName": "三孚股份",
+      "leaderPctChange": 9.995835304260254,
+      "heatScore": 65.61,
+      "trend": [],
+      "reasons": [
+        "主力净流入 31.36 亿",
+        "2 只涨停",
+        "领涨 三孚股份 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

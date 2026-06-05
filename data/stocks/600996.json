@@ -1,0 +1,93 @@
+{
+  "stock": {
+    "code": "600996",
+    "name": "贵广网络",
+    "market": "main",
+    "industry": "电视广播",
+    "concepts": [],
+    "pctChange": 9.964829444885254,
+    "turnoverAmount": 509900768,
+    "turnoverRate": 4.547547340393066,
+    "volumeRatio": 1,
+    "close": 9.38,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 41,
+    "code": "600996",
+    "name": "贵广网络",
+    "market": "main",
+    "score": 24.26,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 4 次，封单 0.93 亿",
+      "行业：电视广播"
+    ],
+    "risks": [
+      "涨停开板次数较多，封板稳定性一般"
+    ],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 29.49,
+      "dragonTiger": 30,
+      "sectorHeat": 4,
+      "moneyFlow": 33.33,
+      "liquidity": 22.39,
+      "riskPenalty": 16
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "600996",
+      "name": "贵广网络",
+      "market": "main",
+      "industry": "电视广播",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "130105",
+      "lastLimitTime": "131232",
+      "openCount": 4,
+      "sealedAmount": 93011507,
+      "turnoverRate": 4.547547340393066,
+      "pctChange": 9.964829444885254
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "电视广播",
+      "type": "industry",
+      "pctChange": 9.964829444885254,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 509900768,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600996",
+      "leaderName": "贵广网络",
+      "leaderPctChange": 9.964829444885254,
+      "heatScore": 54.37,
+      "trend": [],
+      "reasons": [
+        "主力净流入 5.1 亿",
+        "1 只涨停",
+        "领涨 贵广网络 9.96%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

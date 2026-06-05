@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "002896",
+    "name": "中大力德",
+    "market": "main",
+    "industry": "通用设备",
+    "concepts": [],
+    "pctChange": 10.002535820007324,
+    "turnoverAmount": 2351434352,
+    "turnoverRate": 14.611720085144043,
+    "volumeRatio": 1,
+    "close": 86.77,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "002896",
+      "name": "中大力德",
+      "market": "main",
+      "industry": "通用设备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "131906",
+      "lastLimitTime": "143706",
+      "openCount": 12,
+      "sealedAmount": 36572687,
+      "turnoverRate": 14.611720085144043,
+      "pctChange": 10.002535820007324
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "通用设备",
+      "type": "industry",
+      "pctChange": 10.023123025894165,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 2944536008,
+      "companyCount": 4,
+      "limitUpCount": 4,
+      "leaderCode": "002903",
+      "leaderName": "宇环数控",
+      "leaderPctChange": 10.011480331420898,
+      "heatScore": 73.1,
+      "trend": [],
+      "reasons": [
+        "主力净流入 29.45 亿",
+        "4 只涨停",
+        "领涨 宇环数控 10.01%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

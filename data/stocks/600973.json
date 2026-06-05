@@ -1,0 +1,94 @@
+{
+  "stock": {
+    "code": "600973",
+    "name": "宝胜股份",
+    "market": "main",
+    "industry": "电网设备",
+    "concepts": [],
+    "pctChange": 9.956709861755371,
+    "turnoverAmount": 698116128,
+    "turnoverRate": 6.802299499511719,
+    "volumeRatio": 1,
+    "close": 7.62,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 20,
+    "code": "600973",
+    "name": "宝胜股份",
+    "market": "main",
+    "score": 38.18,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 3 次，封单 0.5 亿",
+      "所属板块热度高，板块分 76",
+      "行业：电网设备"
+    ],
+    "risks": [
+      "涨停开板次数较多，封板稳定性一般"
+    ],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 27.89,
+      "dragonTiger": 30,
+      "sectorHeat": 76,
+      "moneyFlow": 33.33,
+      "liquidity": 32.19,
+      "riskPenalty": 16
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "600973",
+      "name": "宝胜股份",
+      "market": "main",
+      "industry": "电网设备",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "095645",
+      "lastLimitTime": "141430",
+      "openCount": 3,
+      "sealedAmount": 50349912,
+      "turnoverRate": 6.802299499511719,
+      "pctChange": 9.956709861755371
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "电网设备",
+      "type": "industry",
+      "pctChange": 9.969547271728516,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1587710103,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "002471",
+      "leaderName": "中超控股",
+      "leaderPctChange": 9.95850658416748,
+      "heatScore": 65.33,
+      "trend": [],
+      "reasons": [
+        "主力净流入 15.88 亿",
+        "3 只涨停",
+        "领涨 中超控股 9.96%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

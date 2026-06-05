@@ -1,0 +1,981 @@
+{
+  "id": "static-20260605",
+  "tradeDate": "20260605",
+  "mode": "post_close",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ],
+  "prompt": "默认盘后短线强势策略",
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "recommendations": [
+    {
+      "rank": 1,
+      "code": "603135",
+      "name": "中重科技",
+      "market": "main",
+      "score": 56.56,
+      "confidence": 78,
+      "reasons": [
+        "3 连板，开板 0 次，封单 0.58 亿",
+        "所属板块热度高，板块分 100",
+        "行业：专用设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 74.16,
+        "dragonTiger": 30,
+        "sectorHeat": 100,
+        "moneyFlow": 33.33,
+        "liquidity": 20,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 2,
+      "code": "002903",
+      "name": "宇环数控",
+      "market": "main",
+      "score": 46.24,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 0 次，封单 1.01 亿",
+        "所属板块热度高，板块分 96",
+        "行业：通用设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 39.77,
+        "dragonTiger": 30,
+        "sectorHeat": 96,
+        "moneyFlow": 33.33,
+        "liquidity": 8.31,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 3,
+      "code": "603159",
+      "name": "上海亚虹",
+      "market": "main",
+      "score": 45.81,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.21 亿",
+        "所属板块热度高，板块分 100",
+        "行业：专用设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 36.8,
+        "dragonTiger": 30,
+        "sectorHeat": 100,
+        "moneyFlow": 33.33,
+        "liquidity": 3.12,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 4,
+      "code": "600293",
+      "name": "三峡新材",
+      "market": "main",
+      "score": 45.69,
+      "confidence": 78,
+      "reasons": [
+        "2 连板，开板 1 次，封单 0.43 亿",
+        "所属板块热度高，板块分 72",
+        "行业：玻璃玻纤"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 45.61,
+        "dragonTiger": 30,
+        "sectorHeat": 72,
+        "moneyFlow": 33.33,
+        "liquidity": 38.24,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 5,
+      "code": "603270",
+      "name": "金帝股份",
+      "market": "main",
+      "score": 45.62,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.47 亿",
+        "所属板块热度高，板块分 96",
+        "行业：通用设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 37.77,
+        "dragonTiger": 30,
+        "sectorHeat": 96,
+        "moneyFlow": 33.33,
+        "liquidity": 6.92,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 6,
+      "code": "002877",
+      "name": "智能自控",
+      "market": "main",
+      "score": 45.37,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.53 亿",
+        "所属板块热度高，板块分 96",
+        "行业：通用设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 38,
+        "dragonTiger": 30,
+        "sectorHeat": 96,
+        "moneyFlow": 33.33,
+        "liquidity": 3.16,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 7,
+      "code": "002471",
+      "name": "中超控股",
+      "market": "main",
+      "score": 45.11,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 0 次，封单 1.44 亿",
+        "所属板块热度高，板块分 76",
+        "行业：电网设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 41.42,
+        "dragonTiger": 30,
+        "sectorHeat": 76,
+        "moneyFlow": 33.33,
+        "liquidity": 34.76,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 8,
+      "code": "002983",
+      "name": "芯瑞达",
+      "market": "main",
+      "score": 44.82,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.57 亿",
+        "所属板块热度高，板块分 92",
+        "行业：光学光电"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 38.12,
+        "dragonTiger": 30,
+        "sectorHeat": 92,
+        "moneyFlow": 33.33,
+        "liquidity": 5.27,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 9,
+      "code": "001400",
+      "name": "江顺科技",
+      "market": "main",
+      "score": 44.14,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 1 次，封单 0.4 亿",
+        "所属板块热度高，板块分 100",
+        "行业：专用设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 27.49,
+        "dragonTiger": 30,
+        "sectorHeat": 100,
+        "moneyFlow": 33.33,
+        "liquidity": 10.95,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 10,
+      "code": "002960",
+      "name": "青鸟智控",
+      "market": "main",
+      "score": 43.98,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 1 次，封单 0.16 亿",
+        "所属板块热度高，板块分 100",
+        "行业：专用设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 26.58,
+        "dragonTiger": 30,
+        "sectorHeat": 100,
+        "moneyFlow": 33.33,
+        "liquidity": 11.71,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 11,
+      "code": "001256",
+      "name": "炜冈科技",
+      "market": "main",
+      "score": 43.39,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 2 次，封单 0.2 亿",
+        "所属板块热度高，板块分 100",
+        "行业：专用设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 26.75,
+        "dragonTiger": 30,
+        "sectorHeat": 100,
+        "moneyFlow": 33.33,
+        "liquidity": 4.22,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 12,
+      "code": "002361",
+      "name": "神剑股份",
+      "market": "main",
+      "score": 41.81,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 1 次，封单 2 亿",
+        "行业：塑料"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 33.5,
+        "dragonTiger": 30,
+        "sectorHeat": 40,
+        "moneyFlow": 33.33,
+        "liquidity": 100,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 13,
+      "code": "603070",
+      "name": "万控智造",
+      "market": "main",
+      "score": 41.57,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.47 亿",
+        "所属板块热度高，板块分 76",
+        "行业：电网设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 37.77,
+        "dragonTiger": 30,
+        "sectorHeat": 76,
+        "moneyFlow": 33.33,
+        "liquidity": 3.24,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 14,
+      "code": "002251",
+      "name": "步步高",
+      "market": "main",
+      "score": 40.73,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 1 次，封单 0.92 亿",
+        "行业：一般零售"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 29.44,
+        "dragonTiger": 30,
+        "sectorHeat": 48,
+        "moneyFlow": 33.33,
+        "liquidity": 81.16,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 15,
+      "code": "600819",
+      "name": "耀皮玻璃",
+      "market": "main",
+      "score": 40.69,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.23 亿",
+        "所属板块热度高，板块分 72",
+        "行业：玻璃玻纤"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 36.85,
+        "dragonTiger": 30,
+        "sectorHeat": 72,
+        "moneyFlow": 33.33,
+        "liquidity": 4.45,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 16,
+      "code": "002613",
+      "name": "北玻股份",
+      "market": "main",
+      "score": 40.5,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 1 次，封单 0.75 亿",
+        "所属板块热度高，板块分 72",
+        "行业：玻璃玻纤"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 28.8,
+        "dragonTiger": 30,
+        "sectorHeat": 72,
+        "moneyFlow": 33.33,
+        "liquidity": 26.33,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 17,
+      "code": "603166",
+      "name": "福达股份",
+      "market": "main",
+      "score": 39.26,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.15 亿",
+        "行业：汽车零部"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 36.58,
+        "dragonTiger": 30,
+        "sectorHeat": 64,
+        "moneyFlow": 33.33,
+        "liquidity": 6.15,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 18,
+      "code": "603992",
+      "name": "松霖科技",
+      "market": "main",
+      "score": 38.96,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.53 亿",
+        "行业：家居用品"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 37.97,
+        "dragonTiger": 30,
+        "sectorHeat": 60,
+        "moneyFlow": 33.33,
+        "liquidity": 7.33,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 19,
+      "code": "600714",
+      "name": "金瑞矿业",
+      "market": "main",
+      "score": 38.74,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 3 次，封单 0.35 亿",
+        "所属板块热度高，板块分 80",
+        "行业：化学原料"
+      ],
+      "risks": [
+        "涨停开板次数较多，封板稳定性一般"
+      ],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 27.33,
+        "dragonTiger": 30,
+        "sectorHeat": 80,
+        "moneyFlow": 33.33,
+        "liquidity": 31.64,
+        "riskPenalty": 16
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 20,
+      "code": "600973",
+      "name": "宝胜股份",
+      "market": "main",
+      "score": 38.18,
+      "confidence": 78,
+      "reasons": [
+        "1 连板，开板 3 次，封单 0.5 亿",
+        "所属板块热度高，板块分 76",
+        "行业：电网设备"
+      ],
+      "risks": [
+        "涨停开板次数较多，封板稳定性一般"
+      ],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 27.89,
+        "dragonTiger": 30,
+        "sectorHeat": 76,
+        "moneyFlow": 33.33,
+        "liquidity": 32.19,
+        "riskPenalty": 16
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 21,
+      "code": "002183",
+      "name": "怡 亚 通",
+      "market": "main",
+      "score": 38,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 0 次，封单 1.32 亿",
+        "行业：贸易Ⅱ"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 40.93,
+        "dragonTiger": 30,
+        "sectorHeat": 24,
+        "moneyFlow": 33.33,
+        "liquidity": 67.94,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 22,
+      "code": "603020",
+      "name": "爱普股份",
+      "market": "main",
+      "score": 37.97,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.75 亿",
+        "行业：化学制品"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 38.81,
+        "dragonTiger": 30,
+        "sectorHeat": 56,
+        "moneyFlow": 33.33,
+        "liquidity": 1.98,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 23,
+      "code": "000668",
+      "name": "荣丰控股",
+      "market": "main",
+      "score": 36.88,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.41 亿",
+        "行业：房地产开"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 37.53,
+        "dragonTiger": 30,
+        "sectorHeat": 52,
+        "moneyFlow": 33.33,
+        "liquidity": 1.77,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 24,
+      "code": "603725",
+      "name": "天安新材",
+      "market": "main",
+      "score": 36.77,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 2 次，封单 0.29 亿",
+        "行业：家居用品"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 27.07,
+        "dragonTiger": 30,
+        "sectorHeat": 60,
+        "moneyFlow": 33.33,
+        "liquidity": 13.73,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 25,
+      "code": "002631",
+      "name": "德尔未来",
+      "market": "main",
+      "score": 36.66,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 1 次，封单 0.27 亿",
+        "行业：家居用品"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 27.01,
+        "dragonTiger": 30,
+        "sectorHeat": 60,
+        "moneyFlow": 33.33,
+        "liquidity": 12.59,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 26,
+      "code": "002194",
+      "name": "武汉凡谷",
+      "market": "main",
+      "score": 35.6,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 0 次，封单 1.57 亿",
+        "行业：通信设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 41.89,
+        "dragonTiger": 30,
+        "sectorHeat": 32,
+        "moneyFlow": 33.33,
+        "liquidity": 18.31,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 27,
+      "code": "600516",
+      "name": "方大炭素",
+      "market": "main",
+      "score": 35.49,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 1 次，封单 0.23 亿",
+        "行业：冶钢原料"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 26.87,
+        "dragonTiger": 30,
+        "sectorHeat": 44,
+        "moneyFlow": 33.33,
+        "liquidity": 35,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 28,
+      "code": "603790",
+      "name": "XD雅运股",
+      "market": "main",
+      "score": 35.1,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 2 次，封单 0.2 亿",
+        "行业：化学制品"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 26.76,
+        "dragonTiger": 30,
+        "sectorHeat": 56,
+        "moneyFlow": 33.33,
+        "liquidity": 3.63,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 29,
+      "code": "600776",
+      "name": "东方通信",
+      "market": "main",
+      "score": 34.95,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.79 亿",
+        "行业：通信设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 38.97,
+        "dragonTiger": 30,
+        "sectorHeat": 32,
+        "moneyFlow": 33.33,
+        "liquidity": 19.26,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 30,
+      "code": "000759",
+      "name": "中百集团",
+      "market": "main",
+      "score": 34.64,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 1 次，封单 0.4 亿",
+        "行业：一般零售"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 27.51,
+        "dragonTiger": 30,
+        "sectorHeat": 48,
+        "moneyFlow": 33.33,
+        "liquidity": 13.93,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 31,
+      "code": "000517",
+      "name": "荣安地产",
+      "market": "main",
+      "score": 34.35,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 1 次，封单 0.37 亿",
+        "行业：房地产开"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 27.38,
+        "dragonTiger": 30,
+        "sectorHeat": 52,
+        "moneyFlow": 33.33,
+        "liquidity": 1.79,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 32,
+      "code": "000520",
+      "name": "凤凰航运",
+      "market": "main",
+      "score": 32.16,
+      "confidence": 66,
+      "reasons": [
+        "2 连板，开板 0 次，封单 0.68 亿",
+        "行业：航运港口"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 56.56,
+        "dragonTiger": 30,
+        "sectorHeat": 0,
+        "moneyFlow": 33.33,
+        "liquidity": 4.97,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 33,
+      "code": "603360",
+      "name": "百傲化学",
+      "market": "main",
+      "score": 30.46,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.56 亿",
+        "行业：农化制品"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 38.1,
+        "dragonTiger": 30,
+        "sectorHeat": 8,
+        "moneyFlow": 33.33,
+        "liquidity": 21.92,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 34,
+      "code": "603124",
+      "name": "江南新材",
+      "market": "main",
+      "score": 29.86,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 1 次，封单 0.23 亿",
+        "行业：金属新材"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 26.88,
+        "dragonTiger": 30,
+        "sectorHeat": 16,
+        "moneyFlow": 33.33,
+        "liquidity": 30.42,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 35,
+      "code": "002354",
+      "name": "天娱数科",
+      "market": "main",
+      "score": 28.74,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 4 次，封单 1.02 亿",
+        "行业：广告营销"
+      ],
+      "risks": [
+        "涨停开板次数较多，封板稳定性一般"
+      ],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 29.83,
+        "dragonTiger": 30,
+        "sectorHeat": 20,
+        "moneyFlow": 33.33,
+        "liquidity": 39.13,
+        "riskPenalty": 16
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 36,
+      "code": "600207",
+      "name": "安彩高科",
+      "market": "main",
+      "score": 28.64,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 2 次，封单 0.26 亿",
+        "行业：光伏设备"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 26.99,
+        "dragonTiger": 30,
+        "sectorHeat": 12,
+        "moneyFlow": 33.33,
+        "liquidity": 24.46,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 37,
+      "code": "603888",
+      "name": "新华网",
+      "market": "main",
+      "score": 28.27,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 0 次，封单 1.26 亿",
+        "行业：数字媒体"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 40.71,
+        "dragonTiger": 30,
+        "sectorHeat": 0,
+        "moneyFlow": 33.33,
+        "liquidity": 5.89,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 38,
+      "code": "600303",
+      "name": "曙光股份",
+      "market": "main",
+      "score": 27.71,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.33 亿",
+        "行业：商用车"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 37.24,
+        "dragonTiger": 30,
+        "sectorHeat": 0,
+        "moneyFlow": 33.33,
+        "liquidity": 9.49,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 39,
+      "code": "603578",
+      "name": "三星新材",
+      "market": "main",
+      "score": 27.5,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 0 次，封单 0.71 亿",
+        "行业：家电零部"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 38.65,
+        "dragonTiger": 30,
+        "sectorHeat": 0,
+        "moneyFlow": 33.33,
+        "liquidity": 2.84,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 40,
+      "code": "600881",
+      "name": "亚泰集团",
+      "market": "main",
+      "score": 24.95,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 2 次，封单 0.08 亿",
+        "行业：综合Ⅱ"
+      ],
+      "risks": [],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 26.29,
+        "dragonTiger": 30,
+        "sectorHeat": 0,
+        "moneyFlow": 33.33,
+        "liquidity": 9.26,
+        "riskPenalty": 0
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    },
+    {
+      "rank": 41,
+      "code": "600996",
+      "name": "贵广网络",
+      "market": "main",
+      "score": 24.26,
+      "confidence": 66,
+      "reasons": [
+        "1 连板，开板 4 次，封单 0.93 亿",
+        "行业：电视广播"
+      ],
+      "risks": [
+        "涨停开板次数较多，封板稳定性一般"
+      ],
+      "factors": {
+        "strategyMatch": 45,
+        "limitUpStrength": 29.49,
+        "dragonTiger": 30,
+        "sectorHeat": 4,
+        "moneyFlow": 33.33,
+        "liquidity": 22.39,
+        "riskPenalty": 16
+      },
+      "dataAsOf": "2026-06-05T11:21:58.381725"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "002251",
+    "name": "步步高",
+    "market": "main",
+    "industry": "一般零售",
+    "concepts": [],
+    "pctChange": 9.954751014709473,
+    "turnoverAmount": 1638265984,
+    "turnoverRate": 15.943615913391113,
+    "volumeRatio": 1,
+    "close": 4.86,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 14,
+    "code": "002251",
+    "name": "步步高",
+    "market": "main",
+    "score": 40.73,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 1 次，封单 0.92 亿",
+      "行业：一般零售"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 29.44,
+      "dragonTiger": 30,
+      "sectorHeat": 48,
+      "moneyFlow": 33.33,
+      "liquidity": 81.16,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "002251",
+      "name": "步步高",
+      "market": "main",
+      "industry": "一般零售",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "093221",
+      "lastLimitTime": "144733",
+      "openCount": 1,
+      "sealedAmount": 91781182,
+      "turnoverRate": 15.943615913391113,
+      "pctChange": 9.954751014709473
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "一般零售",
+      "type": "industry",
+      "pctChange": 9.99668025970459,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1985656224,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "002251",
+      "leaderName": "步步高",
+      "leaderPctChange": 9.954751014709473,
+      "heatScore": 62.42,
+      "trend": [],
+      "reasons": [
+        "主力净流入 19.86 亿",
+        "2 只涨停",
+        "领涨 步步高 9.95%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

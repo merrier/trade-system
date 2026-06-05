@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "600881",
+    "name": "亚泰集团",
+    "market": "main",
+    "industry": "综合Ⅱ",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 257858371,
+    "turnoverRate": 4.996262073516846,
+    "volumeRatio": 1,
+    "close": 1.65,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 40,
+    "code": "600881",
+    "name": "亚泰集团",
+    "market": "main",
+    "score": 24.95,
+    "confidence": 66,
+    "reasons": [
+      "1 连板，开板 2 次，封单 0.08 亿",
+      "行业：综合Ⅱ"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 26.29,
+      "dragonTiger": 30,
+      "sectorHeat": 0,
+      "moneyFlow": 33.33,
+      "liquidity": 9.26,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "600881",
+      "name": "亚泰集团",
+      "market": "main",
+      "industry": "综合Ⅱ",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "140657",
+      "lastLimitTime": "143121",
+      "openCount": 2,
+      "sealedAmount": 7655587,
+      "turnoverRate": 4.996262073516846,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "综合Ⅱ",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 257858371,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "600881",
+      "leaderName": "亚泰集团",
+      "leaderPctChange": 10,
+      "heatScore": 53.71,
+      "trend": [],
+      "reasons": [
+        "主力净流入 2.58 亿",
+        "1 只涨停",
+        "领涨 亚泰集团 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

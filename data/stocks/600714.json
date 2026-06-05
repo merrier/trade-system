@@ -1,0 +1,94 @@
+{
+  "stock": {
+    "code": "600714",
+    "name": "金瑞矿业",
+    "market": "main",
+    "industry": "化学原料",
+    "concepts": [],
+    "pctChange": 9.99665641784668,
+    "turnoverAmount": 687557872,
+    "turnoverRate": 7.600383758544922,
+    "volumeRatio": 1,
+    "close": 32.9,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 19,
+    "code": "600714",
+    "name": "金瑞矿业",
+    "market": "main",
+    "score": 38.74,
+    "confidence": 78,
+    "reasons": [
+      "1 连板，开板 3 次，封单 0.35 亿",
+      "所属板块热度高，板块分 80",
+      "行业：化学原料"
+    ],
+    "risks": [
+      "涨停开板次数较多，封板稳定性一般"
+    ],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 27.33,
+      "dragonTiger": 30,
+      "sectorHeat": 80,
+      "moneyFlow": 33.33,
+      "liquidity": 31.64,
+      "riskPenalty": 16
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "600714",
+      "name": "金瑞矿业",
+      "market": "main",
+      "industry": "化学原料",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "095957",
+      "lastLimitTime": "100548",
+      "openCount": 3,
+      "sealedAmount": 35413560,
+      "turnoverRate": 7.600383758544922,
+      "pctChange": 9.99665641784668
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "化学原料",
+      "type": "industry",
+      "pctChange": 9.996245861053467,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 3135985376,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "603938",
+      "leaderName": "三孚股份",
+      "leaderPctChange": 9.995835304260254,
+      "heatScore": 65.61,
+      "trend": [],
+      "reasons": [
+        "主力净流入 31.36 亿",
+        "2 只涨停",
+        "领涨 三孚股份 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

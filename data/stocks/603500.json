@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "603500",
+    "name": "祥和实业",
+    "market": "main",
+    "industry": "轨交设备",
+    "concepts": [],
+    "pctChange": 9.982014656066895,
+    "turnoverAmount": 65812602,
+    "turnoverRate": 1.6178882122039795,
+    "volumeRatio": 1,
+    "close": 12.23,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "603500",
+      "name": "祥和实业",
+      "market": "main",
+      "industry": "轨交设备",
+      "concepts": [],
+      "consecutive": 2,
+      "firstLimitTime": "092502",
+      "lastLimitTime": "092502",
+      "openCount": 0,
+      "sealedAmount": 166624663,
+      "turnoverRate": 1.6178882122039795,
+      "pctChange": 9.982014656066895
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "轨交设备",
+      "type": "industry",
+      "pctChange": 9.982014656066895,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 65812602,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "603500",
+      "leaderName": "祥和实业",
+      "leaderPctChange": 9.982014656066895,
+      "heatScore": 53.17,
+      "trend": [],
+      "reasons": [
+        "主力净流入 0.66 亿",
+        "1 只涨停",
+        "领涨 祥和实业 9.98%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

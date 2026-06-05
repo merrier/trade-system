@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "603823",
+    "name": "XD百合花",
+    "market": "main",
+    "industry": "化学制品",
+    "concepts": [],
+    "pctChange": 9.988860130310059,
+    "turnoverAmount": 592463984,
+    "turnoverRate": 4.891592502593994,
+    "volumeRatio": 1,
+    "close": 29.62,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "603823",
+      "name": "XD百合花",
+      "market": "main",
+      "industry": "化学制品",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "095248",
+      "lastLimitTime": "143150",
+      "openCount": 18,
+      "sealedAmount": 13383737,
+      "turnoverRate": 4.891592502593994,
+      "pctChange": 9.988860130310059
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "化学制品",
+      "type": "industry",
+      "pctChange": 9.990897178649902,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 860347036,
+      "companyCount": 3,
+      "limitUpCount": 3,
+      "leaderCode": "603020",
+      "leaderName": "爱普股份",
+      "leaderPctChange": 10,
+      "heatScore": 63.36,
+      "trend": [],
+      "reasons": [
+        "主力净流入 8.6 亿",
+        "3 只涨停",
+        "领涨 爱普股份 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

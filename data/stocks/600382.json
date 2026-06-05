@@ -1,0 +1,68 @@
+{
+  "stock": {
+    "code": "600382",
+    "name": "广东明珠",
+    "market": "main",
+    "industry": "冶钢原料",
+    "concepts": [],
+    "pctChange": 10,
+    "turnoverAmount": 720800208,
+    "turnoverRate": 10.912911415100098,
+    "volumeRatio": 1,
+    "close": 9.68,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "600382",
+      "name": "广东明珠",
+      "market": "main",
+      "industry": "冶钢原料",
+      "concepts": [],
+      "consecutive": 1,
+      "firstLimitTime": "101418",
+      "lastLimitTime": "145615",
+      "openCount": 21,
+      "sealedAmount": 1732720,
+      "turnoverRate": 10.912911415100098,
+      "pctChange": 10
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "冶钢原料",
+      "type": "industry",
+      "pctChange": 10,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 1472748128,
+      "companyCount": 2,
+      "limitUpCount": 2,
+      "leaderCode": "600516",
+      "leaderName": "方大炭素",
+      "leaderPctChange": 10,
+      "heatScore": 61.05,
+      "trend": [],
+      "reasons": [
+        "主力净流入 14.73 亿",
+        "2 只涨停",
+        "领涨 方大炭素 10%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}

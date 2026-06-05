@@ -1,0 +1,91 @@
+{
+  "stock": {
+    "code": "000520",
+    "name": "凤凰航运",
+    "market": "main",
+    "industry": "航运港口",
+    "concepts": [],
+    "pctChange": 10.047846794128418,
+    "turnoverAmount": 175432181,
+    "turnoverRate": 3.8560409545898438,
+    "volumeRatio": 1,
+    "close": 4.6,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0,
+    "ma5": null,
+    "listedDays": 999,
+    "mainNetInflow": 0
+  },
+  "score": {
+    "rank": 32,
+    "code": "000520",
+    "name": "凤凰航运",
+    "market": "main",
+    "score": 32.16,
+    "confidence": 66,
+    "reasons": [
+      "2 连板，开板 0 次，封单 0.68 亿",
+      "行业：航运港口"
+    ],
+    "risks": [],
+    "factors": {
+      "strategyMatch": 45,
+      "limitUpStrength": 56.56,
+      "dragonTiger": 30,
+      "sectorHeat": 0,
+      "moneyFlow": 33.33,
+      "liquidity": 4.97,
+      "riskPenalty": 0
+    },
+    "dataAsOf": "2026-06-05T11:21:58.381725"
+  },
+  "limitUps": [
+    {
+      "tradeDate": "20260605",
+      "code": "000520",
+      "name": "凤凰航运",
+      "market": "main",
+      "industry": "航运港口",
+      "concepts": [],
+      "consecutive": 2,
+      "firstLimitTime": "093212",
+      "lastLimitTime": "093212",
+      "openCount": 0,
+      "sealedAmount": 68206868,
+      "turnoverRate": 3.8560409545898438,
+      "pctChange": 10.047846794128418
+    }
+  ],
+  "dragonTiger": [],
+  "relatedSectors": [
+    {
+      "tradeDate": "20260605",
+      "name": "航运港口",
+      "type": "industry",
+      "pctChange": 10.047846794128418,
+      "inflowAmount": 0,
+      "outflowAmount": 0,
+      "netInflow": 175432181,
+      "companyCount": 1,
+      "limitUpCount": 1,
+      "leaderCode": "000520",
+      "leaderName": "凤凰航运",
+      "leaderPctChange": 10.047846794128418,
+      "heatScore": 53.52,
+      "trend": [],
+      "reasons": [
+        "主力净流入 1.75 亿",
+        "1 只涨停",
+        "领涨 凤凰航运 10.05%"
+      ]
+    }
+  ],
+  "dataAsOf": "2026-06-05T11:21:58.381725",
+  "source": "akshare_partial",
+  "warnings": [
+    "行业资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError",
+    "概念资金流接口不可用，已用涨停池行业聚合兜底：JSONDecodeError"
+  ]
+}
