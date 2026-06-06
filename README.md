@@ -13,6 +13,7 @@
 - 监控池：把主观看好的股票加入观察，满足模板/自然语言条件后进入触发推荐池。
 - 三时报：GitHub Actions 在北京时间 09:00、14:50、16:00 生成晨报、盘中主板选股、收盘复盘，并导出到 `data/reports/*/latest.json`。
 - 30 天主板滑窗：按沪深主板代码前缀缓存最近 30 个 A 股交易日的开收盘价、成交量、成交额、涨跌幅和换手率。
+- 问财主板全量快照：通过 `hithink-market-query` 技能分页抓取 A 股主板全量行情，写入 SQLite 和原始 JSON。
 
 ## 快速开始
 
@@ -21,6 +22,7 @@ cp .env.example .env
 npm install
 npm run prisma:generate
 npm run db:init
+npm run ingest:iwencai-main-board
 npm run ingest:post-close
 npm run dev
 ```
@@ -29,13 +31,13 @@ API 默认运行在 `http://localhost:8787`，Web 看板默认运行在 `http://
 
 ## GitHub Pages
 
-源码提交到 `dev` 分支后，`.github/workflows/deploy-pages.yml` 会自动构建前端、导出静态行情 JSON，并把 `dist-web` 发布到 `main` 分支。仓库的 GitHub Pages 需要配置为从 `main` 分支根目录发布。
+仓库可以通过 GitHub Pages 从 `main` 分支根目录发布静态页面。当前没有恢复之前那个构建前端并覆盖 `main` 的 Pages 发布 workflow。
+
+现在只保留一个很窄的 GitHub Action：`Ingest Iwencai main board data`。它在北京时间工作日 16:40 运行，也可以手动触发；任务只安装 `hithink-market-query` 技能、抓取问财主板全量行情，并把 `data/iwencai/*.json` 与 `cache/main-daily-bars.json` 提交回 `dev` 分支，不会推送或覆盖 `main`。
 
 GitHub Pages 只能托管静态页面，不能运行 Fastify API。当前免费部署模式不需要 `PAGES_API_BASE_URL`，页面会直接读取 `data/*.json`。本地开发仍然通过 Vite proxy 请求 `http://localhost:8787/api`。
 
-仓库默认分支应保持为 `dev`，因为 GitHub Actions 的 `schedule` 只会从默认分支读取 workflow；`main` 只作为 GitHub Pages 静态发布分支。
-
-Workflow 会在北京时间交易日 09:00、14:50、16:00 左右自动运行，也可以在 GitHub Actions 页面手动触发。页面会读取静态镜像：
+页面会读取静态镜像：
 
 - `data/reports/morning/latest.json`
 - `data/reports/intraday-selection/latest.json`
@@ -73,6 +75,48 @@ ASHARE_MODULE_PATH="/path/to/Ashare.py"
 ```
 
 如果 `prisma db push` 在本机 SQLite schema engine 上失败，使用 `npm run db:init` 初始化数据库；运行时仍由 Prisma Client 读写。
+
+### 同花顺问财 SkillHub
+
+安装 `hithink-market-query` 技能并配置 `IWENCAI_API_KEY` 后，可以每日抓取 A 股主板全量行情：
+
+```bash
+source ~/.zshrc
+npm run db:init
+npm run ingest:iwencai-main-board
+```
+
+默认查询：
+
+```text
+A股主板股票 股票代码 股票简称 上市板块 最新价 涨跌幅 开盘价 最高价 最低价 收盘价 成交量 成交额 换手率 主力资金流向 主力增仓占比
+```
+
+输出会写入：
+
+- SQLite `DailyBarRecord`：结构化日线字段，供推荐、筛选、监控使用。
+- SQLite `Stock`：同步股票基础信息和 ST/停牌状态。
+- `data/iwencai/main-board-YYYYMMDD.json`：问财原始返回，保留主力资金等全部查询字段。
+- `cache/main-daily-bars.json`：主板日线滑窗缓存，默认保留 90 天。
+
+可选参数：
+
+```bash
+npm run ingest:iwencai-main-board -- --limit=100 --delay-ms=250
+npm run ingest:iwencai-main-board -- --query="A股主板股票 最新价 成交额 换手率 主力资金流向" --limit=100
+```
+
+本地每日运行可以使用 macOS `launchd` 或 crontab。例如 crontab 工作日 16:40 执行：
+
+```cron
+40 16 * * 1-5 cd /Users/bytedance/repos/mine/trade-system && /bin/zsh -lc 'source ~/.zshrc && npm run ingest:iwencai-main-board >> data/iwencai-cron.log 2>&1'
+```
+
+云端每日运行使用 `.github/workflows/iwencai-main-board.yml`。需要在 GitHub 仓库 Secrets 配置：
+
+```text
+IWENCAI_API_KEY=你的问财 SkillHub API Key
+```
 
 ## DeepSeek
 

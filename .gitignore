@@ -10,6 +10,8 @@ data/*.db-journal
 data/*.sqlite
 data/*.sqlite-journal
 data/inbox/*.jsonl
+data/iwencai/
+cache/
 coverage/
 __pycache__/
 *.pyc

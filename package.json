@@ -15,6 +15,7 @@
     "db:init": "python3 python/init_db.py",
     "prisma:migrate": "npm run db:init && npm run prisma:generate",
     "ingest:post-close": "tsx src/jobs/postCloseIngest.ts",
+    "ingest:iwencai-main-board": "tsx src/jobs/ingestIwencaiMainBoard.ts",
     "export:static-data": "tsx src/jobs/exportStaticData.ts",
     "reports:run": "tsx src/jobs/runReport.ts",
     "reports:morning": "tsx src/jobs/runReport.ts --kind=morning",
