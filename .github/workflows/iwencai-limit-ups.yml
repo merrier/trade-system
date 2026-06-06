@@ -1,0 +1,84 @@
+name: Ingest Iwencai limit-up data
+
+on:
+  schedule:
+    # 16:45 Asia/Shanghai on weekdays.
+    - cron: "45 8 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: iwencai-limit-up-ingest
+  cancel-in-progress: true
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "file:../data/trade-system.db"
+      IWENCAI_API_KEY: ${{ secrets.IWENCAI_API_KEY }}
+      IWENCAI_API_KEY_FALLBACK: ${{ secrets.IWENCAI_API_KEY_FALLBACK }}
+      IWENCAI_BASE_URL: "https://openapi.iwencai.com"
+      IWENCAI_SKILL_CLI: "~/.codex/skills/hithink-market-query/scripts/cli.py"
+      IWENCAI_TIMEOUT_MS: "60000"
+      PYTHON_BIN: "python3"
+
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Node dependencies
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          yarn install --non-interactive --no-lockfile
+
+      - name: Generate Prisma client
+        run: yarn prisma:generate
+
+      - name: Initialize SQLite schema
+        run: yarn db:init
+
+      - name: Install Iwencai SkillHub CLI
+        run: |
+          curl -fsSL -o /tmp/iwencai-skillhub-cli.zip https://www.iwencai.com/skillhub/static/0.0.4/iwencai-skillhub-cli.zip
+          rm -rf /tmp/iwencai-skillhub-cli
+          mkdir -p /tmp/iwencai-skillhub-cli
+          unzip -q -o /tmp/iwencai-skillhub-cli.zip -d /tmp/iwencai-skillhub-cli
+          bash /tmp/iwencai-skillhub-cli/iwencai-skillhub-cli/iwencai-install.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install hithink market query skill
+        run: iwencai-skillhub-cli --dir "$HOME/.codex/skills" install hithink-market-query
+
+      - name: Ingest limit-up data
+        run: yarn ingest:iwencai-limit-ups
+
+      - name: Upload limit-up data artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iwencai-limit-up-data
+          path: data/iwencai/limit-ups-*.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Commit limit-up data to dev
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/iwencai/limit-ups-*.json
+          if git diff --cached --quiet; then
+            echo "No limit-up data changes to commit."
+          else
+            git commit -m "data: update iwencai limit ups $(date -u +%Y-%m-%d)"
+            git push origin HEAD:dev
+          fi

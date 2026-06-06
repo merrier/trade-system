@@ -14,6 +14,7 @@
 - 三时报：GitHub Actions 在北京时间 09:00、14:50、16:00 生成晨报、盘中主板选股、收盘复盘，并导出到 `data/reports/*/latest.json`。
 - 30 天主板滑窗：按沪深主板代码前缀缓存最近 30 个 A 股交易日的开收盘价、成交量、成交额、涨跌幅和换手率。
 - 问财主板全量快照：通过 `hithink-market-query` 技能分页抓取 A 股主板全量行情，写入 SQLite 和原始 JSON。
+- 问财涨停板快照：通过 `hithink-market-query` 技能抓取涨停原因、连板数、首封/终封时间、封单额、开板次数和行业。
 
 ## 快速开始
 
@@ -33,7 +34,12 @@ API 默认运行在 `http://localhost:8787`，Web 看板默认运行在 `http://
 
 仓库可以通过 GitHub Pages 从 `main` 分支根目录发布静态页面。当前没有恢复之前那个构建前端并覆盖 `main` 的 Pages 发布 workflow。
 
-现在只保留一个很窄的 GitHub Action：`Ingest Iwencai main board data`。它在北京时间工作日 16:40 运行，也可以手动触发；任务只安装 `hithink-market-query` 技能、抓取问财主板全量行情，并把 `data/iwencai/*.json` 与 `cache/main-daily-bars.json` 提交回 `dev` 分支，不会推送或覆盖 `main`。
+现在只保留很窄的问财数据 GitHub Actions：
+
+- `Ingest Iwencai main board data`：北京时间工作日 16:40 运行，抓取问财主板全量行情，并把 `data/iwencai/main-board-*.json` 与 `cache/main-daily-bars.json` 提交回 `dev` 分支。
+- `Ingest Iwencai limit-up data`：北京时间工作日 16:45 运行，抓取问财涨停板数据，并把 `data/iwencai/limit-ups-*.json` 提交回 `dev` 分支。
+
+这两个任务都不会推送或覆盖 `main`。
 
 GitHub Pages 只能托管静态页面，不能运行 Fastify API。当前免费部署模式不需要 `PAGES_API_BASE_URL`，页面会直接读取 `data/*.json`。本地开发仍然通过 Vite proxy 请求 `http://localhost:8787/api`。
 
@@ -84,6 +90,7 @@ ASHARE_MODULE_PATH="/path/to/Ashare.py"
 source ~/.zshrc
 npm run db:init
 npm run ingest:iwencai-main-board
+npm run ingest:iwencai-limit-ups
 ```
 
 默认查询：
@@ -99,11 +106,24 @@ A股主板股票 股票代码 股票简称 上市板块 最新价 涨跌幅 开�
 - `data/iwencai/main-board-YYYYMMDD.json`：问财原始返回，保留主力资金等全部查询字段。
 - `cache/main-daily-bars.json`：主板日线滑窗缓存，默认保留 90 天。
 
+涨停板抓取默认查询：
+
+```text
+今日A股涨停股票 股票代码 股票简称 最新价 最新涨跌幅 涨停原因 连续涨停天数 首次涨停时间 最终涨停时间 涨停封单额 涨停封单量 涨停开板次数 所属同花顺行业
+```
+
+涨停板输出会写入：
+
+- SQLite `LimitUpRecord`：涨停天梯结构化字段。
+- SQLite `Stock`：同步股票基础信息、行业和概念标签。
+- `data/iwencai/limit-ups-YYYYMMDD.json`：问财涨停板原始返回。
+
 可选参数：
 
 ```bash
 npm run ingest:iwencai-main-board -- --limit=100 --delay-ms=250
 npm run ingest:iwencai-main-board -- --query="A股主板股票 最新价 成交额 换手率 主力资金流向" --limit=100
+npm run ingest:iwencai-limit-ups -- --limit=100
 ```
 
 本地每日运行可以使用 macOS `launchd` 或 crontab。例如 crontab 工作日 16:40 执行：
@@ -112,7 +132,7 @@ npm run ingest:iwencai-main-board -- --query="A股主板股票 最新价 成交�
 40 16 * * 1-5 cd /Users/bytedance/repos/mine/trade-system && /bin/zsh -lc 'source ~/.zshrc && npm run ingest:iwencai-main-board >> data/iwencai-cron.log 2>&1'
 ```
 
-云端每日运行使用 `.github/workflows/iwencai-main-board.yml`。需要在 GitHub 仓库 Secrets 配置：
+云端每日运行使用 `.github/workflows/iwencai-main-board.yml` 和 `.github/workflows/iwencai-limit-ups.yml`。需要在 GitHub 仓库 Secrets 配置：
 
 ```text
 IWENCAI_API_KEY=你的问财 SkillHub API Key
