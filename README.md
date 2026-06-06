@@ -15,6 +15,7 @@
 - 30 天主板滑窗：按沪深主板代码前缀缓存最近 30 个 A 股交易日的开收盘价、成交量、成交额、涨跌幅和换手率。
 - 问财主板全量快照：通过 `hithink-market-query` 技能分页抓取 A 股主板全量行情，写入 SQLite 和原始 JSON。
 - 问财涨停板快照：通过 `hithink-market-query` 技能抓取涨停原因、连板数、首封/终封时间、封单额、开板次数和行业。
+- 问财龙虎榜快照：通过 `hithink-market-query` 技能抓取龙虎榜席位明细，并按股票聚合净买入额、买入额、卖出额和席位列表。
 
 ## 快速开始
 
@@ -38,8 +39,9 @@ API 默认运行在 `http://localhost:8787`，Web 看板默认运行在 `http://
 
 - `Ingest Iwencai main board data`：北京时间工作日 16:40 运行，抓取问财主板全量行情，并把 `data/iwencai/main-board-*.json` 与 `cache/main-daily-bars.json` 提交回 `dev` 分支。
 - `Ingest Iwencai limit-up data`：北京时间工作日 16:45 运行，抓取问财涨停板数据，并把 `data/iwencai/limit-ups-*.json` 提交回 `dev` 分支。
+- `Ingest Iwencai dragon tiger data`：北京时间工作日 16:55 运行，抓取问财龙虎榜席位明细，并把 `data/iwencai/dragon-tiger-*.json` 提交回 `dev` 分支。
 
-这两个任务都不会推送或覆盖 `main`。
+这些任务都不会推送或覆盖 `main`。
 
 GitHub Pages 只能托管静态页面，不能运行 Fastify API。当前免费部署模式不需要 `PAGES_API_BASE_URL`，页面会直接读取 `data/*.json`。本地开发仍然通过 Vite proxy 请求 `http://localhost:8787/api`。
 
@@ -91,6 +93,7 @@ source ~/.zshrc
 npm run db:init
 npm run ingest:iwencai-main-board
 npm run ingest:iwencai-limit-ups
+npm run ingest:iwencai-dragon-tiger
 ```
 
 默认查询：
@@ -118,12 +121,25 @@ A股主板股票 股票代码 股票简称 上市板块 最新价 涨跌幅 开�
 - SQLite `Stock`：同步股票基础信息、行业和概念标签。
 - `data/iwencai/limit-ups-YYYYMMDD.json`：问财涨停板原始返回。
 
+龙虎榜抓取默认查询：
+
+```text
+今日A股龙虎榜 股票代码 股票简称 上榜日期 上榜原因 龙虎榜净买入额 龙虎榜买入额 龙虎榜卖出额 营业部名称 买卖席位 营业部类型 买入额占成交额比例 卖出额占成交额比例 净买入额占成交额比例
+```
+
+龙虎榜输出会写入：
+
+- SQLite `DragonTigerRecord`：按股票聚合后的买入额、卖出额、净买入额和席位列表。
+- SQLite `Stock`：同步股票基础信息。
+- `data/iwencai/dragon-tiger-YYYYMMDD.json`：问财龙虎榜席位明细原始返回。
+
 可选参数：
 
 ```bash
 npm run ingest:iwencai-main-board -- --limit=100 --delay-ms=250
 npm run ingest:iwencai-main-board -- --query="A股主板股票 最新价 成交额 换手率 主力资金流向" --limit=100
 npm run ingest:iwencai-limit-ups -- --limit=100
+npm run ingest:iwencai-dragon-tiger -- --limit=100
 ```
 
 本地每日运行可以使用 macOS `launchd` 或 crontab。例如 crontab 工作日 16:40 执行：
@@ -132,7 +148,7 @@ npm run ingest:iwencai-limit-ups -- --limit=100
 40 16 * * 1-5 cd /Users/bytedance/repos/mine/trade-system && /bin/zsh -lc 'source ~/.zshrc && npm run ingest:iwencai-main-board >> data/iwencai-cron.log 2>&1'
 ```
 
-云端每日运行使用 `.github/workflows/iwencai-main-board.yml` 和 `.github/workflows/iwencai-limit-ups.yml`。需要在 GitHub 仓库 Secrets 配置：
+云端每日运行使用 `.github/workflows/iwencai-main-board.yml`、`.github/workflows/iwencai-limit-ups.yml` 和 `.github/workflows/iwencai-dragon-tiger.yml`。需要在 GitHub 仓库 Secrets 配置：
 
 ```text
 IWENCAI_API_KEY=你的问财 SkillHub API Key
