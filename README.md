@@ -116,7 +116,10 @@ npm run ingest:iwencai-main-board -- --query="A股主板股票 最新价 成交�
 
 ```text
 IWENCAI_API_KEY=你的问财 SkillHub API Key
+IWENCAI_API_KEY_FALLBACK=可选备用 Key
 ```
+
+如果主 key 在分页抓取过程中触发额度限制或请求失败，脚本会自动尝试备用 key；备用 key 成功后，后续分页会继续使用备用 key。
 
 ## DeepSeek
 

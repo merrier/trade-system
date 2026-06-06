@@ -25,6 +25,11 @@ interface IwencaiCliResponse {
   error?: string;
 }
 
+interface FetchPageResult {
+  response: IwencaiCliResponse;
+  keyIndex: number;
+}
+
 const defaultQuery = [
   "A股主板股票",
   "股票代码 股票简称 上市板块",
@@ -75,19 +80,27 @@ async function ingestIwencaiMainBoard(config: IngestOptions) {
   const cliPath = expandHome(config.cliPath ?? process.env.IWENCAI_SKILL_CLI ?? "~/.codex/skills/hithink-market-query/scripts/cli.py");
   const pythonBin = config.pythonBin ?? process.env.PYTHON_BIN ?? "python3";
   const warnings: string[] = [];
+  const apiKeys = uniqueStrings([process.env.IWENCAI_API_KEY, process.env.IWENCAI_API_KEY_FALLBACK]);
 
-  if (!process.env.IWENCAI_API_KEY) {
+  if (apiKeys.length === 0) {
     warnings.push("IWENCAI_API_KEY is not present in the current process environment.");
   }
 
-  const firstPage = await fetchPage({ pythonBin, cliPath, query: config.query, page: 1, limit: config.limit });
+  const firstPageResult = await fetchPage({ pythonBin, cliPath, query: config.query, page: 1, limit: config.limit, apiKeys, preferredKeyIndex: 0 });
+  let activeKeyIndex = firstPageResult.keyIndex;
+  const firstPage = firstPageResult.response;
   const total = Number(firstPage.code_count || firstPage.datas.length);
   const maxPages = config.maxPages ?? Math.ceil(total / config.limit);
   const pages: IwencaiCliResponse[] = [firstPage];
 
   for (let page = 2; page <= maxPages && pages.at(-1)?.has_more; page += 1) {
     await sleep(config.delayMs);
-    pages.push(await fetchPage({ pythonBin, cliPath, query: config.query, page, limit: config.limit }));
+    const pageResult = await fetchPage({ pythonBin, cliPath, query: config.query, page, limit: config.limit, apiKeys, preferredKeyIndex: activeKeyIndex });
+    if (pageResult.keyIndex !== activeKeyIndex) {
+      warnings.push(`问财分页抓取在第 ${page} 页切换到备用 API key。`);
+      activeKeyIndex = pageResult.keyIndex;
+    }
+    pages.push(pageResult.response);
   }
 
   const rawRows = uniqueByCode(pages.flatMap((page) => page.datas));
@@ -140,21 +153,40 @@ async function ingestIwencaiMainBoard(config: IngestOptions) {
   };
 }
 
-async function fetchPage(input: { pythonBin: string; cliPath: string; query: string; page: number; limit: number }): Promise<IwencaiCliResponse> {
-  const { stdout } = await execFileAsync(
-    input.pythonBin,
-    [input.cliPath, "--query", input.query, "--page", String(input.page), "--limit", String(input.limit)],
-    {
-      env: process.env,
-      maxBuffer: 20 * 1024 * 1024,
-      timeout: Number(process.env.IWENCAI_TIMEOUT_MS ?? 60_000)
+async function fetchPage(input: {
+  pythonBin: string;
+  cliPath: string;
+  query: string;
+  page: number;
+  limit: number;
+  apiKeys: string[];
+  preferredKeyIndex: number;
+}): Promise<FetchPageResult> {
+  const keyOrder = keyAttemptOrder(input.apiKeys, input.preferredKeyIndex);
+  const errors: string[] = [];
+
+  for (const keyIndex of keyOrder) {
+    try {
+      const { stdout } = await execFileAsync(
+        input.pythonBin,
+        [input.cliPath, "--query", input.query, "--page", String(input.page), "--limit", String(input.limit)],
+        {
+          env: { ...process.env, IWENCAI_API_KEY: input.apiKeys[keyIndex] },
+          maxBuffer: 20 * 1024 * 1024,
+          timeout: Number(process.env.IWENCAI_TIMEOUT_MS ?? 60_000)
+        }
+      );
+      const response = JSON.parse(stdout.slice(stdout.indexOf("{"))) as IwencaiCliResponse;
+      if (!response.success) {
+        throw new Error(response.error ?? `Iwencai query failed on page ${input.page}`);
+      }
+      return { response, keyIndex };
+    } catch (error) {
+      errors.push(`key#${keyIndex + 1}: ${error instanceof Error ? sanitizeError(error.message) : String(error)}`);
     }
-  );
-  const response = JSON.parse(stdout.slice(stdout.indexOf("{"))) as IwencaiCliResponse;
-  if (!response.success) {
-    throw new Error(response.error ?? `Iwencai query failed on page ${input.page}`);
   }
-  return response;
+
+  throw new Error(`Iwencai query failed on page ${input.page}; ${errors.join("; ")}`);
 }
 
 async function persistBars(tradeDate: string, bars: DailyBar[]) {
@@ -277,6 +309,20 @@ function uniqueByCode(rows: Array<Record<string, unknown>>) {
     if (code) byCode.set(code, row);
   }
   return [...byCode.values()];
+}
+
+function uniqueStrings(values: Array<string | undefined>): string[] {
+  return [...new Set(values.filter((value): value is string => Boolean(value?.trim())))];
+}
+
+function keyAttemptOrder(apiKeys: string[], preferredKeyIndex: number): number[] {
+  if (apiKeys.length === 0) return [];
+  const normalized = Math.min(Math.max(preferredKeyIndex, 0), apiKeys.length - 1);
+  return [normalized, ...apiKeys.map((_, index) => index).filter((index) => index !== normalized)];
+}
+
+function sanitizeError(message: string): string {
+  return message.replace(/Bearer\s+[A-Za-z0-9._-]+/g, "Bearer ***").replace(/sk-proj-[A-Za-z0-9._-]+/g, "sk-proj-***");
 }
 
 function inferTradeDate(rows: Array<Record<string, unknown>>): string | null {

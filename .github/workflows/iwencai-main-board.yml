@@ -19,6 +19,7 @@ jobs:
     env:
       DATABASE_URL: "file:../data/trade-system.db"
       IWENCAI_API_KEY: ${{ secrets.IWENCAI_API_KEY }}
+      IWENCAI_API_KEY_FALLBACK: ${{ secrets.IWENCAI_API_KEY_FALLBACK }}
       IWENCAI_BASE_URL: "https://openapi.iwencai.com"
       IWENCAI_SKILL_CLI: "~/.codex/skills/hithink-market-query/scripts/cli.py"
       IWENCAI_TIMEOUT_MS: "60000"
