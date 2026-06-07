@@ -70,6 +70,8 @@ GitHub Pages 只能托管静态页面，不能运行 Fastify API。当前免费�
 
 默认通过 `python/akshare_worker.py` 调用多数据源链路：AKShare/东方财富、efinance、easyquotation、BaoStock；配置 `TUSHARE_TOKEN` 后，Tushare 会优先补 30 天日线滑窗缓存。Ashare 可作为日线和分钟线 K 线兜底，GitHub Actions 会运行时下载单文件模块。系统默认不允许静默展示 sample 数据；只有设置 `ALLOW_SAMPLE_DATA=true` 时，才会在真实数据源不可用时返回开发演示数据。数据源细节见 `docs/data-sources.md`。
 
+后续可参考 [simonlin1212/a-stock-data](https://github.com/simonlin1212/a-stock-data) 补充研报、一致预期、北向资金、两融、大宗交易、股东户数、新闻公告和龙虎榜增强字段；它暂作为候选数据源与实现参考，详见 `docs/data-sources.md`。
+
 模型训练和回测不放在数据源链路里；后续可用 [Microsoft Qlib](https://github.com/microsoft/qlib) 读取已沉淀的问财/AKShare 数据，做离线训练、因子验证和回测评估，路线见 `docs/modeling.md`。
 
 可选安装：
