@@ -16,6 +16,7 @@
 - 问财主板全量快照：通过 `hithink-market-query` 技能分页抓取 A 股主板全量行情，写入 SQLite 和原始 JSON。
 - 问财涨停板快照：通过 `hithink-market-query` 技能抓取涨停原因、连板数、首封/终封时间、封单额、开板次数和行业。
 - 问财龙虎榜快照：通过 `hithink-market-query` 技能抓取龙虎榜席位明细，并按股票聚合净买入额、买入额、卖出额和席位列表。
+- 训练与回测路线：后续可接入 Microsoft Qlib，用每日行情、涨停、龙虎榜和板块数据做模型训练、因子验证和历史回测，见 `docs/modeling.md`。
 
 ## 快速开始
 
@@ -68,6 +69,8 @@ GitHub Pages 只能托管静态页面，不能运行 Fastify API。当前免费�
 ## 数据源
 
 默认通过 `python/akshare_worker.py` 调用多数据源链路：AKShare/东方财富、efinance、easyquotation、BaoStock；配置 `TUSHARE_TOKEN` 后，Tushare 会优先补 30 天日线滑窗缓存。Ashare 可作为日线和分钟线 K 线兜底，GitHub Actions 会运行时下载单文件模块。系统默认不允许静默展示 sample 数据；只有设置 `ALLOW_SAMPLE_DATA=true` 时，才会在真实数据源不可用时返回开发演示数据。数据源细节见 `docs/data-sources.md`。
+
+模型训练和回测不放在数据源链路里；后续可用 [Microsoft Qlib](https://github.com/microsoft/qlib) 读取已沉淀的问财/AKShare 数据，做离线训练、因子验证和回测评估，路线见 `docs/modeling.md`。
 
 可选安装：
 
