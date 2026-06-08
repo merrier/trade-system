@@ -16,6 +16,7 @@
 - 问财主板全量快照：通过 `hithink-market-query` 技能分页抓取 A 股主板全量行情，写入 SQLite 和原始 JSON。
 - 问财涨停板快照：通过 `hithink-market-query` 技能抓取涨停原因、连板数、首封/终封时间、封单额、开板次数和行业。
 - 问财龙虎榜快照：通过 `hithink-market-query` 技能抓取龙虎榜席位明细，并按股票聚合净买入额、买入额、卖出额和席位列表。
+- 公司画像增强：盘后对涨停池股票补所属行业/概念、涨停原因、竞争对手、行业地位/市占率/龙头相关证据和题材唯一性。
 - mootdx 主板日 K 快照：通过通达信线上行情抓取最近 30 个交易日主板日 K，作为后续“涨停倍量阴”等 K 线策略的数据基础。
 - 训练与回测路线：后续可接入 Microsoft Qlib，用每日行情、涨停、龙虎榜和板块数据做模型训练、因子验证和历史回测，见 `docs/modeling.md`。
 
@@ -43,6 +44,7 @@ API 默认运行在 `http://localhost:8787`，Web 看板默认运行在 `http://
 - `Ingest Iwencai limit-up data`：北京时间工作日 16:45 运行，抓取问财涨停板数据，并把 `data/iwencai/limit-ups-*.json` 提交回 `dev` 分支。
 - `Ingest Iwencai dragon tiger data`：北京时间工作日 16:55 运行，抓取问财龙虎榜席位明细，并把 `data/iwencai/dragon-tiger-*.json` 提交回 `dev` 分支。
 - `Ingest Mootdx main daily bars`：北京时间工作日 17:05 运行，按问财主板股票池抓取最近 30 根日 K，并把 `data/mootdx/main-daily-bars-*.json` 与 `cache/main-daily-bars.json` 提交回 `dev` 分支。
+- `Enrich company context`：北京时间工作日 17:15 运行，参考 `a-stock-data` 记录的 F10/研报/题材/资金面能力方向，对涨停池股票补公司画像，并把 `data/company-context/*.json` 提交回 `dev` 分支。
 - `Send 14:50 intraday selection`：北京时间工作日 14:45 运行，使用“涨停倍量阴”策略生成并发送 14:50 主板盘中选股；该任务只上传报告 artifact，不提交数据、不覆盖 `main`。
 
 这些任务都不会推送或覆盖 `main`。
@@ -142,6 +144,13 @@ A股主板股票 股票代码 股票简称 上市板块 最新价 涨跌幅 开�
 - SQLite `Stock`：同步股票基础信息。
 - `data/iwencai/dragon-tiger-YYYYMMDD.json`：问财龙虎榜席位明细原始返回。
 
+公司画像增强会读取最新涨停池股票，盘后补充：
+
+- `data/company-context/company-context-YYYYMMDD.json`：当日公司画像快照。
+- `data/company-context/latest.json`：14:50 盘中消息优先读取的最新画像缓存。
+
+字段包括：涨停原因、所属行业/概念、主营/行业地位/市占率/龙头相关问财返回字段、竞争对手、题材关键词和唯一性说明。当前第一版用问财 SkillHub 落库，设计参考 `a-stock-data` 中记录的 F10、研报、一致预期、行业对比、股东户数等增强方向；后续可把 `a-stock-data` 的 F10/研报实现接成第二数据源。
+
 mootdx 主板日 K 抓取会读取最新的 `data/iwencai/main-board-YYYYMMDD.json` 作为股票池，默认抓取最近 30 根日 K。输出会写入：
 
 - SQLite `DailyBarRecord`：日 K 结构化字段。
@@ -157,6 +166,7 @@ npm run ingest:iwencai-main-board -- --limit=100 --delay-ms=250
 npm run ingest:iwencai-main-board -- --query="A股主板股票 最新价 成交额 换手率 主力资金流向" --limit=100
 npm run ingest:iwencai-limit-ups -- --limit=100
 npm run ingest:iwencai-dragon-tiger -- --limit=100
+npm run enrich:company-context -- --max-codes=80
 npm run ingest:mootdx-main-daily-bars -- --days=30 --concurrency=8
 ```
 

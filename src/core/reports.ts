@@ -349,11 +349,14 @@ function formatIntradayPayload(payload: IntradaySelectionReportPayload): string[
 async function enrichRecommendations(recommendations: ReturnType<typeof rankStocks>, dataset: MarketDataset, dailyBars: DailyBar[]) {
   if (!recommendations.length) return recommendations;
   const limitUpInsights = await readLimitUpInsights();
-  const iwencaiContexts = await fetchIwencaiRecommendationContexts(recommendations.slice(0, 10));
+  const cachedContexts = await readCachedCompanyContexts();
+  const missingContextRecommendations = recommendations.slice(0, 10).filter((item) => !cachedContexts.has(item.code));
+  const liveContexts = await fetchIwencaiRecommendationContexts(missingContextRecommendations);
+  const companyContexts = new Map([...cachedContexts, ...liveContexts]);
   const stocksByCode = new Map(dataset.stocks.map((stock) => [stock.code, stock]));
   return recommendations.map((item) => ({
     ...item,
-    context: buildRecommendationContext(item.code, item.name, stocksByCode.get(item.code), dataset, dailyBars, limitUpInsights, iwencaiContexts.get(item.code))
+    context: buildRecommendationContext(item.code, item.name, stocksByCode.get(item.code), dataset, dailyBars, limitUpInsights, companyContexts.get(item.code))
   }));
 }
 
@@ -374,6 +377,30 @@ interface IwencaiRecommendationContext {
   keywords: string[];
   leaderEvidence?: string;
   uniquenessEvidence?: string;
+}
+
+async function readCachedCompanyContexts(): Promise<Map<string, IwencaiRecommendationContext>> {
+  try {
+    const text = await fs.readFile(path.resolve(process.cwd(), "data", "company-context", "latest.json"), "utf8");
+    const parsed = JSON.parse(text) as { records?: Array<Record<string, unknown>> };
+    const contexts = new Map<string, IwencaiRecommendationContext>();
+    for (const record of parsed.records ?? []) {
+      const code = normalizeCode(textValue(record, "code"));
+      if (!code) continue;
+      contexts.set(code, {
+        code,
+        reason: textValue(record, "limitUpReason"),
+        industry: textValue(record, "industry"),
+        sectors: arrayText(record.sectors),
+        keywords: arrayText(record.keywords),
+        leaderEvidence: textValue(record, "leaderEvidence"),
+        uniquenessEvidence: textValue(record, "uniquenessEvidence")
+      });
+    }
+    return contexts;
+  } catch {
+    return new Map();
+  }
 }
 
 function buildRecommendationContext(
@@ -426,29 +453,38 @@ async function fetchIwencaiRecommendationContexts(recommendations: ReturnType<ty
 }
 
 async function queryIwencaiContextRow(pythonBin: string, cliPath: string, code: string, name: string): Promise<Record<string, unknown> | null> {
-  const query = `${code} ${name} 所属同花顺行业 所属概念 主营业务 行业地位 市占率 龙头 竞争对手 唯一性 近5日涨停原因`;
+  const queries = [
+    `${code} ${name} 所属同花顺行业 所属概念 主营业务`,
+    `${code} ${name} 近5日涨停原因 涨停日期 所属概念`,
+    `${code} ${name} 行业地位 行业排名 市占率 龙头 竞争对手 主营产品`
+  ];
   const apiKeys = uniqueStrings([process.env.IWENCAI_API_KEY, process.env.IWENCAI_API_KEY_FALLBACK]);
-  for (const apiKey of apiKeys) {
-    try {
-      const { stdout } = await execFileAsync(
-        pythonBin,
-        [cliPath, "--query", query, "--page", "1", "--limit", "3"],
-        {
-          env: { ...process.env, IWENCAI_API_KEY: apiKey },
-          timeout: Number(process.env.IWENCAI_TIMEOUT_MS ?? 30_000),
-          maxBuffer: 10 * 1024 * 1024
-        }
-      );
-      const jsonStart = stdout.indexOf("{");
-      if (jsonStart < 0) continue;
-      const parsed = JSON.parse(stdout.slice(jsonStart)) as { datas?: Array<Record<string, unknown>> };
-      const normalizedCode = normalizeCode(code);
-      return parsed.datas?.find((row) => normalizeCode(text(row["股票代码"])) === normalizedCode) ?? parsed.datas?.[0] ?? null;
-    } catch {
-      // Fall back to the next key or historical snapshots.
+  const normalizedCode = normalizeCode(code);
+  const merged: Record<string, unknown> = {};
+  for (const query of queries) {
+    for (const apiKey of apiKeys) {
+      try {
+        const { stdout } = await execFileAsync(
+          pythonBin,
+          [cliPath, "--query", query, "--page", "1", "--limit", "3"],
+          {
+            env: { ...process.env, IWENCAI_API_KEY: apiKey },
+            timeout: Number(process.env.IWENCAI_TIMEOUT_MS ?? 30_000),
+            maxBuffer: 10 * 1024 * 1024
+          }
+        );
+        const jsonStart = stdout.indexOf("{");
+        if (jsonStart < 0) continue;
+        const parsed = JSON.parse(stdout.slice(jsonStart)) as { datas?: Array<Record<string, unknown>> };
+        const row = parsed.datas?.find((item) => normalizeCode(text(item["股票代码"])) === normalizedCode) ?? parsed.datas?.[0];
+        if (row) Object.assign(merged, row);
+        break;
+      } catch {
+        // Fall back to the next key or historical snapshots.
+      }
     }
   }
-  return null;
+  return Object.keys(merged).length ? merged : null;
 }
 
 function iwencaiRowToContext(row: Record<string, unknown>): IwencaiRecommendationContext | null {
@@ -506,7 +542,7 @@ async function readLimitUpInsights(): Promise<LimitUpInsight[]> {
 
 function inferIndustryLeader(code: string, name: string, stock: StockSnapshot | undefined, dataset: MarketDataset, sectors: string[], iwencaiContext?: IwencaiRecommendationContext): RecommendationContext["industryLeader"] {
   if (iwencaiContext?.leaderEvidence) {
-    return { status: /龙头|领先|第一|市占率|市占/.test(iwencaiContext.leaderEvidence) ? "likely" : "unknown", reason: iwencaiContext.leaderEvidence };
+    return { status: /龙头|领先|第一|排名|市占率|市占/.test(iwencaiContext.leaderEvidence) ? "likely" : "unknown", reason: iwencaiContext.leaderEvidence };
   }
   const directLeader = dataset.sectors.find((sector) => sectors.includes(sector.name) && (sector.leaderCode === code || sector.leaderName === name));
   if (directLeader) {
@@ -547,7 +583,7 @@ function findRecentSolidLimitUpDate(code: string, tradeDate: string, dailyBars: 
 }
 
 function leaderEvidenceFromRow(row: Record<string, unknown>): string | undefined {
-  const directKeys = Object.keys(row).filter((key) => /龙头|行业地位|市场地位|市占率|市占/.test(key));
+  const directKeys = Object.keys(row).filter((key) => /龙头|行业地位|行业排名|市场地位|市占率|市占/.test(key));
   const direct = directKeys
     .map((key) => `${key}：${fieldSummary(row[key])}`)
     .filter((item) => !item.endsWith("："))

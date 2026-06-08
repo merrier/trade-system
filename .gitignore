@@ -12,6 +12,7 @@ data/*.sqlite-journal
 data/inbox/*.jsonl
 data/iwencai/
 data/mootdx/
+data/company-context/
 cache/
 coverage/
 __pycache__/

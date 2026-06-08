@@ -1,0 +1,83 @@
+name: Enrich company context
+
+on:
+  schedule:
+    # 17:15 Asia/Shanghai on weekdays, after Iwencai limit-up and dragon-tiger snapshots.
+    - cron: "15 9 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      max_codes:
+        description: "Maximum stocks to enrich in manual test runs"
+        required: false
+        default: "5"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: company-context-enrich
+  cancel-in-progress: true
+
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    env:
+      IWENCAI_API_KEY: ${{ secrets.IWENCAI_API_KEY }}
+      IWENCAI_API_KEY_FALLBACK: ${{ secrets.IWENCAI_API_KEY_FALLBACK }}
+      IWENCAI_BASE_URL: "https://openapi.iwencai.com"
+      IWENCAI_SKILL_CLI: "~/.codex/skills/hithink-market-query/scripts/cli.py"
+      IWENCAI_TIMEOUT_MS: "30000"
+      PYTHON_BIN: "python3"
+      COMPANY_CONTEXT_MAX_CODES: ${{ github.event_name == 'workflow_dispatch' && inputs.max_codes || '80' }}
+
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Node dependencies
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          yarn install --non-interactive --no-lockfile
+
+      - name: Install Iwencai SkillHub CLI
+        run: |
+          curl -fsSL -o /tmp/iwencai-skillhub-cli.zip https://www.iwencai.com/skillhub/static/0.0.4/iwencai-skillhub-cli.zip
+          rm -rf /tmp/iwencai-skillhub-cli
+          mkdir -p /tmp/iwencai-skillhub-cli
+          unzip -q -o /tmp/iwencai-skillhub-cli.zip -d /tmp/iwencai-skillhub-cli
+          bash /tmp/iwencai-skillhub-cli/iwencai-skillhub-cli/iwencai-install.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install hithink market query skill
+        run: iwencai-skillhub-cli --dir "$HOME/.codex/skills" install hithink-market-query
+
+      - name: Enrich company context
+        run: yarn enrich:company-context
+
+      - name: Upload company context artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: company-context
+          path: data/company-context/*.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Commit company context to dev
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/company-context/*.json
+          if git diff --cached --quiet; then
+            echo "No company context changes to commit."
+          else
+            git commit -m "data: update company context $(date -u +%Y-%m-%d)"
+            git push origin HEAD:dev
+          fi
