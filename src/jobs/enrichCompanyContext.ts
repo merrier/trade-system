@@ -91,7 +91,7 @@ async function loadCandidates(config: IngestOptions): Promise<Candidate[]> {
         code: normalizeCode(text(row["股票代码"])),
         name: text(row["股票简称"])
       }))
-      .filter((item) => item.code && item.name && !/(^\\*?ST|退$)/i.test(item.name))
+      .filter((item) => item.code && item.name && !/(^\*?ST|退$)/i.test(item.name))
   );
 }
 
