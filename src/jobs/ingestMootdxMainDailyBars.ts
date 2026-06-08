@@ -84,7 +84,9 @@ async function fetchMootdxBars(config: IngestOptions): Promise<MootdxEnvelope> {
     "--concurrency",
     String(config.concurrency),
     "--delay-ms",
-    String(config.delayMs)
+    String(config.delayMs),
+    "--socket-timeout",
+    String(config.socketTimeout)
   ];
   if (config.maxCodes) args.push("--max-codes", String(config.maxCodes));
   if (config.universeFile) args.push("--universe-file", config.universeFile);
@@ -185,6 +187,7 @@ interface IngestOptions {
   days: number;
   concurrency: number;
   delayMs: number;
+  socketTimeout: number;
   cacheWindowDays: number;
   maxCodes?: number;
   universeFile?: string;
@@ -198,6 +201,7 @@ function parseArgs(args: string[]): IngestOptions {
     days: Number(get("days") ?? 30),
     concurrency: Number(get("concurrency") ?? 8),
     delayMs: Number(get("delay-ms") ?? 0),
+    socketTimeout: Number(get("socket-timeout") ?? process.env.MOOTDX_SOCKET_TIMEOUT ?? 8),
     cacheWindowDays: Number(get("cache-window-days") ?? 30),
     maxCodes: maxCodes ? Number(maxCodes) : undefined,
     universeFile: get("universe-file"),

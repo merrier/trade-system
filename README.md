@@ -147,7 +147,7 @@ mootdx 主板日 K 抓取会读取最新的 `data/iwencai/main-board-YYYYMMDD.js
 - `cache/main-daily-bars.json`：主板最近 30 个交易日滑窗缓存。
 - `data/mootdx/main-daily-bars-YYYYMMDD.json`：mootdx 原始归一化日 K 快照。
 
-这份缓存用于后续讨论和实现“涨停倍量阴”等 K 线策略。mootdx 首次运行需要选择最快通达信服务器；云端 Action 会自动执行 `python3 -m mootdx bestip`。
+这份缓存用于后续讨论和实现“涨停倍量阴”等 K 线策略。mootdx 首次运行需要选择最快通达信服务器；云端 Action 会自动执行 `python3 -m mootdx bestip`。抓取过程设置了 socket 超时并输出批量进度，避免单个通达信连接长期挂住。
 
 可选参数：
 

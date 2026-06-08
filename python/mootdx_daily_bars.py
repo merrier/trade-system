@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import socket
 import subprocess
 import sys
 import threading
@@ -23,12 +24,14 @@ def main() -> int:
     parser.add_argument("--max-codes", type=int, default=0)
     parser.add_argument("--universe-file", default="")
     parser.add_argument("--delay-ms", type=int, default=0)
+    parser.add_argument("--socket-timeout", type=float, default=8.0)
     args = parser.parse_args()
 
     started = datetime.now().isoformat()
     warnings: list[str] = []
 
     try:
+      socket.setdefaulttimeout(args.socket_timeout)
       ensure_mootdx_config()
       universe = read_universe(Path(args.universe_file) if args.universe_file else latest_universe_file())
       if args.max_codes > 0:
@@ -39,6 +42,8 @@ def main() -> int:
       bars: list[dict[str, Any]] = []
       failures: list[str] = []
       concurrency = max(1, args.concurrency)
+      completed = 0
+      print(f"mootdx daily-bars start: universe={len(universe)} days={args.days} concurrency={concurrency}", file=sys.stderr, flush=True)
 
       with ThreadPoolExecutor(max_workers=concurrency) as executor:
           futures = {
@@ -47,10 +52,17 @@ def main() -> int:
           }
           for future in as_completed(futures):
               stock = futures[future]
+              completed += 1
               try:
                   bars.extend(future.result())
               except Exception as exc:
                   failures.append(f"{stock['code']} {stock['name']}: {type(exc).__name__}: {exc}")
+              if completed == len(universe) or completed % 100 == 0:
+                  print(
+                      f"mootdx daily-bars progress: completed={completed}/{len(universe)} bars={len(bars)} failures={len(failures)}",
+                      file=sys.stderr,
+                      flush=True,
+                  )
 
       if failures:
           warnings.append(f"mootdx failed for {len(failures)} stocks; first failures: {'; '.join(failures[:8])}")
