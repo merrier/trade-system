@@ -1,3 +1,5 @@
+import fs from "node:fs/promises";
+import path from "node:path";
 import { z } from "zod";
 import { compileStrategy } from "./deepseek.js";
 import { createDefaultStrategy } from "./defaults.js";
@@ -9,8 +11,10 @@ import type {
   IntradaySelectionReportPayload,
   MarketDataset,
   MorningReportPayload,
+  RecommendationContext,
   ReportArtifact,
   ReportKind,
+  StockSnapshot,
   StrategySnapshot
 } from "../shared/types.js";
 import type { DailyBar } from "../shared/types.js";
@@ -69,7 +73,7 @@ export async function buildIntradaySelectionReport(
   const compiled = strategyPrompt.trim()
     ? await compileStrategy(strategyPrompt, ["main"], "short_term")
     : { dsl: createDefaultStrategy("short_term", ["main"]), warnings: ["未配置策略，使用默认主板短线强势策略。"], unsupported: [] };
-  const recommendations = rankStocks(dataset, compiled.dsl, "intraday", { dailyBars: options.dailyBars });
+  const recommendations = await enrichRecommendations(rankStocks(dataset, compiled.dsl, "intraday", { dailyBars: options.dailyBars }), dataset, options.dailyBars ?? []);
   const dailyBarWarnings = buildDailyBarWarnings(compiled.dsl, options.dailyBars ?? []);
   const strategy: StrategySnapshot = {
     prompt: strategyPrompt || "默认主板短线强势策略",
@@ -329,10 +333,130 @@ function formatIntradayPayload(payload: IntradaySelectionReportPayload): string[
     ...payload.recommendations.slice(0, 10).map((item) => {
       const reasons = item.reasons.slice(0, 2).join("；");
       const risks = item.risks.slice(0, 2).join("；") || "暂无额外风险提示";
-      return `- **${item.rank}. ${item.code} ${item.name}**：${item.score} 分，置信度 ${item.confidence}。${reasons}。风险：${risks}`;
+      const context = item.context
+        ? `涨停原因：${item.context.limitUpReason}；板块：${item.context.sectors.join("、") || "数据不足"}；龙头：${item.context.industryLeader.reason}；唯一性：${item.context.uniqueness.reason}`
+        : "涨停原因/板块/龙头/唯一性：数据不足";
+      return `- **${item.rank}. ${item.code} ${item.name}**：${item.score} 分，置信度 ${item.confidence}。${context}。形态：${reasons}。风险：${risks}`;
     })
   );
   return lines;
+}
+
+async function enrichRecommendations(recommendations: ReturnType<typeof rankStocks>, dataset: MarketDataset, dailyBars: DailyBar[]) {
+  if (!recommendations.length) return recommendations;
+  const limitUpInsights = await readLimitUpInsights();
+  const stocksByCode = new Map(dataset.stocks.map((stock) => [stock.code, stock]));
+  return recommendations.map((item) => ({
+    ...item,
+    context: buildRecommendationContext(item.code, item.name, stocksByCode.get(item.code), dataset, dailyBars, limitUpInsights)
+  }));
+}
+
+interface LimitUpInsight {
+  tradeDate: string;
+  code: string;
+  reason: string;
+  industry?: string;
+  sectors: string[];
+  keywords: string[];
+}
+
+function buildRecommendationContext(
+  code: string,
+  name: string,
+  stock: StockSnapshot | undefined,
+  dataset: MarketDataset,
+  dailyBars: DailyBar[],
+  limitUpInsights: LimitUpInsight[]
+): RecommendationContext {
+  const recentLimitUpDate = findRecentSolidLimitUpDate(code, dataset.tradeDate, dailyBars);
+  const exactInsight = limitUpInsights.find((item) => item.code === code && item.tradeDate === recentLimitUpDate);
+  const fallbackInsight = [...limitUpInsights].reverse().find((item) => item.code === code);
+  const insight = exactInsight ?? fallbackInsight;
+  const sectors = uniqueStrings([
+    stock?.industry,
+    ...(stock?.concepts ?? []),
+    insight?.industry,
+    ...(insight?.sectors ?? [])
+  ]).filter(isRealSectorName).slice(0, 5);
+
+  return {
+    limitUpDate: recentLimitUpDate ?? insight?.tradeDate,
+    limitUpReason: insight?.reason || "未找到历史涨停原因",
+    sectors,
+    industryLeader: inferIndustryLeader(code, name, stock, dataset, sectors),
+    uniqueness: inferUniqueness(insight, limitUpInsights)
+  };
+}
+
+async function readLimitUpInsights(): Promise<LimitUpInsight[]> {
+  const dir = path.resolve(process.cwd(), "data", "iwencai");
+  let files: string[] = [];
+  try {
+    files = await fs.readdir(dir);
+  } catch {
+    return [];
+  }
+  const insights: LimitUpInsight[] = [];
+  for (const file of files.filter((item) => /^limit-ups-\d{8}\.json$/.test(item)).sort()) {
+    const tradeDate = file.match(/(\d{8})/)?.[1] ?? "";
+    try {
+      const parsed = JSON.parse(await fs.readFile(path.join(dir, file), "utf8")) as { rows?: Array<Record<string, unknown>> };
+      for (const row of parsed.rows ?? []) {
+        const code = normalizeCode(text(row["股票代码"]));
+        if (!code) continue;
+        const reason = textValue(row, "涨停原因");
+        const industryPath = arrayText(row["所属同花顺行业"]);
+        insights.push({
+          tradeDate,
+          code,
+          reason,
+          industry: industryPath[0],
+          sectors: uniqueStrings([...industryPath.slice(1), ...splitReason(reason)]),
+          keywords: splitReason(reason)
+        });
+      }
+    } catch {
+      // Ignore malformed historical snapshots; the report will mark missing context.
+    }
+  }
+  return insights;
+}
+
+function inferIndustryLeader(code: string, name: string, stock: StockSnapshot | undefined, dataset: MarketDataset, sectors: string[]): RecommendationContext["industryLeader"] {
+  const directLeader = dataset.sectors.find((sector) => sectors.includes(sector.name) && (sector.leaderCode === code || sector.leaderName === name));
+  if (directLeader) {
+    return { status: "likely", reason: `${directLeader.name}领涨股` };
+  }
+  if (stock?.industry) {
+    const peers = dataset.stocks.filter((item) => item.industry === stock.industry);
+    const leader = [...peers].sort((a, b) => b.pctChange - a.pctChange || b.turnoverAmount - a.turnoverAmount)[0];
+    if (leader?.code === code && peers.length >= 3) {
+      return { status: "likely", reason: `${stock.industry}内涨幅/成交额领先` };
+    }
+  }
+  return { status: "unknown", reason: "缺少完整板块成分或行业排名数据，暂不能确认" };
+}
+
+function inferUniqueness(insight: LimitUpInsight | undefined, allInsights: LimitUpInsight[]): RecommendationContext["uniqueness"] {
+  if (!insight?.keywords.length) {
+    return { status: "unknown", reason: "缺少涨停原因关键词，暂不能确认" };
+  }
+  const keywordCounts = insight.keywords.map((keyword) => ({
+    keyword,
+    count: allInsights.filter((item) => item.keywords.includes(keyword)).length
+  }));
+  const rare = keywordCounts.filter((item) => item.count <= 2);
+  if (rare.length) {
+    return { status: "high", reason: `${rare.map((item) => item.keyword).slice(0, 2).join("、")}标签较少见` };
+  }
+  return { status: "medium", reason: `${insight.keywords.slice(0, 2).join("、")}有同题材共振，唯一性一般` };
+}
+
+function findRecentSolidLimitUpDate(code: string, tradeDate: string, dailyBars: DailyBar[]): string | undefined {
+  return [...dailyBars]
+    .filter((bar) => bar.code === code && bar.tradeDate < tradeDate && bar.pctChange >= 9.8 && bar.close > bar.open)
+    .sort((a, b) => b.tradeDate.localeCompare(a.tradeDate))[0]?.tradeDate;
 }
 
 function formatClosePayload(payload: CloseReportPayload): string[] {
@@ -393,6 +517,38 @@ function inferAshareReadThrough(brief: MorningReportPayload["brief"]): string[] 
   if (oil) lines.push(oil.pctChange >= 0 ? "原油偏强时，留意能源、化工与通胀链条。" : "原油走弱时，周期资源链条可能承压。");
   if (cnh) lines.push(cnh.pctChange >= 0 ? "离岸人民币价格上行需结合美元方向判断，重点观察北向风险偏好。" : "人民币偏弱时，主板权重和外资敏感资产需降低预期。");
   return lines.length ? lines : ["外盘关键指标已更新，需结合开盘集合竞价确认 A 股主板风险偏好。"];
+}
+
+function textValue(row: Record<string, unknown>, prefix: string): string {
+  const direct = text(row[prefix]);
+  if (direct) return direct;
+  const matchedKey = Object.keys(row).find((key) => key === prefix || key.startsWith(`${prefix}[`));
+  return text(matchedKey ? row[matchedKey] : undefined);
+}
+
+function text(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function arrayText(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => text(item)).filter(Boolean);
+}
+
+function splitReason(reason: string): string[] {
+  return reason.split(/[+＋、,，/]/).map((item) => item.trim()).filter(Boolean);
+}
+
+function normalizeCode(code: string): string {
+  return code.replace(/\.(SZ|SH|BJ)$/i, "");
+}
+
+function uniqueStrings(values: Array<string | undefined>): string[] {
+  return [...new Set(values.filter((value): value is string => Boolean(value?.trim())))];
+}
+
+function isRealSectorName(value: string): boolean {
+  return !["涨停回调候选"].includes(value);
 }
 
 function currentTradeDate(): string {

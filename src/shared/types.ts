@@ -196,7 +196,22 @@ export interface RecommendationResult {
   reasons: string[];
   risks: string[];
   factors: Record<string, number>;
+  context?: RecommendationContext;
   dataAsOf: string;
+}
+
+export interface RecommendationContext {
+  limitUpDate?: string;
+  limitUpReason: string;
+  sectors: string[];
+  industryLeader: {
+    status: "likely" | "unknown";
+    reason: string;
+  };
+  uniqueness: {
+    status: "high" | "medium" | "unknown";
+    reason: string;
+  };
 }
 
 export interface CompileResult {
