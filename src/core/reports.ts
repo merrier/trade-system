@@ -1,5 +1,7 @@
+import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { promisify } from "node:util";
 import { z } from "zod";
 import { compileStrategy } from "./deepseek.js";
 import { createDefaultStrategy } from "./defaults.js";
@@ -18,6 +20,8 @@ import type {
   StrategySnapshot
 } from "../shared/types.js";
 import type { DailyBar } from "../shared/types.js";
+
+const execFileAsync = promisify(execFile);
 
 export const reportArtifactSchema = z.object({
   id: z.string(),
@@ -345,10 +349,11 @@ function formatIntradayPayload(payload: IntradaySelectionReportPayload): string[
 async function enrichRecommendations(recommendations: ReturnType<typeof rankStocks>, dataset: MarketDataset, dailyBars: DailyBar[]) {
   if (!recommendations.length) return recommendations;
   const limitUpInsights = await readLimitUpInsights();
+  const iwencaiContexts = await fetchIwencaiRecommendationContexts(recommendations.slice(0, 10));
   const stocksByCode = new Map(dataset.stocks.map((stock) => [stock.code, stock]));
   return recommendations.map((item) => ({
     ...item,
-    context: buildRecommendationContext(item.code, item.name, stocksByCode.get(item.code), dataset, dailyBars, limitUpInsights)
+    context: buildRecommendationContext(item.code, item.name, stocksByCode.get(item.code), dataset, dailyBars, limitUpInsights, iwencaiContexts.get(item.code))
   }));
 }
 
@@ -361,13 +366,24 @@ interface LimitUpInsight {
   keywords: string[];
 }
 
+interface IwencaiRecommendationContext {
+  code: string;
+  reason?: string;
+  industry?: string;
+  sectors: string[];
+  keywords: string[];
+  leaderEvidence?: string;
+  uniquenessEvidence?: string;
+}
+
 function buildRecommendationContext(
   code: string,
   name: string,
   stock: StockSnapshot | undefined,
   dataset: MarketDataset,
   dailyBars: DailyBar[],
-  limitUpInsights: LimitUpInsight[]
+  limitUpInsights: LimitUpInsight[],
+  iwencaiContext?: IwencaiRecommendationContext
 ): RecommendationContext {
   const recentLimitUpDate = findRecentSolidLimitUpDate(code, dataset.tradeDate, dailyBars);
   const exactInsight = limitUpInsights.find((item) => item.code === code && item.tradeDate === recentLimitUpDate);
@@ -376,16 +392,81 @@ function buildRecommendationContext(
   const sectors = uniqueStrings([
     stock?.industry,
     ...(stock?.concepts ?? []),
+    iwencaiContext?.industry,
+    ...(iwencaiContext?.sectors ?? []),
     insight?.industry,
     ...(insight?.sectors ?? [])
   ]).filter(isRealSectorName).slice(0, 5);
+  const reason = iwencaiContext?.reason || insight?.reason || "";
+  const keywords = uniqueStrings([...(iwencaiContext?.keywords ?? []), ...(insight?.keywords ?? [])]);
 
   return {
     limitUpDate: recentLimitUpDate ?? insight?.tradeDate,
-    limitUpReason: insight?.reason || "未找到历史涨停原因",
+    limitUpReason: reason || "未找到历史涨停原因",
     sectors,
-    industryLeader: inferIndustryLeader(code, name, stock, dataset, sectors),
-    uniqueness: inferUniqueness(insight, limitUpInsights)
+    industryLeader: inferIndustryLeader(code, name, stock, dataset, sectors, iwencaiContext),
+    uniqueness: inferUniqueness(keywords, limitUpInsights, iwencaiContext)
+  };
+}
+
+async function fetchIwencaiRecommendationContexts(recommendations: ReturnType<typeof rankStocks>): Promise<Map<string, IwencaiRecommendationContext>> {
+  if (!process.env.IWENCAI_API_KEY?.trim()) return new Map();
+  const cliPath = expandHome(process.env.IWENCAI_SKILL_CLI ?? "~/.codex/skills/hithink-market-query/scripts/cli.py");
+  const pythonBin = process.env.PYTHON_BIN ?? "python3";
+  const contexts = new Map<string, IwencaiRecommendationContext>();
+  const topN = Number(process.env.IWENCAI_CONTEXT_TOP_N ?? 10);
+
+  for (const item of recommendations.slice(0, topN)) {
+    const row = await queryIwencaiContextRow(pythonBin, cliPath, item.code, item.name);
+    if (!row) continue;
+    const context = iwencaiRowToContext(row);
+    if (context) contexts.set(context.code, context);
+  }
+  return contexts;
+}
+
+async function queryIwencaiContextRow(pythonBin: string, cliPath: string, code: string, name: string): Promise<Record<string, unknown> | null> {
+  const query = `${code} ${name} 所属同花顺行业 所属概念 主营业务 行业地位 市占率 龙头 竞争对手 唯一性 近5日涨停原因`;
+  const apiKeys = uniqueStrings([process.env.IWENCAI_API_KEY, process.env.IWENCAI_API_KEY_FALLBACK]);
+  for (const apiKey of apiKeys) {
+    try {
+      const { stdout } = await execFileAsync(
+        pythonBin,
+        [cliPath, "--query", query, "--page", "1", "--limit", "3"],
+        {
+          env: { ...process.env, IWENCAI_API_KEY: apiKey },
+          timeout: Number(process.env.IWENCAI_TIMEOUT_MS ?? 30_000),
+          maxBuffer: 10 * 1024 * 1024
+        }
+      );
+      const jsonStart = stdout.indexOf("{");
+      if (jsonStart < 0) continue;
+      const parsed = JSON.parse(stdout.slice(jsonStart)) as { datas?: Array<Record<string, unknown>> };
+      const normalizedCode = normalizeCode(code);
+      return parsed.datas?.find((row) => normalizeCode(text(row["股票代码"])) === normalizedCode) ?? parsed.datas?.[0] ?? null;
+    } catch {
+      // Fall back to the next key or historical snapshots.
+    }
+  }
+  return null;
+}
+
+function iwencaiRowToContext(row: Record<string, unknown>): IwencaiRecommendationContext | null {
+  const code = normalizeCode(text(row["股票代码"]));
+  if (!code) return null;
+  const reason = textValue(row, "涨停原因");
+  const industryPath = arrayText(row["所属同花顺行业"]);
+  const concepts = arrayText(row["所属概念"]);
+  const keywords = splitReason(reason);
+  const leaderEvidence = leaderEvidenceFromRow(row);
+  return {
+    code,
+    reason,
+    industry: industryPath[0],
+    sectors: uniqueStrings([...industryPath.slice(1), ...concepts, ...keywords]),
+    keywords,
+    leaderEvidence,
+    uniquenessEvidence: uniquenessEvidenceFromKeywords(keywords)
   };
 }
 
@@ -423,7 +504,10 @@ async function readLimitUpInsights(): Promise<LimitUpInsight[]> {
   return insights;
 }
 
-function inferIndustryLeader(code: string, name: string, stock: StockSnapshot | undefined, dataset: MarketDataset, sectors: string[]): RecommendationContext["industryLeader"] {
+function inferIndustryLeader(code: string, name: string, stock: StockSnapshot | undefined, dataset: MarketDataset, sectors: string[], iwencaiContext?: IwencaiRecommendationContext): RecommendationContext["industryLeader"] {
+  if (iwencaiContext?.leaderEvidence) {
+    return { status: /龙头|领先|第一|市占率|市占/.test(iwencaiContext.leaderEvidence) ? "likely" : "unknown", reason: iwencaiContext.leaderEvidence };
+  }
   const directLeader = dataset.sectors.find((sector) => sectors.includes(sector.name) && (sector.leaderCode === code || sector.leaderName === name));
   if (directLeader) {
     return { status: "likely", reason: `${directLeader.name}领涨股` };
@@ -438,11 +522,14 @@ function inferIndustryLeader(code: string, name: string, stock: StockSnapshot | 
   return { status: "unknown", reason: "缺少完整板块成分或行业排名数据，暂不能确认" };
 }
 
-function inferUniqueness(insight: LimitUpInsight | undefined, allInsights: LimitUpInsight[]): RecommendationContext["uniqueness"] {
-  if (!insight?.keywords.length) {
+function inferUniqueness(keywords: string[], allInsights: LimitUpInsight[], iwencaiContext?: IwencaiRecommendationContext): RecommendationContext["uniqueness"] {
+  if (iwencaiContext?.uniquenessEvidence) {
+    return { status: keywords.length >= 3 ? "high" : "medium", reason: iwencaiContext.uniquenessEvidence };
+  }
+  if (!keywords.length) {
     return { status: "unknown", reason: "缺少涨停原因关键词，暂不能确认" };
   }
-  const keywordCounts = insight.keywords.map((keyword) => ({
+  const keywordCounts = keywords.map((keyword) => ({
     keyword,
     count: allInsights.filter((item) => item.keywords.includes(keyword)).length
   }));
@@ -450,13 +537,41 @@ function inferUniqueness(insight: LimitUpInsight | undefined, allInsights: Limit
   if (rare.length) {
     return { status: "high", reason: `${rare.map((item) => item.keyword).slice(0, 2).join("、")}标签较少见` };
   }
-  return { status: "medium", reason: `${insight.keywords.slice(0, 2).join("、")}有同题材共振，唯一性一般` };
+  return { status: "medium", reason: `${keywords.slice(0, 2).join("、")}有同题材共振，唯一性一般` };
 }
 
 function findRecentSolidLimitUpDate(code: string, tradeDate: string, dailyBars: DailyBar[]): string | undefined {
   return [...dailyBars]
     .filter((bar) => bar.code === code && bar.tradeDate < tradeDate && bar.pctChange >= 9.8 && bar.close > bar.open)
     .sort((a, b) => b.tradeDate.localeCompare(a.tradeDate))[0]?.tradeDate;
+}
+
+function leaderEvidenceFromRow(row: Record<string, unknown>): string | undefined {
+  const directKeys = Object.keys(row).filter((key) => /龙头|行业地位|市场地位|市占率|市占/.test(key));
+  const direct = directKeys
+    .map((key) => `${key}：${fieldSummary(row[key])}`)
+    .filter((item) => !item.endsWith("："))
+    .slice(0, 2)
+    .join("；");
+  if (direct) return direct;
+
+  const competitors = arrayText(row["竞争对手"]);
+  if (competitors.length) {
+    return `问财返回竞争对手：${competitors.slice(0, 3).join("、")}；未见直接龙头/市占率字段`;
+  }
+  return undefined;
+}
+
+function uniquenessEvidenceFromKeywords(keywords: string[]): string | undefined {
+  if (!keywords.length) return undefined;
+  if (keywords.length >= 3) return `${keywords.slice(0, 3).join("+")} 复合题材，辨识度较高`;
+  return `${keywords.join("+")} 题材，需结合同题材数量确认唯一性`;
+}
+
+function fieldSummary(value: unknown): string {
+  if (Array.isArray(value)) return value.map((item) => text(item)).filter(Boolean).slice(0, 3).join("、");
+  if (typeof value === "number") return String(round(value));
+  return text(value);
 }
 
 function formatClosePayload(payload: CloseReportPayload): string[] {
@@ -549,6 +664,10 @@ function uniqueStrings(values: Array<string | undefined>): string[] {
 
 function isRealSectorName(value: string): boolean {
   return !["涨停回调候选"].includes(value);
+}
+
+function expandHome(input: string): string {
+  return input.startsWith("~/") ? path.join(process.env.HOME ?? "", input.slice(2)) : input;
 }
 
 function currentTradeDate(): string {

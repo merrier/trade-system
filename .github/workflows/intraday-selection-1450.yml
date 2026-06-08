@@ -31,6 +31,12 @@ jobs:
       PREVIOUS_STATIC_DATA_DIR: "."
       SKIP_DAILY_BAR_REFRESH: "true"
       DATA_PROVIDER_TIMEOUT_MS: "60000"
+      IWENCAI_API_KEY: ${{ secrets.IWENCAI_API_KEY }}
+      IWENCAI_API_KEY_FALLBACK: ${{ secrets.IWENCAI_API_KEY_FALLBACK }}
+      IWENCAI_BASE_URL: "https://openapi.iwencai.com"
+      IWENCAI_SKILL_CLI: "~/.codex/skills/hithink-market-query/scripts/cli.py"
+      IWENCAI_TIMEOUT_MS: "30000"
+      IWENCAI_CONTEXT_TOP_N: "10"
       FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
       FEISHU_WEBHOOK_SECRET: ${{ secrets.FEISHU_WEBHOOK_SECRET }}
       FEISHU_WEBHOOK_MODE: ${{ vars.FEISHU_WEBHOOK_MODE }}
@@ -56,6 +62,18 @@ jobs:
 
       - name: Install Python data dependencies
         run: python3 -m pip install --user akshare pandas efinance baostock easyquotation
+
+      - name: Install Iwencai SkillHub CLI
+        run: |
+          curl -fsSL -o /tmp/iwencai-skillhub-cli.zip https://www.iwencai.com/skillhub/static/0.0.4/iwencai-skillhub-cli.zip
+          rm -rf /tmp/iwencai-skillhub-cli
+          mkdir -p /tmp/iwencai-skillhub-cli
+          unzip -q -o /tmp/iwencai-skillhub-cli.zip -d /tmp/iwencai-skillhub-cli
+          bash /tmp/iwencai-skillhub-cli/iwencai-skillhub-cli/iwencai-install.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install hithink market query skill
+        run: iwencai-skillhub-cli --dir "$HOME/.codex/skills" install hithink-market-query
 
       - name: Generate Prisma client
         run: yarn prisma:generate
