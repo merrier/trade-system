@@ -16,6 +16,7 @@
 - 问财主板全量快照：通过 `hithink-market-query` 技能分页抓取 A 股主板全量行情，写入 SQLite 和原始 JSON。
 - 问财涨停板快照：通过 `hithink-market-query` 技能抓取涨停原因、连板数、首封/终封时间、封单额、开板次数和行业。
 - 问财龙虎榜快照：通过 `hithink-market-query` 技能抓取龙虎榜席位明细，并按股票聚合净买入额、买入额、卖出额和席位列表。
+- mootdx 主板日 K 快照：通过通达信线上行情抓取最近 30 个交易日主板日 K，作为后续“涨停倍量阴”等 K 线策略的数据基础。
 - 训练与回测路线：后续可接入 Microsoft Qlib，用每日行情、涨停、龙虎榜和板块数据做模型训练、因子验证和历史回测，见 `docs/modeling.md`。
 
 ## 快速开始
@@ -41,6 +42,7 @@ API 默认运行在 `http://localhost:8787`，Web 看板默认运行在 `http://
 - `Ingest Iwencai main board data`：北京时间工作日 16:40 运行，抓取问财主板全量行情，并把 `data/iwencai/main-board-*.json` 与 `cache/main-daily-bars.json` 提交回 `dev` 分支。
 - `Ingest Iwencai limit-up data`：北京时间工作日 16:45 运行，抓取问财涨停板数据，并把 `data/iwencai/limit-ups-*.json` 提交回 `dev` 分支。
 - `Ingest Iwencai dragon tiger data`：北京时间工作日 16:55 运行，抓取问财龙虎榜席位明细，并把 `data/iwencai/dragon-tiger-*.json` 提交回 `dev` 分支。
+- `Ingest Mootdx main daily bars`：北京时间工作日 17:05 运行，按问财主板股票池抓取最近 30 根日 K，并把 `data/mootdx/main-daily-bars-*.json` 与 `cache/main-daily-bars.json` 提交回 `dev` 分支。
 
 这些任务都不会推送或覆盖 `main`。
 
@@ -99,6 +101,7 @@ npm run db:init
 npm run ingest:iwencai-main-board
 npm run ingest:iwencai-limit-ups
 npm run ingest:iwencai-dragon-tiger
+npm run ingest:mootdx-main-daily-bars
 ```
 
 默认查询：
@@ -138,6 +141,14 @@ A股主板股票 股票代码 股票简称 上市板块 最新价 涨跌幅 开�
 - SQLite `Stock`：同步股票基础信息。
 - `data/iwencai/dragon-tiger-YYYYMMDD.json`：问财龙虎榜席位明细原始返回。
 
+mootdx 主板日 K 抓取会读取最新的 `data/iwencai/main-board-YYYYMMDD.json` 作为股票池，默认抓取最近 30 根日 K。输出会写入：
+
+- SQLite `DailyBarRecord`：日 K 结构化字段。
+- `cache/main-daily-bars.json`：主板最近 30 个交易日滑窗缓存。
+- `data/mootdx/main-daily-bars-YYYYMMDD.json`：mootdx 原始归一化日 K 快照。
+
+这份缓存用于后续讨论和实现“涨停倍量阴”等 K 线策略。mootdx 首次运行需要选择最快通达信服务器；云端 Action 会自动执行 `python3 -m mootdx bestip`。
+
 可选参数：
 
 ```bash
@@ -145,6 +156,7 @@ npm run ingest:iwencai-main-board -- --limit=100 --delay-ms=250
 npm run ingest:iwencai-main-board -- --query="A股主板股票 最新价 成交额 换手率 主力资金流向" --limit=100
 npm run ingest:iwencai-limit-ups -- --limit=100
 npm run ingest:iwencai-dragon-tiger -- --limit=100
+npm run ingest:mootdx-main-daily-bars -- --days=30 --concurrency=8
 ```
 
 本地每日运行可以使用 macOS `launchd` 或 crontab。例如 crontab 工作日 16:40 执行：
@@ -153,7 +165,7 @@ npm run ingest:iwencai-dragon-tiger -- --limit=100
 40 16 * * 1-5 cd /Users/bytedance/repos/mine/trade-system && /bin/zsh -lc 'source ~/.zshrc && npm run ingest:iwencai-main-board >> data/iwencai-cron.log 2>&1'
 ```
 
-云端每日运行使用 `.github/workflows/iwencai-main-board.yml`、`.github/workflows/iwencai-limit-ups.yml` 和 `.github/workflows/iwencai-dragon-tiger.yml`。需要在 GitHub 仓库 Secrets 配置：
+云端每日运行使用 `.github/workflows/iwencai-main-board.yml`、`.github/workflows/iwencai-limit-ups.yml`、`.github/workflows/iwencai-dragon-tiger.yml` 和 `.github/workflows/mootdx-main-daily-bars.yml`。问财任务需要在 GitHub 仓库 Secrets 配置：
 
 ```text
 IWENCAI_API_KEY=你的问财 SkillHub API Key

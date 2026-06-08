@@ -18,6 +18,7 @@
     "ingest:iwencai-main-board": "tsx src/jobs/ingestIwencaiMainBoard.ts",
     "ingest:iwencai-limit-ups": "tsx src/jobs/ingestIwencaiLimitUps.ts",
     "ingest:iwencai-dragon-tiger": "tsx src/jobs/ingestIwencaiDragonTiger.ts",
+    "ingest:mootdx-main-daily-bars": "tsx src/jobs/ingestMootdxMainDailyBars.ts",
     "export:static-data": "tsx src/jobs/exportStaticData.ts",
     "reports:run": "tsx src/jobs/runReport.ts",
     "reports:morning": "tsx src/jobs/runReport.ts --kind=morning",
