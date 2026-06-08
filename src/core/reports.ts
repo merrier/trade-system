@@ -408,9 +408,10 @@ function round(value: number): number {
 }
 
 function buildDailyBarWarnings(dsl: StrategySnapshot["compiledDsl"], dailyBars: DailyBar[]): string[] {
-  if (!dsl.strategyTemplates?.includes("limit_up_pullback")) return [];
-  if (!dailyBars.length) return ["涨停回调策略需要30日日线缓存；当前未读取到日线缓存，无法验证回调条件。"];
+  const needsDailyBars = dsl.strategyTemplates?.some((template) => template === "limit_up_pullback" || template === "limit_up_double_volume_bearish");
+  if (!needsDailyBars) return [];
+  if (!dailyBars.length) return ["该策略需要30日日线缓存；当前未读取到日线缓存，无法验证形态条件。"];
   const dates = new Set(dailyBars.map((bar) => bar.tradeDate));
-  if (dates.size < 20) return [`涨停回调策略需要近20个交易日以上日线以验证20日涨幅和多头排列；当前缓存仅 ${dates.size} 个交易日。`];
+  if (dates.size < 20) return [`该策略需要近20个交易日以上日线以验证涨幅和均线条件；当前缓存仅 ${dates.size} 个交易日。`];
   return [];
 }

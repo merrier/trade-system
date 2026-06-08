@@ -16,7 +16,7 @@ const forceNonTrading = process.env.FORCE_REPORT_ON_NON_TRADING_DAY === "true" |
 const skipDelivery = process.env.SKIP_REPORT_DELIVERY === "true" || process.argv.includes("--skip-delivery");
 
 const kinds: ReportKind[] = kind === "all" ? ["morning", "intraday-selection", "close"] : [kind];
-if (/涨停.*回调|阴线.*缩量/.test(strategyPrompt)) {
+if (/涨停.*回调|阴线.*缩量|倍量阴/.test(strategyPrompt)) {
   process.env.DAILY_BARS_LIMIT_UP_UNIVERSE ??= "true";
 }
 await fs.mkdir(outputRoot, { recursive: true });

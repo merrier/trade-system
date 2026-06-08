@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createDefaultStrategy, createLimitUpPullbackStrategy } from "../src/core/defaults.js";
+import { createDefaultStrategy, createLimitUpDoubleVolumeBearishStrategy, createLimitUpPullbackStrategy } from "../src/core/defaults.js";
 import { rankSectors, rankStocks } from "../src/core/scoring.js";
 import { evaluateWatchCondition } from "../src/core/watchlist.js";
 import { createSampleDataset } from "../src/data/sampleDataset.js";
@@ -67,6 +67,43 @@ describe("ranking", () => {
     expect(results[0].reasons.join(" ")).toContain("贴近");
     expect(results[0].reasons.join(" ")).toContain("均线多头排列");
   });
+
+  it("filters and ranks the limit-up double-volume bearish strategy from daily bars", () => {
+    const dataset: MarketDataset = {
+      tradeDate: "20260522",
+      dataAsOf: "2026-05-22T06:50:00.000Z",
+      source: "sample",
+      warnings: [],
+      stocks: [
+        stock("600101", "涨停倍量阴", 11.05, 120_000_000),
+        stock("600102", "跌破支撑", 11.05, 120_000_000),
+        stock("600103", "今日缩量", 11.05, 120_000_000),
+        stock("600104", "成交不足", 11.05, 20_000_000),
+        { ...stock("688001", "科创排除", 11.05, 120_000_000), market: "star" as const }
+      ],
+      limitUps: [],
+      dragonTiger: [],
+      sectors: []
+    };
+    const bars = [
+      ...doubleVolumeBearishBars("600101"),
+      ...doubleVolumeBearishBars("600102", { pullbackLow: 9.8 }),
+      ...doubleVolumeBearishBars("600103", { currentVolume: 1000 }),
+      ...doubleVolumeBearishBars("600104", { amount: 20_000_000 }),
+      ...doubleVolumeBearishBars("688001")
+    ];
+
+    const results = rankStocks(dataset, createLimitUpDoubleVolumeBearishStrategy(["main"]), "intraday", { dailyBars: bars });
+
+    expect(results.map((item) => item.code)).toEqual(["600101"]);
+    expect(results[0].factors.doubleVolumeBearishMatch).toBeGreaterThan(70);
+    expect(results[0].factors.todayPctChange).toBeLessThan(5);
+    expect(results[0].factors.twentyDayRangePct).toBeLessThan(45);
+    expect(results[0].factors.fiveDayAvgAmount).toBeGreaterThan(30_000_000);
+    expect(results[0].reasons.join(" ")).toContain("实体涨停");
+    expect(results[0].reasons.join(" ")).toContain("缩量阴线调整");
+    expect(results[0].reasons.join(" ")).toContain("站上10日均线");
+  });
 });
 
 function stock(code: string, name: string, close: number, turnoverAmount: number) {
@@ -133,5 +170,68 @@ function pullbackBars(code: string, currentVolume: number, options: { firstClose
       turnoverRate: 3,
       provider: "test"
     };
+  });
+}
+
+function doubleVolumeBearishBars(code: string, options: { pullbackLow?: number; currentVolume?: number; amount?: number } = {}): DailyBar[] {
+  const dates = [
+    "20260422",
+    "20260423",
+    "20260424",
+    "20260427",
+    "20260428",
+    "20260429",
+    "20260430",
+    "20260506",
+    "20260507",
+    "20260508",
+    "20260511",
+    "20260512",
+    "20260513",
+    "20260514",
+    "20260515",
+    "20260518",
+    "20260519",
+    "20260520",
+    "20260521",
+    "20260522"
+  ];
+  return dates.map((tradeDate, index) => {
+    const baseClose = 9.4 + index * 0.04;
+    const amount = options.amount ?? 50_000_000;
+    const bar = {
+      tradeDate,
+      code,
+      name: code,
+      market: code.startsWith("688") ? "star" as const : "main" as const,
+      open: baseClose - 0.03,
+      high: baseClose + 0.08,
+      low: baseClose - 0.08,
+      close: baseClose,
+      volume: 1000,
+      amount,
+      pctChange: 0.4,
+      turnoverRate: 3,
+      provider: "test"
+    };
+    if (tradeDate === "20260515") {
+      return { ...bar, open: 10, high: 11.05, low: 9.95, close: 11, volume: 3000, amount: 90_000_000, pctChange: 10 };
+    }
+    if (tradeDate === "20260518") {
+      return { ...bar, open: 11.2, high: 11.25, low: 10.4, close: 10.8, volume: 1800, amount, pctChange: -1.8 };
+    }
+    if (tradeDate === "20260519") {
+      return { ...bar, open: 10.9, high: 10.95, low: 10.2, close: 10.7, volume: 1400, amount, pctChange: -0.9 };
+    }
+    if (tradeDate === "20260520") {
+      return { ...bar, open: 10.8, high: 10.85, low: options.pullbackLow ?? 10.1, close: 10.6, volume: 1200, amount, pctChange: -0.9 };
+    }
+    if (tradeDate === "20260521") {
+      return { ...bar, open: 10.7, high: 10.75, low: 10.2, close: 10.55, volume: 1100, amount, pctChange: -0.5 };
+    }
+    if (tradeDate === "20260522") {
+      return { ...bar, open: 10.7, high: 11.1, low: 10.6, close: 11.05, volume: options.currentVolume ?? 1600, amount: amount + 10_000_000, pctChange: 4.7 };
+    }
+    return bar;
   });
 }

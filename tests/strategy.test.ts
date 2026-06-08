@@ -34,4 +34,23 @@ describe("strategy compiler", () => {
     expect(result.dsl.filters.maxTwentyDayGainPct).toBe(25);
     expect(result.dsl.filters.requireBullishMaAlignment).toBe(true);
   });
+
+  it("compiles the limit-up double-volume bearish strategy template", () => {
+    const result = compileStrategyLocally("涨停倍量阴：近5日实体涨停，涨停后缩量阴线调整，今日收阳并站上10日线", ["main", "gem"], "short_term");
+
+    expect(result.dsl.markets).toEqual(["main"]);
+    expect(result.dsl.strategyTemplates).toContain("limit_up_double_volume_bearish");
+    expect(result.dsl.filters.recentLimitUpDays).toBe(5);
+    expect(result.dsl.filters.requireSolidLimitUp).toBe(true);
+    expect(result.dsl.filters.requirePostLimitUpBearishPullback).toBe(true);
+    expect(result.dsl.filters.requirePullbackVolumeContraction).toBe(true);
+    expect(result.dsl.filters.requirePullbackLowAboveLimitOpen).toBe(true);
+    expect(result.dsl.filters.requireBullishClose).toBe(true);
+    expect(result.dsl.filters.requireAboveMa).toBe("ma10");
+    expect(result.dsl.filters.requireVolumeExpansionVsYesterday).toBe(true);
+    expect(result.dsl.filters.maxTodayPctChange).toBe(5);
+    expect(result.dsl.filters.maxTwentyDayRangePct).toBe(45);
+    expect(result.dsl.filters.minPrice).toBe(5);
+    expect(result.dsl.filters.minFiveDayAvgAmount).toBe(30_000_000);
+  });
 });

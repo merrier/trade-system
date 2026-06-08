@@ -8,8 +8,9 @@ import { z } from "zod";
 import { compileStrategy, compileWatchCondition } from "../core/deepseek.js";
 import { createDefaultStrategy } from "../core/defaults.js";
 import { rankSectors } from "../core/scoring.js";
-import { normalizeMarkets, strategyDslSchema } from "../core/strategy.js";
+import { normalizeMarkets, strategyDslSchema, strategyRequiresDailyBars } from "../core/strategy.js";
 import { fetchDailyBars, fetchMarketDataset } from "../data/akshareClient.js";
+import { readDailyBarCache } from "../data/dailyBarCache.js";
 import { appendWeixinInboundMessage, readLatestWeixinInboundMessages } from "../inbox/weixinInbox.js";
 import { readReportArtifact } from "../jobs/reportArtifacts.js";
 import type { RunMode, StrategyStyle } from "../shared/types.js";
@@ -90,8 +91,8 @@ export function createApp(prisma: PrismaClient) {
     }
 
     const dataset = body.mode === "intraday" ? await fetchMarketDataset("intraday") : await latestDatasetFromDb(prisma);
-    const dailyBars = dsl.strategyTemplates?.includes("limit_up_pullback")
-      ? await fetchDailyBars(dataset.tradeDate, 30).then((result) => result.bars).catch(() => [])
+    const dailyBars = strategyRequiresDailyBars(dsl)
+      ? await getDailyBarsForStrategy(dataset.tradeDate)
       : [];
     if (body.mode === "post_close") {
       await persistMarketDataset(prisma, dataset);
@@ -326,4 +327,12 @@ export function createApp(prisma: PrismaClient) {
   });
 
   return app;
+}
+
+async function getDailyBarsForStrategy(tradeDate: string) {
+  const cached = await readDailyBarCache(process.cwd());
+  if (cached?.bars.length && (!cached.tradeDate || cached.tradeDate >= tradeDate)) {
+    return cached.bars;
+  }
+  return fetchDailyBars(tradeDate, 30).then((result) => result.bars).catch(() => []);
 }

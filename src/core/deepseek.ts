@@ -19,7 +19,7 @@ export async function compileStrategy(prompt: string, markets: Market[], style: 
       {
         role: "system",
         content:
-          "你是A股选股策略编译器。只返回JSON。把用户自然语言转换为StrategyDsl，字段必须包括style, markets, strategyTemplates, include, exclude, weights, filters, warnings, unsupported。strategyTemplates可包含limit_up_pullback；对应filters可包含recentLimitUpDays, requireBearishCandle, requireHoldLimitUpPrice, requireAboveMa, maxMaDistancePct, requireVolumeContraction, maxTwentyDayGainPct, requireBullishMaAlignment。禁止输出交易指令。"
+          "你是A股选股策略编译器。只返回JSON。把用户自然语言转换为StrategyDsl，字段必须包括style, markets, strategyTemplates, include, exclude, weights, filters, warnings, unsupported。strategyTemplates可包含limit_up_pullback或limit_up_double_volume_bearish；对应filters可包含recentLimitUpDays, requireBearishCandle, requireHoldLimitUpPrice, requireAboveMa, maxMaDistancePct, requireVolumeContraction, maxTwentyDayGainPct, requireBullishMaAlignment, requireSolidLimitUp, requirePostLimitUpBearishPullback, requirePullbackVolumeContraction, requirePullbackLowAboveLimitOpen, requireBullishClose, requireVolumeExpansionVsYesterday, maxTodayPctChange, maxTwentyDayRangePct, minPrice, minFiveDayAvgAmount。禁止输出交易指令。"
       },
       {
         role: "user",
@@ -45,6 +45,24 @@ export async function compileStrategy(prompt: string, markets: Market[], style: 
       dsl.filters.requireVolumeContraction ??= fallback.dsl.filters.requireVolumeContraction;
       dsl.filters.maxTwentyDayGainPct ??= fallback.dsl.filters.maxTwentyDayGainPct;
       dsl.filters.requireBullishMaAlignment ??= fallback.dsl.filters.requireBullishMaAlignment;
+    }
+    if (fallback.dsl.strategyTemplates?.includes("limit_up_double_volume_bearish")) {
+      if (!dsl.strategyTemplates?.includes("limit_up_double_volume_bearish")) {
+        dsl.strategyTemplates = [...(dsl.strategyTemplates ?? []), "limit_up_double_volume_bearish"];
+      }
+      dsl.markets = ["main"];
+      dsl.filters.recentLimitUpDays ??= fallback.dsl.filters.recentLimitUpDays;
+      dsl.filters.requireSolidLimitUp ??= fallback.dsl.filters.requireSolidLimitUp;
+      dsl.filters.requirePostLimitUpBearishPullback ??= fallback.dsl.filters.requirePostLimitUpBearishPullback;
+      dsl.filters.requirePullbackVolumeContraction ??= fallback.dsl.filters.requirePullbackVolumeContraction;
+      dsl.filters.requirePullbackLowAboveLimitOpen ??= fallback.dsl.filters.requirePullbackLowAboveLimitOpen;
+      dsl.filters.requireBullishClose ??= fallback.dsl.filters.requireBullishClose;
+      dsl.filters.requireAboveMa ??= fallback.dsl.filters.requireAboveMa;
+      dsl.filters.requireVolumeExpansionVsYesterday ??= fallback.dsl.filters.requireVolumeExpansionVsYesterday;
+      dsl.filters.maxTodayPctChange ??= fallback.dsl.filters.maxTodayPctChange;
+      dsl.filters.maxTwentyDayRangePct ??= fallback.dsl.filters.maxTwentyDayRangePct;
+      dsl.filters.minPrice ??= fallback.dsl.filters.minPrice;
+      dsl.filters.minFiveDayAvgAmount ??= fallback.dsl.filters.minFiveDayAvgAmount;
     }
     return {
       dsl,

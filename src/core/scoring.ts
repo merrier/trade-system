@@ -74,14 +74,14 @@ function scoreStock(
   dailyBars: DailyBar[] | undefined,
   tradeDate: string
 ): RecommendationResult {
-  const pullback = evaluateLimitUpPullback(stock, dsl, dailyBars, tradeDate);
-  const strategyMatch = pullback ? pullback.score : getStrategyMatch(stock, dsl, limitUp, dragon);
+  const templateEvaluation = evaluateStrategyTemplate(stock, dsl, dailyBars, tradeDate);
+  const strategyMatch = templateEvaluation ? templateEvaluation.score : getStrategyMatch(stock, dsl, limitUp, dragon);
   const limitUpStrength = limitUp ? clamp(limitUp.consecutive * 18 + (limitUp.openCount === 0 ? 18 : 8) + scale(limitUp.sealedAmount, 0, 800_000_000) * 0.3, 0, 100) : 0;
   const dragonTiger = dragon ? clamp(scale(dragon.netAmount, -80_000_000, 180_000_000), 0, 100) : 30;
   const sectorHeat = getSectorHeat(stock, sectors, sectorScores);
   const moneyFlow = clamp(scale(stock.mainNetInflow ?? 0, -60_000_000, 120_000_000), 0, 100);
   const liquidity = clamp(scale(stock.turnoverAmount, dsl.filters.minTurnoverAmount, 2_000_000_000), 0, 100);
-  const riskPenalty = getRiskPenalty(stock, limitUp, dragon, pullback);
+  const riskPenalty = getRiskPenalty(stock, limitUp, dragon, templateEvaluation);
 
   const weighted =
     strategyMatch * dsl.weights.strategyMatch +
@@ -96,8 +96,8 @@ function scoreStock(
     .reduce((sum, [, value]) => sum + value, 0);
   const score = clamp(weighted / Math.max(1, weightTotal), 0, 100);
 
-  const reasons = buildReasons(stock, limitUp, dragon, sectorHeat, moneyFlow, pullback);
-  const risks = buildRisks(stock, limitUp, mode, pullback);
+  const reasons = buildReasons(stock, limitUp, dragon, sectorHeat, moneyFlow, templateEvaluation);
+  const risks = buildRisks(stock, limitUp, mode, templateEvaluation);
   const confidence = round(clamp((limitUp ? 28 : 8) + (dragon ? 20 : 8) + (sectorHeat > 60 ? 24 : 12) + (stock.turnoverAmount > dsl.filters.minTurnoverAmount ? 18 : 6), 25, 96));
 
   return {
@@ -117,7 +117,7 @@ function scoreStock(
       moneyFlow: round(moneyFlow),
       liquidity: round(liquidity),
       riskPenalty: round(riskPenalty),
-      ...(pullback?.factors ?? {})
+      ...(templateEvaluation?.factors ?? {})
     },
     dataAsOf
   };
@@ -131,7 +131,7 @@ function passesFilters(stock: StockSnapshot, dsl: StrategyDsl, limitUp?: LimitUp
   if (stock.turnoverAmount < dsl.filters.minTurnoverAmount) return false;
   if (dsl.filters.maxOpenCount !== undefined && limitUp && limitUp.openCount > dsl.filters.maxOpenCount) return false;
   if (dsl.filters.minConsecutiveLimitUps !== undefined && limitUp && limitUp.consecutive < dsl.filters.minConsecutiveLimitUps) return false;
-  if (isLimitUpPullbackStrategy(dsl) && !evaluateLimitUpPullback(stock, dsl, dailyBars, tradeDate ?? "")?.matched) return false;
+  if (isDailyBarStrategy(dsl) && !evaluateStrategyTemplate(stock, dsl, dailyBars, tradeDate ?? "")?.matched) return false;
   return true;
 }
 
@@ -192,8 +192,149 @@ function buildRisks(stock: StockSnapshot, limitUp: LimitUpSnapshot | undefined, 
   return risks;
 }
 
+function isDailyBarStrategy(dsl: StrategyDsl): boolean {
+  return Boolean(dsl.strategyTemplates?.some((template) => template === "limit_up_pullback" || template === "limit_up_double_volume_bearish"));
+}
+
 function isLimitUpPullbackStrategy(dsl: StrategyDsl): boolean {
   return Boolean(dsl.strategyTemplates?.includes("limit_up_pullback"));
+}
+
+function isLimitUpDoubleVolumeBearishStrategy(dsl: StrategyDsl): boolean {
+  return Boolean(dsl.strategyTemplates?.includes("limit_up_double_volume_bearish"));
+}
+
+function evaluateStrategyTemplate(stock: StockSnapshot, dsl: StrategyDsl, dailyBars: DailyBar[] | undefined, tradeDate: string): PullbackEvaluation | null {
+  return evaluateLimitUpDoubleVolumeBearish(stock, dsl, dailyBars, tradeDate) ?? evaluateLimitUpPullback(stock, dsl, dailyBars, tradeDate);
+}
+
+function evaluateLimitUpDoubleVolumeBearish(stock: StockSnapshot, dsl: StrategyDsl, dailyBars: DailyBar[] | undefined, tradeDate: string): PullbackEvaluation | null {
+  if (!isLimitUpDoubleVolumeBearishStrategy(dsl)) return null;
+  const bars = [...(dailyBars ?? [])].sort((a, b) => a.tradeDate.localeCompare(b.tradeDate));
+  const currentFromBars = bars.find((bar) => bar.tradeDate === tradeDate) ?? bars.at(-1);
+  if (!currentFromBars) return { matched: false, score: 0, reasons: [], risks: ["缺少30日日线缓存，无法验证涨停倍量阴条件"], factors: { doubleVolumeBearishMatch: 0 } };
+
+  const current: DailyBar = {
+    ...currentFromBars,
+    open: currentFromBars.open || stock.open || currentFromBars.close,
+    high: currentFromBars.high || stock.high || currentFromBars.close,
+    low: currentFromBars.low || stock.low || currentFromBars.close,
+    close: currentFromBars.close || stock.close,
+    volume: currentFromBars.volume || stock.volume || 0,
+    amount: currentFromBars.amount || stock.turnoverAmount || 0
+  };
+  const currentIndex = bars.findIndex((bar) => bar.tradeDate === current.tradeDate);
+  const previous = currentIndex > 0 ? bars[currentIndex - 1] : undefined;
+  const recentDays = dsl.filters.recentLimitUpDays ?? 5;
+  const recentLimitUp = bars.slice(Math.max(0, currentIndex - recentDays), currentIndex).reverse().find(isSolidLimitUpBar);
+  const limitUpIndex = recentLimitUp ? bars.findIndex((bar) => bar.tradeDate === recentLimitUp.tradeDate) : -1;
+  const adjustmentBars = limitUpIndex >= 0 ? bars.slice(limitUpIndex + 1, currentIndex) : [];
+  const pullbackWindow = limitUpIndex >= 0 ? bars.slice(limitUpIndex + 1, currentIndex + 1) : [];
+  const maBars = bars.slice(0, currentIndex).concat(current);
+  const ma10 = movingAverage(maBars, 10);
+  const twentyDayBars = bars.slice(Math.max(0, currentIndex - 19), currentIndex + 1);
+  const fiveDayBars = bars.slice(Math.max(0, currentIndex - 4), currentIndex + 1);
+  const todayPctChange = current.pctChange || (previous && previous.close > 0 ? ((current.close - previous.close) / previous.close) * 100 : 0);
+  const twentyDayRangePct = twentyDayBars.length >= 20 ? rangePct(twentyDayBars) : undefined;
+  const fiveDayAvgAmount = fiveDayBars.length >= 5 ? avg(fiveDayBars.map((bar) => bar.amount)) : undefined;
+  const lowestPullbackLow = pullbackWindow.length ? Math.min(...pullbackWindow.map((bar) => bar.low)) : 0;
+
+  const hasRecentSolidLimitUp = Boolean(recentLimitUp);
+  const hasAdjustment = adjustmentBars.length > 0;
+  const bearishPullback = !dsl.filters.requirePostLimitUpBearishPullback || (hasAdjustment && adjustmentBars.every(isBearishBar));
+  const pullbackVolumeContraction = !dsl.filters.requirePullbackVolumeContraction || (
+    hasAdjustment && adjustmentBars.every((bar, index) => {
+      const reference = bars[limitUpIndex + index];
+      return reference?.volume > 0 && bar.volume > 0 && bar.volume < reference.volume;
+    })
+  );
+  const holdsLimitOpen = !dsl.filters.requirePullbackLowAboveLimitOpen || Boolean(recentLimitUp && lowestPullbackLow >= recentLimitUp.open);
+  const bullishClose = !dsl.filters.requireBullishClose || current.close > current.open;
+  const aboveMa10 = dsl.filters.requireAboveMa !== "ma10" || (ma10 > 0 && current.close > ma10);
+  const volumeExpansion = !dsl.filters.requireVolumeExpansionVsYesterday || Boolean(previous && current.volume > previous.volume);
+  const withinTodayGain = dsl.filters.maxTodayPctChange === undefined || todayPctChange < dsl.filters.maxTodayPctChange;
+  const withinTwentyDayRange = dsl.filters.maxTwentyDayRangePct === undefined || (twentyDayRangePct !== undefined && twentyDayRangePct < dsl.filters.maxTwentyDayRangePct);
+  const aboveMinPrice = dsl.filters.minPrice === undefined || current.close > dsl.filters.minPrice;
+  const enoughFiveDayAmount = dsl.filters.minFiveDayAvgAmount === undefined || (fiveDayAvgAmount !== undefined && fiveDayAvgAmount > dsl.filters.minFiveDayAvgAmount);
+  const matched = hasRecentSolidLimitUp && bearishPullback && pullbackVolumeContraction && holdsLimitOpen && bullishClose && aboveMa10 && volumeExpansion && withinTodayGain && withinTwentyDayRange && aboveMinPrice && enoughFiveDayAmount;
+
+  if (!matched) {
+    return {
+      matched,
+      score: 0,
+      reasons: [],
+      risks: [
+        !hasRecentSolidLimitUp ? `近${recentDays}个交易日未识别到实体涨停` : "",
+        !hasAdjustment ? "涨停后没有调整日" : "",
+        !bearishPullback ? "涨停后调整日不是连续阴线" : "",
+        !pullbackVolumeContraction ? "涨停后调整日未缩量" : "",
+        !holdsLimitOpen ? "调整区间最低价跌破涨停当日开盘价" : "",
+        !bullishClose ? "今日不是阳线" : "",
+        !aboveMa10 ? "今日收盘价未站上10日均线" : "",
+        !volumeExpansion ? "今日成交量未大于昨日成交量" : "",
+        !withinTodayGain ? `今日涨幅 ${round(todayPctChange)}% 不小于 ${round(dsl.filters.maxTodayPctChange ?? 0)}%` : "",
+        !withinTwentyDayRange
+          ? twentyDayRangePct === undefined
+            ? "近20日K线不足，无法验证最大涨幅"
+            : `近20日最大涨幅 ${round(twentyDayRangePct)}% 不小于 ${round(dsl.filters.maxTwentyDayRangePct ?? 0)}%`
+          : "",
+        !aboveMinPrice ? `股价 ${round(current.close)} 元不大于 ${round(dsl.filters.minPrice ?? 0)} 元` : "",
+        !enoughFiveDayAmount
+          ? fiveDayAvgAmount === undefined
+            ? "近5日成交额数据不足"
+            : `近5日日均成交额 ${formatYi(fiveDayAvgAmount)} 不大于 ${formatYi(dsl.filters.minFiveDayAvgAmount ?? 0)}`
+          : ""
+      ].filter(Boolean),
+      factors: { doubleVolumeBearishMatch: 0 }
+    };
+  }
+
+  const daysAgo = currentIndex - limitUpIndex;
+  const supportDistancePct = recentLimitUp && recentLimitUp.open > 0 ? ((lowestPullbackLow - recentLimitUp.open) / recentLimitUp.open) * 100 : 0;
+  const ma10DistancePct = ma10 > 0 ? ((current.close - ma10) / ma10) * 100 : 99;
+  const volumeExpansionRatio = previous && previous.volume > 0 ? current.volume / previous.volume : 1;
+  const rangeRoomScore = dsl.filters.maxTwentyDayRangePct && twentyDayRangePct !== undefined
+    ? clamp(scale(dsl.filters.maxTwentyDayRangePct - twentyDayRangePct, 0, dsl.filters.maxTwentyDayRangePct), 0, 100)
+    : 50;
+  const pullbackScore = clamp(
+    48 +
+      clamp(scale(recentDays - daysAgo + 1, 0, recentDays), 0, 100) * 0.18 +
+      clamp(scale(supportDistancePct, 0, 8), 0, 100) * 0.12 +
+      clamp(scale(4 - Math.abs(adjustmentBars.length - 2), 0, 4), 0, 100) * 0.12 +
+      clamp(scale(3 - ma10DistancePct, 0, 3), 0, 100) * 0.12 +
+      clamp(scale(volumeExpansionRatio, 1, 2.5), 0, 100) * 0.12 +
+      rangeRoomScore * 0.12 +
+      clamp(scale((fiveDayAvgAmount ?? 0) / 10_000_000, 3, 20), 0, 100) * 0.1,
+    0,
+    100
+  );
+
+  return {
+    matched,
+    score: pullbackScore,
+    reasons: [
+      `近${recentDays}日内 ${recentLimitUp?.tradeDate} 出现实体涨停，涨停日开盘价 ${round(recentLimitUp?.open ?? 0)}`,
+      `涨停后 ${adjustmentBars.length} 个交易日缩量阴线调整，区间最低价 ${round(lowestPullbackLow)} 未跌破涨停日开盘价`,
+      `今日收阳并站上10日均线：收盘 ${round(current.close)}，MA10 ${round(ma10)}`,
+      `今日成交量为昨日 ${round(volumeExpansionRatio * 100)}%，涨幅 ${round(todayPctChange)}%`,
+      `近20日最大涨幅 ${round(twentyDayRangePct ?? 0)}%，近5日日均成交额 ${formatYi(fiveDayAvgAmount ?? 0)}`
+    ],
+    risks: [
+      supportDistancePct < 1 ? "调整低点距离涨停日开盘价支撑较近，跌破后形态失效" : "",
+      ma10DistancePct > 6 ? "收盘价距离10日均线偏远，追高性价比下降" : ""
+    ].filter(Boolean),
+    factors: {
+      doubleVolumeBearishMatch: round(pullbackScore),
+      limitUpRecency: round(clamp(scale(recentDays - daysAgo + 1, 0, recentDays), 0, 100)),
+      pullbackDays: adjustmentBars.length,
+      supportDistancePct: round(supportDistancePct),
+      ma10DistancePct: round(ma10DistancePct),
+      todayVolumeVsYesterday: round(volumeExpansionRatio),
+      todayPctChange: round(todayPctChange),
+      twentyDayRangePct: round(twentyDayRangePct ?? 0),
+      fiveDayAvgAmount: round(fiveDayAvgAmount ?? 0)
+    }
+  };
 }
 
 function evaluateLimitUpPullback(stock: StockSnapshot, dsl: StrategyDsl, dailyBars: DailyBar[] | undefined, tradeDate: string): PullbackEvaluation | null {
@@ -338,6 +479,14 @@ function isLimitUpBar(bar: DailyBar): boolean {
   return bar.pctChange >= 9.8 || (bar.open > 0 && ((bar.close - bar.open) / bar.open) * 100 >= 9.8);
 }
 
+function isSolidLimitUpBar(bar: DailyBar): boolean {
+  return bar.pctChange >= 9.8 && bar.close > bar.open;
+}
+
+function isBearishBar(bar: DailyBar): boolean {
+  return bar.close < bar.open;
+}
+
 function closestMaProximity(close: number, ma5: number, ma10: number): { label: "MA5" | "MA10"; value: number; distancePct: number } | null {
   const candidates = [
     { label: "MA5" as const, value: ma5 },
@@ -357,6 +506,14 @@ function movingAverage(bars: DailyBar[], days: number): number {
   const values = bars.slice(-days).map((bar) => bar.close).filter((value) => value > 0);
   if (!values.length) return 0;
   return avg(values);
+}
+
+function rangePct(bars: DailyBar[]): number {
+  const lows = bars.map((bar) => bar.low).filter((value) => value > 0);
+  if (!lows.length) return 0;
+  const minLow = Math.min(...lows);
+  const maxHigh = Math.max(...bars.map((bar) => bar.high));
+  return ((maxHigh - minLow) / minLow) * 100;
 }
 
 function scale(value: number, min: number, max: number): number {

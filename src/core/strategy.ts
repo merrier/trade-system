@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createDefaultStrategy, createLimitUpPullbackStrategy } from "./defaults.js";
+import { createDefaultStrategy, createLimitUpDoubleVolumeBearishStrategy, createLimitUpPullbackStrategy } from "./defaults.js";
 import type { CompileResult, Market, StrategyDsl, StrategyStyle, WatchConditionDsl, WatchTemplate } from "../shared/types.js";
 
 const marketSchema = z.enum(["main", "gem", "star", "bse"]);
@@ -8,7 +8,7 @@ const styleSchema = z.enum(["short_term", "stable", "custom"]);
 export const strategyDslSchema: z.ZodType<StrategyDsl> = z.object({
   style: styleSchema,
   markets: z.array(marketSchema).min(1),
-  strategyTemplates: z.array(z.enum(["limit_up_pullback"])).optional().default([]),
+  strategyTemplates: z.array(z.enum(["limit_up_pullback", "limit_up_double_volume_bearish"])).optional().default([]),
   include: z.array(z.string()),
   exclude: z.array(z.string()),
   weights: z.object({
@@ -31,11 +31,21 @@ export const strategyDslSchema: z.ZodType<StrategyDsl> = z.object({
     recentLimitUpDays: z.number().min(1).max(30).optional(),
     requireBearishCandle: z.boolean().optional(),
     requireHoldLimitUpPrice: z.boolean().optional(),
-    requireAboveMa: z.enum(["ma5_or_ma10"]).optional(),
+    requireAboveMa: z.enum(["ma5_or_ma10", "ma10"]).optional(),
     maxMaDistancePct: z.number().min(0).max(20).optional(),
     requireVolumeContraction: z.boolean().optional(),
     maxTwentyDayGainPct: z.number().min(0).max(100).optional(),
-    requireBullishMaAlignment: z.boolean().optional()
+    requireBullishMaAlignment: z.boolean().optional(),
+    requireSolidLimitUp: z.boolean().optional(),
+    requirePostLimitUpBearishPullback: z.boolean().optional(),
+    requirePullbackVolumeContraction: z.boolean().optional(),
+    requirePullbackLowAboveLimitOpen: z.boolean().optional(),
+    requireBullishClose: z.boolean().optional(),
+    requireVolumeExpansionVsYesterday: z.boolean().optional(),
+    maxTodayPctChange: z.number().min(0).max(20).optional(),
+    maxTwentyDayRangePct: z.number().min(0).max(200).optional(),
+    minPrice: z.number().min(0).optional(),
+    minFiveDayAvgAmount: z.number().min(0).optional()
   })
 });
 
@@ -73,6 +83,9 @@ export function compileStrategyLocally(prompt: string, markets: Market[] = ["mai
 
   if (isLimitUpPullbackPrompt(prompt)) {
     Object.assign(dsl, createLimitUpPullbackStrategy(markets));
+  }
+  if (isLimitUpDoubleVolumeBearishPrompt(prompt)) {
+    Object.assign(dsl, createLimitUpDoubleVolumeBearishStrategy(["main"]));
   }
 
   const twentyDayGainMatch = prompt.match(/(?:近|最近)?\s*20\s*(?:天|日).*?(?:涨幅|涨跌幅).*?(?:不超过|不要超过|小于|低于|<=|≤)\s*(\d+(?:\.\d+)?)\s*%?/);
@@ -140,6 +153,18 @@ function isLimitUpPullbackPrompt(prompt: string): boolean {
   );
 }
 
+function isLimitUpDoubleVolumeBearishPrompt(prompt: string): boolean {
+  const text = prompt.trim();
+  return Boolean(
+    /涨停.*倍量阴|倍量阴/.test(text) ||
+    (
+      text.includes("实体涨停") &&
+      /缩量.*阴线|阴线.*缩量/.test(text) &&
+      /10日均线|十日均线|10日线|十日线/.test(text)
+    )
+  );
+}
+
 export function compileWatchConditionLocally(prompt: string, markets: Market[] = ["main"]): WatchConditionDsl {
   const templates: WatchTemplate[] = [];
   const text = prompt.trim();
@@ -173,6 +198,10 @@ export function normalizeMarkets(input?: unknown): Market[] {
   if (!Array.isArray(input)) return ["main"];
   const parsed = input.filter((item): item is Market => ["main", "gem", "star", "bse"].includes(String(item)));
   return parsed.length > 0 ? uniqueMarkets(parsed) : ["main"];
+}
+
+export function strategyRequiresDailyBars(dsl: StrategyDsl): boolean {
+  return Boolean(dsl.strategyTemplates?.some((template) => template === "limit_up_pullback" || template === "limit_up_double_volume_bearish"));
 }
 
 function addKeyword(target: string[], prompt: string, terms: string[]) {
