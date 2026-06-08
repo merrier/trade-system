@@ -43,6 +43,7 @@ API 默认运行在 `http://localhost:8787`，Web 看板默认运行在 `http://
 - `Ingest Iwencai limit-up data`：北京时间工作日 16:45 运行，抓取问财涨停板数据，并把 `data/iwencai/limit-ups-*.json` 提交回 `dev` 分支。
 - `Ingest Iwencai dragon tiger data`：北京时间工作日 16:55 运行，抓取问财龙虎榜席位明细，并把 `data/iwencai/dragon-tiger-*.json` 提交回 `dev` 分支。
 - `Ingest Mootdx main daily bars`：北京时间工作日 17:05 运行，按问财主板股票池抓取最近 30 根日 K，并把 `data/mootdx/main-daily-bars-*.json` 与 `cache/main-daily-bars.json` 提交回 `dev` 分支。
+- `Send 14:50 intraday selection`：北京时间工作日 14:45 运行，使用“涨停倍量阴”策略生成并发送 14:50 主板盘中选股；该任务只上传报告 artifact，不提交数据、不覆盖 `main`。
 
 这些任务都不会推送或覆盖 `main`。
 
@@ -208,7 +209,7 @@ INTRADAY_STRATEGY_PROMPT="涨停回调策略：主板股票最近10天内有涨�
 
 报告任务会按北京时间自动识别 A 股交易日。周末和已内置的 2026 年交易所休市日会直接跳过，不生成报告、不推送微信；临时休市可用 `A_SHARE_EXTRA_HOLIDAYS=2026-05-25,2026-05-26` 补充。手动调试非交易日时可设置 `FORCE_REPORT_ON_NON_TRADING_DAY=true` 或传 `--force-non-trading`。
 
-14:50 盘中选股默认使用“涨停回调策略”：主板股票最近 10 个交易日内曾涨停，当日为阴线，低点未跌破最近涨停日收盘价，收盘价站上并回调至 MA5 或 MA10 附近，默认距离最近均线不超过 3%，且当日成交量较前一交易日缩量；同时要求最近 20 个交易日涨幅不超过 25%，并形成 MA5 > MA10 > MA20 的均线多头排列。该策略依赖 `data/cache/main-daily-bars.json` 的 30 日滑窗日线缓存；缓存不足时报告会在 `warnings` 中提示。
+14:50 盘中选股的 GitHub Action 默认使用“涨停倍量阴策略”：主板股票近 5 日出现实体涨停，涨停后缩量阴线调整，调整区间最低价未跌破涨停当日开盘价，今日收阳线，收盘价站上 10 日均线，今日成交量大于昨日成交量，今日涨幅小于 5%，近 20 日最大涨幅小于 45%，非 ST，非科创板，非北交所，非创业板，股价大于 5 元，近 5 日日均成交额大于 3000 万。该任务读取 `cache/main-daily-bars.json` 的 30 日滑窗日线缓存，并用盘中快照合成今日临时日 K；缓存不足时报告会在 `warnings` 中提示。
 
 ### 微信入站转发
 

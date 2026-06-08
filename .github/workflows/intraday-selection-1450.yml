@@ -1,0 +1,80 @@
+name: Send 14:50 intraday selection
+
+on:
+  schedule:
+    # 14:45 Asia/Shanghai on weekdays. The report title/message is the 14:50 selection.
+    - cron: "45 6 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      skip_delivery:
+        description: "Skip message delivery for manual test runs"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: intraday-selection-1450
+  cancel-in-progress: true
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "file:../data/trade-system.db"
+      PYTHON_BIN: "python3"
+      PREVIOUS_STATIC_DATA_DIR: "."
+      SKIP_DAILY_BAR_REFRESH: "true"
+      DATA_PROVIDER_TIMEOUT_MS: "60000"
+      FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+      FEISHU_WEBHOOK_SECRET: ${{ secrets.FEISHU_WEBHOOK_SECRET }}
+      FEISHU_WEBHOOK_MODE: ${{ vars.FEISHU_WEBHOOK_MODE }}
+      FEISHU_WEBHOOK_KEYWORD: ${{ vars.FEISHU_WEBHOOK_KEYWORD }}
+      INTRADAY_STRATEGY_PROMPT: "涨停倍量阴策略：主板股票近5日出现实体涨停，涨停后缩量阴线调整，调整区间最低价未跌破涨停当日开盘价，今日收阳线，收盘价站上10日均线，今日成交量大于昨日成交量，今日涨幅小于5%，近20日最大涨幅小于45%，非ST，非科创板，非北交所，非创业板，股价大于5元，近5日日均成交额大于3000万"
+
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Node dependencies
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          yarn install --non-interactive --no-lockfile
+
+      - name: Install Python data dependencies
+        run: python3 -m pip install --user akshare pandas efinance baostock easyquotation
+
+      - name: Generate Prisma client
+        run: yarn prisma:generate
+
+      - name: Initialize SQLite schema
+        run: yarn db:init
+
+      - name: Build and send 14:50 intraday selection
+        run: |
+          extra_args=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.skip_delivery }}" != "false" ]; then
+            extra_args="--skip-delivery"
+          fi
+          yarn reports:run -- --kind=intraday-selection --skip-daily-bar-refresh ${extra_args}
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: intraday-selection-1450
+          path: dist-web/data/reports/intraday-selection/*.json
+          if-no-files-found: warn
+          retention-days: 30

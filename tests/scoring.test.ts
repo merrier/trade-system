@@ -104,6 +104,35 @@ describe("ranking", () => {
     expect(results[0].reasons.join(" ")).toContain("缩量阴线调整");
     expect(results[0].reasons.join(" ")).toContain("站上10日均线");
   });
+
+  it("uses intraday snapshot as the current bar when daily cache lacks today", () => {
+    const dataset: MarketDataset = {
+      tradeDate: "20260522",
+      dataAsOf: "2026-05-22T06:50:00.000Z",
+      source: "sample",
+      warnings: [],
+      stocks: [
+        {
+          ...stock("600101", "盘中涨停倍量阴", 11.05, 120_000_000),
+          open: 10.7,
+          high: 11.1,
+          low: 10.6,
+          volume: 1600,
+          pctChange: 4.7
+        }
+      ],
+      limitUps: [],
+      dragonTiger: [],
+      sectors: []
+    };
+    const bars = doubleVolumeBearishBars("600101").filter((bar) => bar.tradeDate !== "20260522");
+
+    const results = rankStocks(dataset, createLimitUpDoubleVolumeBearishStrategy(["main"]), "intraday", { dailyBars: bars });
+
+    expect(results.map((item) => item.code)).toEqual(["600101"]);
+    expect(results[0].factors.todayPctChange).toBe(4.7);
+    expect(results[0].reasons.join(" ")).toContain("今日收阳并站上10日均线");
+  });
 });
 
 function stock(code: string, name: string, close: number, turnoverAmount: number) {

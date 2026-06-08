@@ -210,19 +210,10 @@ function evaluateStrategyTemplate(stock: StockSnapshot, dsl: StrategyDsl, dailyB
 
 function evaluateLimitUpDoubleVolumeBearish(stock: StockSnapshot, dsl: StrategyDsl, dailyBars: DailyBar[] | undefined, tradeDate: string): PullbackEvaluation | null {
   if (!isLimitUpDoubleVolumeBearishStrategy(dsl)) return null;
-  const bars = [...(dailyBars ?? [])].sort((a, b) => a.tradeDate.localeCompare(b.tradeDate));
-  const currentFromBars = bars.find((bar) => bar.tradeDate === tradeDate) ?? bars.at(-1);
-  if (!currentFromBars) return { matched: false, score: 0, reasons: [], risks: ["缺少30日日线缓存，无法验证涨停倍量阴条件"], factors: { doubleVolumeBearishMatch: 0 } };
+  const prepared = prepareBarsForEvaluation(stock, dailyBars, tradeDate);
+  if (!prepared) return { matched: false, score: 0, reasons: [], risks: ["缺少30日日线缓存，无法验证涨停倍量阴条件"], factors: { doubleVolumeBearishMatch: 0 } };
 
-  const current: DailyBar = {
-    ...currentFromBars,
-    open: currentFromBars.open || stock.open || currentFromBars.close,
-    high: currentFromBars.high || stock.high || currentFromBars.close,
-    low: currentFromBars.low || stock.low || currentFromBars.close,
-    close: currentFromBars.close || stock.close,
-    volume: currentFromBars.volume || stock.volume || 0,
-    amount: currentFromBars.amount || stock.turnoverAmount || 0
-  };
+  const { bars, current } = prepared;
   const currentIndex = bars.findIndex((bar) => bar.tradeDate === current.tradeDate);
   const previous = currentIndex > 0 ? bars[currentIndex - 1] : undefined;
   const recentDays = dsl.filters.recentLimitUpDays ?? 5;
@@ -339,18 +330,10 @@ function evaluateLimitUpDoubleVolumeBearish(stock: StockSnapshot, dsl: StrategyD
 
 function evaluateLimitUpPullback(stock: StockSnapshot, dsl: StrategyDsl, dailyBars: DailyBar[] | undefined, tradeDate: string): PullbackEvaluation | null {
   if (!isLimitUpPullbackStrategy(dsl)) return null;
-  const bars = [...(dailyBars ?? [])].sort((a, b) => a.tradeDate.localeCompare(b.tradeDate));
-  const currentFromBars = bars.find((bar) => bar.tradeDate === tradeDate) ?? bars.at(-1);
-  if (!currentFromBars) return { matched: false, score: 0, reasons: [], risks: ["缺少30日日线缓存，无法验证涨停回调条件"], factors: { pullbackMatch: 0 } };
+  const prepared = prepareBarsForEvaluation(stock, dailyBars, tradeDate);
+  if (!prepared) return { matched: false, score: 0, reasons: [], risks: ["缺少30日日线缓存，无法验证涨停回调条件"], factors: { pullbackMatch: 0 } };
 
-  const current: DailyBar = {
-    ...currentFromBars,
-    open: currentFromBars.open || stock.open || currentFromBars.close,
-    high: currentFromBars.high || stock.high || currentFromBars.close,
-    low: currentFromBars.low || stock.low || currentFromBars.close,
-    close: currentFromBars.close || stock.close,
-    volume: currentFromBars.volume || stock.volume || 0
-  };
+  const { bars, current } = prepared;
   const currentIndex = bars.findIndex((bar) => bar.tradeDate === current.tradeDate);
   const priorBars = bars.slice(0, currentIndex >= 0 ? currentIndex : -1);
   const previous = priorBars.at(-1);
@@ -473,6 +456,58 @@ function groupDailyBars(bars: DailyBar[]): Map<string, DailyBar[]> {
     items.sort((a, b) => a.tradeDate.localeCompare(b.tradeDate));
   }
   return grouped;
+}
+
+function prepareBarsForEvaluation(stock: StockSnapshot, dailyBars: DailyBar[] | undefined, tradeDate: string): { bars: DailyBar[]; current: DailyBar } | null {
+  const bars = [...(dailyBars ?? [])].sort((a, b) => a.tradeDate.localeCompare(b.tradeDate));
+  const currentFromBars = bars.find((bar) => bar.tradeDate === tradeDate);
+  if (currentFromBars) {
+    const current = hydrateCurrentBar(currentFromBars, stock);
+    const nextBars = bars.map((bar) => (bar.tradeDate === current.tradeDate ? current : bar));
+    return { bars: nextBars, current };
+  }
+
+  const previous = bars.at(-1);
+  if (!tradeDate || !previous || !stock.close) return null;
+  const current = stockSnapshotToDailyBar(stock, tradeDate, previous);
+  return {
+    bars: [...bars, current].sort((a, b) => a.tradeDate.localeCompare(b.tradeDate)),
+    current
+  };
+}
+
+function hydrateCurrentBar(bar: DailyBar, stock: StockSnapshot): DailyBar {
+  return {
+    ...bar,
+    open: bar.open || stock.open || bar.close,
+    high: bar.high || stock.high || bar.close,
+    low: bar.low || stock.low || bar.close,
+    close: bar.close || stock.close,
+    volume: bar.volume || stock.volume || 0,
+    amount: bar.amount || stock.turnoverAmount || 0,
+    pctChange: bar.pctChange || stock.pctChange || 0
+  };
+}
+
+function stockSnapshotToDailyBar(stock: StockSnapshot, tradeDate: string, previous: DailyBar): DailyBar {
+  const close = stock.close || previous.close;
+  const open = stock.open || close;
+  const pctChange = stock.pctChange || (previous.close > 0 ? ((close - previous.close) / previous.close) * 100 : 0);
+  return {
+    tradeDate,
+    code: stock.code,
+    name: stock.name,
+    market: stock.market,
+    open,
+    high: stock.high || Math.max(open, close),
+    low: stock.low || Math.min(open, close),
+    close,
+    volume: stock.volume || 0,
+    amount: stock.turnoverAmount || 0,
+    pctChange,
+    turnoverRate: stock.turnoverRate || 0,
+    provider: "intraday-snapshot"
+  };
 }
 
 function isLimitUpBar(bar: DailyBar): boolean {

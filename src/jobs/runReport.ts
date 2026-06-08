@@ -14,6 +14,7 @@ const strategyArg = process.argv.find((arg) => arg.startsWith("--strategy-prompt
 const strategyPrompt = strategyArg || defaultStrategyPrompt;
 const forceNonTrading = process.env.FORCE_REPORT_ON_NON_TRADING_DAY === "true" || process.argv.includes("--force-non-trading");
 const skipDelivery = process.env.SKIP_REPORT_DELIVERY === "true" || process.argv.includes("--skip-delivery");
+const skipDailyBarRefresh = process.env.SKIP_DAILY_BAR_REFRESH === "true" || process.argv.includes("--skip-daily-bar-refresh");
 
 const kinds: ReportKind[] = kind === "all" ? ["morning", "intraday-selection", "close"] : [kind];
 if (/涨停.*回调|阴线.*缩量|倍量阴/.test(strategyPrompt)) {
@@ -39,12 +40,16 @@ let dailyBarWarnings: string[] = [];
 try {
   const previous = await readDailyBarCache(previousRoot);
   dailyBarsForReport = previous?.bars ?? [];
-  const dailyBars = await fetchDailyBars(tradingDay.tradeDate, 30);
-  const cache = mergeDailyBarCache(previous, dailyBars.bars, dailyBars.provider, dailyBars.warnings);
-  await writeDailyBarCache(outputRoot, cache);
-  dailyBarsForReport = cache.bars;
-  dailyBarWarnings = cache.warnings;
-  cacheSummary = { bars: cache.bars.length, tradeDate: cache.tradeDate, source: cache.source, warnings: cache.warnings };
+  if (skipDailyBarRefresh) {
+    cacheSummary = { bars: dailyBarsForReport.length, tradeDate: previous?.tradeDate ?? null, source: previous?.source ?? "cache", skippedRefresh: true, warnings: previous?.warnings ?? [] };
+  } else {
+    const dailyBars = await fetchDailyBars(tradingDay.tradeDate, 30);
+    const cache = mergeDailyBarCache(previous, dailyBars.bars, dailyBars.provider, dailyBars.warnings);
+    await writeDailyBarCache(outputRoot, cache);
+    dailyBarsForReport = cache.bars;
+    dailyBarWarnings = cache.warnings;
+    cacheSummary = { bars: cache.bars.length, tradeDate: cache.tradeDate, source: cache.source, warnings: cache.warnings };
+  }
 } catch (error) {
   cacheSummary = { error: error instanceof Error ? error.message : String(error) };
   dailyBarWarnings = [`日线缓存更新失败：${error instanceof Error ? error.message : String(error)}`];
