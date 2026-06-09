@@ -61,6 +61,9 @@ async function enrichCompanyContext(config: IngestOptions) {
     records,
     warnings
   };
+  if (output.targetCount > 0 && records.length === 0) {
+    throw new Error(`Company context enrichment returned 0 records for ${output.targetCount} candidates; keeping the previous cache.`);
+  }
   const outputDir = path.join(process.cwd(), "data", "company-context");
   await fs.mkdir(outputDir, { recursive: true });
   const datedPath = path.join(outputDir, `company-context-${tradeDate}.json`);
