@@ -72,5 +72,6 @@ jobs:
             echo "No Mootdx daily bar changes to commit."
           else
             git commit -m "data: update mootdx main daily bars $(date -u +%Y-%m-%d)"
+            git pull --rebase origin dev
             git push origin HEAD:dev
           fi

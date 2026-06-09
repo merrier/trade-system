@@ -82,5 +82,6 @@ jobs:
             echo "No market data changes to commit."
           else
             git commit -m "data: update iwencai main board $(date -u +%Y-%m-%d)"
+            git pull --rebase origin dev
             git push origin HEAD:dev
           fi
