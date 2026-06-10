@@ -336,16 +336,37 @@ function formatIntradayPayload(payload: IntradaySelectionReportPayload): string[
     return lines;
   }
   lines.push(
+    "| 排名 | 股票 | 分数 | 置信度 | 板块 | 涨停原因 | 龙头 | 唯一性 |",
+    "| --- | --- | ---: | ---: | --- | --- | --- | --- |",
+    ...payload.recommendations.slice(0, 10).map((item) => {
+      const context = item.context;
+      return [
+        item.rank,
+        tableCell(`${item.code} ${item.name}`, 18),
+        tableCell(item.score, 8),
+        tableCell(item.confidence, 8),
+        tableCell(context?.sectors.join("、") || "数据不足", 30),
+        tableCell(context?.limitUpReason || "未找到历史涨停原因", 34),
+        tableCell(context?.industryLeader.reason || "数据不足", 38),
+        tableCell(context?.uniqueness.reason || "数据不足", 38)
+      ].join(" | ").replace(/^/, "| ").replace(/$/, " |");
+    }),
+    "",
+    "## 补充说明"
+  );
+  lines.push(
     ...payload.recommendations.slice(0, 10).map((item) => {
       const reasons = item.reasons.slice(0, 2).join("；");
       const risks = item.risks.slice(0, 2).join("；") || "暂无额外风险提示";
-      const context = item.context
-        ? `涨停原因：${item.context.limitUpReason}；板块：${item.context.sectors.join("、") || "数据不足"}；龙头：${item.context.industryLeader.reason}；唯一性：${item.context.uniqueness.reason}`
-        : "涨停原因/板块/龙头/唯一性：数据不足";
-      return `- **${item.rank}. ${item.code} ${item.name}**：${item.score} 分，置信度 ${item.confidence}。${context}。形态：${reasons}。风险：${risks}`;
+      return `- **${item.rank}. ${item.code} ${item.name}**：形态：${reasons || "暂无形态说明"}。风险：${risks}`;
     })
   );
   return lines;
+}
+
+function tableCell(value: string | number, maxLength: number): string {
+  const text = String(value).replace(/\|/g, "/").replace(/\s+/g, " ").trim() || "-";
+  return text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
 }
 
 async function enrichRecommendations(recommendations: ReturnType<typeof rankStocks>, dataset: MarketDataset, dailyBars: DailyBar[]) {
