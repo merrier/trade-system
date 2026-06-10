@@ -151,6 +151,13 @@ A股主板股票 股票代码 股票简称 上市板块 最新价 涨跌幅 开�
 
 字段包括：涨停原因、所属行业/概念、主营/行业地位/市占率/龙头相关问财返回字段、竞争对手、题材关键词和唯一性说明。当前第一版用问财 SkillHub 落库，设计参考 `a-stock-data` 中记录的 F10、研报、一致预期、行业对比、股东户数等增强方向；后续可把 `a-stock-data` 的 F10/研报实现接成第二数据源。
 
+离线板块映射会用东方财富行业/概念板块成分补充主板股票的稳定行业与概念标签。输出会写入：
+
+- `data/sector-map/main-board-sector-map-YYYYMMDD.json`：当日主板股票行业/概念映射快照。
+- `data/sector-map/latest.json`：14:50 盘中选股优先读取的最新映射缓存。
+
+该缓存用于给 `easyquotation` 等实时快照源补齐缺失的 `industry/concepts` 字段，从而让推荐原因里的“板块”、板块热度因子和龙头/唯一性判断有基础数据。
+
 mootdx 主板日 K 抓取会读取最新的 `data/iwencai/main-board-YYYYMMDD.json` 作为股票池，默认抓取最近 30 根日 K。输出会写入：
 
 - SQLite `DailyBarRecord`：日 K 结构化字段。
@@ -167,6 +174,7 @@ npm run ingest:iwencai-main-board -- --query="A股主板股票 最新价 成交�
 npm run ingest:iwencai-limit-ups -- --limit=100
 npm run ingest:iwencai-dragon-tiger -- --limit=100
 npm run enrich:company-context -- --max-codes=80
+npm run ingest:sector-map
 npm run ingest:mootdx-main-daily-bars -- --days=30 --concurrency=8
 ```
 

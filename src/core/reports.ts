@@ -8,6 +8,7 @@ import { createDefaultStrategy } from "./defaults.js";
 import { HermesAgentClient } from "./hermesAgentClient.js";
 import { rankSectors, rankStocks } from "./scoring.js";
 import { fetchMarketDataset, fetchUsMarketBrief } from "../data/akshareClient.js";
+import { enrichDatasetWithSectorMap, readSectorMap } from "../data/sectorMap.js";
 import type {
   CloseReportPayload,
   IntradaySelectionReportPayload,
@@ -73,7 +74,8 @@ export async function buildIntradaySelectionReport(
   tradeDate?: string,
   options: { dailyBars?: DailyBar[]; dailyBarWarnings?: string[] } = {}
 ): Promise<ReportArtifact<IntradaySelectionReportPayload>> {
-  const dataset = await fetchIntradayDatasetWithDailyBarFallback(tradeDate, options.dailyBars ?? []);
+  const rawDataset = await fetchIntradayDatasetWithDailyBarFallback(tradeDate, options.dailyBars ?? []);
+  const dataset = enrichDatasetWithSectorMap(rawDataset, await readSectorMap());
   const compiled = strategyPrompt.trim()
     ? await compileStrategy(strategyPrompt, ["main"], "short_term")
     : { dsl: createDefaultStrategy("short_term", ["main"]), warnings: ["未配置策略，使用默认主板短线强势策略。"], unsupported: [] };

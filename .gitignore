@@ -13,6 +13,7 @@ data/inbox/*.jsonl
 data/iwencai/
 data/mootdx/
 data/company-context/
+data/sector-map/
 cache/
 coverage/
 __pycache__/
