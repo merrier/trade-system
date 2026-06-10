@@ -24,6 +24,23 @@ mootdx 当前作为独立的主板日 K 快照任务运行：`Ingest Mootdx main
 
 ## 后续候选数据源
 
+### AnySearch Skill
+
+[anysearch-ai/anysearch-skill](https://github.com/anysearch-ai/anysearch-skill) 已安装到本地 Codex skills，后续可作为“公司是否行业龙头”“题材是否唯一”“市占率/行业地位证据”的实时搜索与网页抽取工具。它不直接作为行情源，也不参与自动评分链路；适合在候选股票生成后，对 Top N 做外部证据补充。
+
+可重点参考的能力：
+
+- 实时搜索：按股票名、业务关键词、行业龙头、市占率、竞争对手等组合查询。
+- 垂直搜索：对金融/商业类问题先查询 sub-domain，再做定向检索。
+- 批量搜索：对多个候选股票并行检索龙头、唯一性和市占率线索。
+- URL 抽取：对研报、公告、新闻或行业文章做 Markdown 内容提取，便于沉淀证据。
+
+接入注意：
+
+- 默认匿名访问可用，但限额较低；高频自动化前应配置 `ANYSEARCH_API_KEY`。
+- 搜索结果只能作为证据线索，进入推荐报告前需要保留来源 URL 和摘要，避免把未经核验的网页说法直接当事实。
+- 不要把包含密钥、个人信息或交易秘密的查询发给外部搜索服务。
+
 ### a-stock-data
 
 [simonlin1212/a-stock-data](https://github.com/simonlin1212/a-stock-data) 可作为后续数据源能力清单和实现参考。它不是当前生产链路的一部分，也不替代已经接入的问财 SkillHub、AKShare 或日线滑窗缓存。
