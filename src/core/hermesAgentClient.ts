@@ -15,6 +15,13 @@ export interface HermesAnalysis {
   warnings: string[];
 }
 
+interface DeliveryArtifact {
+  kind: string;
+  pushMessage: string;
+  id: string;
+  tradeDate?: string;
+}
+
 export class HermesAgentClient {
   async analyze(request: HermesRequest): Promise<HermesAnalysis> {
     const prompt = buildPrompt(request);
@@ -33,8 +40,18 @@ export class HermesAgentClient {
     }
   }
 
-  async deliver(artifact: { kind: string; pushMessage: string; id: string; tradeDate?: string }): Promise<string[]> {
+  async deliver(artifact: DeliveryArtifact): Promise<string[]> {
     const warnings: string[] = [];
+    const larkCliArgs = buildLarkCliSendArgs(artifact);
+    if (larkCliArgs) {
+      try {
+        await execCommandWithArgs(process.env.LARK_CLI_BIN ?? "lark-cli", larkCliArgs, "");
+      } catch (error) {
+        warnings.push(`lark-cli 推送失败：${error instanceof Error ? error.message : "unknown error"}`);
+      }
+      return warnings;
+    }
+
     const feishuWebhookUrl = process.env.FEISHU_WEBHOOK_URL || process.env.HERMES_FEISHU_WEBHOOK_URL;
     if (feishuWebhookUrl) {
       try {
@@ -82,9 +99,29 @@ export class HermesAgentClient {
       return warnings;
     }
 
-    warnings.push("未配置 FEISHU_WEBHOOK_URL、HERMES_DELIVERY_COMMAND 或 HERMES_DELIVERY_WEBHOOK_URL，仅生成静态报告。");
+    warnings.push("未配置 LARK_CLI_CHAT_ID、LARK_CLI_USER_ID、FEISHU_WEBHOOK_URL、HERMES_DELIVERY_COMMAND 或 HERMES_DELIVERY_WEBHOOK_URL，仅生成静态报告。");
     return warnings;
   }
+}
+
+export function buildLarkCliSendArgs(artifact: DeliveryArtifact): string[] | null {
+  const chatId = process.env.LARK_CLI_CHAT_ID;
+  const userId = process.env.LARK_CLI_USER_ID;
+  if (!chatId && !userId) return null;
+
+  const args = [
+    "im",
+    "+messages-send",
+    "--as",
+    process.env.LARK_CLI_AS || "bot",
+    "--markdown",
+    artifact.pushMessage,
+    "--idempotency-key",
+    artifact.id
+  ];
+  if (chatId) args.push("--chat-id", chatId);
+  else if (userId) args.push("--user-id", userId);
+  return args;
 }
 
 function normalizeFeishuWebhookMode(value: string | undefined): "feishu-card" | "signed-message" | undefined {

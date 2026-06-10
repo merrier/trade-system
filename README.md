@@ -201,6 +201,9 @@ Hermes Agent 用于报告分析编排和消息网关推送，不直接抓行情�
 
 ```bash
 HERMES_ANALYSIS_COMMAND=""
+LARK_CLI_CHAT_ID=""
+LARK_CLI_USER_ID=""
+LARK_CLI_AS="bot"
 HERMES_SEND_TARGET="weixin"
 FEISHU_WEBHOOK_URL=""
 FEISHU_WEBHOOK_SECRET=""
@@ -211,15 +214,17 @@ HERMES_DELIVERY_WEBHOOK_URL=""
 INTRADAY_STRATEGY_PROMPT="涨停回调策略：主板股票最近10天内有涨停，今天是阴线，但是没有跌破涨停价，收盘价回调至五日线或十日线附近且距离不超过3%，阴线缩量，最近20天涨幅不超过25%，均线呈多头排列"
 ```
 
+如果配置 `LARK_CLI_CHAT_ID` 或 `LARK_CLI_USER_ID`，系统会优先使用 `lark-cli im +messages-send` 发送 Markdown 简报。首次使用前需要完成 `lark-cli config init` 和 `lark-cli auth login --recommend`，并确认 `lark-cli auth status` 中 bot 身份可用。`LARK_CLI_AS` 默认是 `bot`。
+
 `HERMES_SEND_TARGET` 使用 `hermes send --to` 的目标格式，例如 `weixin` 或 `weixin:<chat_id>`。未配置 Hermes 推送时，系统仍会生成静态报告，并在 `warnings` 中说明仅落盘未推送。
 
-如果配置 `FEISHU_WEBHOOK_URL`，系统会优先推送飞书简报。原生飞书机器人 URL（`open.feishu.cn/open-apis/bot/...`）会自动使用飞书互动卡片；自建中转 URL 会发送 `{"title":"2026-05-26 早报","content":"...markdown..."}`，标题按交易日和报告类型生成，并在配置 `FEISHU_WEBHOOK_SECRET` 后附带 `X-Hub-Signature-256: sha256=<hmac>`。需要强制指定时可设置 `FEISHU_WEBHOOK_MODE=feishu-card` 或 `FEISHU_WEBHOOK_MODE=signed-message`。若飞书机器人使用关键词安全校验，可把关键词填到 `FEISHU_WEBHOOK_KEYWORD`。GitHub Actions 云端发送时，把 `FEISHU_WEBHOOK_URL`、`FEISHU_WEBHOOK_SECRET` 配置到仓库 Secrets，把 `FEISHU_WEBHOOK_MODE`、`FEISHU_WEBHOOK_KEYWORD` 配置到 Variables。
+如果未配置 `lark-cli` 目标但配置了 `FEISHU_WEBHOOK_URL`，系统会推送飞书简报。原生飞书机器人 URL（`open.feishu.cn/open-apis/bot/...`）会自动使用飞书互动卡片；自建中转 URL 会发送 `{"title":"2026-05-26 早报","content":"...markdown..."}`，标题按交易日和报告类型生成，并在配置 `FEISHU_WEBHOOK_SECRET` 后附带 `X-Hub-Signature-256: sha256=<hmac>`。需要强制指定时可设置 `FEISHU_WEBHOOK_MODE=feishu-card` 或 `FEISHU_WEBHOOK_MODE=signed-message`。若飞书机器人使用关键词安全校验，可把关键词填到 `FEISHU_WEBHOOK_KEYWORD`。GitHub Actions 云端发送时，把 `FEISHU_WEBHOOK_URL`、`FEISHU_WEBHOOK_SECRET` 配置到仓库 Secrets，把 `FEISHU_WEBHOOK_MODE`、`FEISHU_WEBHOOK_KEYWORD` 配置到 Variables。
 
 三类报告的 `pushMessage` 默认使用 Markdown 简报格式，飞书会按标题、列表和加粗字段渲染；微信等纯文本渠道会收到同一份内容的可读文本。
 
 报告任务会按北京时间自动识别 A 股交易日。周末和已内置的 2026 年交易所休市日会直接跳过，不生成报告、不推送微信；临时休市可用 `A_SHARE_EXTRA_HOLIDAYS=2026-05-25,2026-05-26` 补充。手动调试非交易日时可设置 `FORCE_REPORT_ON_NON_TRADING_DAY=true` 或传 `--force-non-trading`。
 
-14:50 盘中选股的 GitHub Action 默认使用“涨停倍量阴策略”：主板股票近 5 日出现实体涨停，涨停后缩量阴线调整，调整区间最低价未跌破涨停当日开盘价，今日收阳线，收盘价站上 10 日均线，今日成交量大于昨日成交量，今日涨幅小于 5%，近 20 日最大涨幅小于 45%，非 ST，非科创板，非北交所，非创业板，股价大于 5 元，近 5 日日均成交额大于 3000 万。该任务读取 `cache/main-daily-bars.json` 的 30 日滑窗日线缓存，并用盘中快照合成今日临时日 K；缓存不足时报告会在 `warnings` 中提示。
+14:50 盘中选股任务默认使用“涨停倍量阴策略”：主板股票近 5 日出现实体涨停，涨停后缩量阴线调整，调整区间最低价未跌破涨停当日开盘价，今日收阳线，收盘价站上 10 日均线，今日成交量大于昨日成交量，今日涨幅小于 5%，近 20 日最大涨幅小于 45%，非 ST，非科创板，非北交所，非创业板，股价大于 5 元，近 5 日日均成交额大于 3000 万。该任务读取 `cache/main-daily-bars.json` 的 30 日滑窗日线缓存，并用盘中快照合成今日临时日 K；缓存不足时报告会在 `warnings` 中提示。
 
 ### 微信入站转发
 
