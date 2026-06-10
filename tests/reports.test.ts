@@ -47,6 +47,12 @@ describe("reports", () => {
             context: {
               limitUpReason: "AI PC+存储芯片",
               sectors: ["半导体", "AI PC"],
+              sectorFlowRank: {
+                name: "半导体",
+                type: "industry",
+                rank: 3,
+                netInflow: 2_400_000_000
+              },
               industryLeader: {
                 status: "likely",
                 reason: "存储模组+自研主控细分头部"
@@ -68,8 +74,8 @@ describe("reports", () => {
 
     const markdown = formatReportMarkdown(report);
 
-    expect(markdown).toContain("| 排名 | 股票 | 分数 | 置信度 | 板块 | 涨停原因 | 龙头 | 唯一性 |");
-    expect(markdown).toContain("| 1 | 001309 德明利 | 88.8 | 72 | 半导体、AI PC | AI PC+存储芯片 | 存储模组+自研主控细分头部 | A股稀缺自研主控+模组一体化 |");
+    expect(markdown).toContain("| 排名 | 股票 | 分数 | 置信度 | 板块 | 板块资金排名 | 涨停原因 | 龙头 | 唯一性 |");
+    expect(markdown).toContain("| 1 | 001309 德明利 | 88.8 | 72 | 半导体、AI PC | 半导体 #3（24 亿） | AI PC+存储芯片 | 存储模组+自研主控细分头部 | A股稀缺自研主控+模组一体化 |");
     expect(markdown).toContain("## 补充说明");
     expect(markdown).toContain("形态：近5日出现实体涨停；今日收阳站上10日线");
     expect(markdown).toContain("风险：盘中推荐为参考结果");

@@ -204,6 +204,12 @@ export interface RecommendationContext {
   limitUpDate?: string;
   limitUpReason: string;
   sectors: string[];
+  sectorFlowRank?: {
+    name: string;
+    type: SectorType;
+    rank: number;
+    netInflow: number;
+  };
   industryLeader: {
     status: "likely" | "unknown";
     reason: string;

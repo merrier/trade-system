@@ -336,8 +336,8 @@ function formatIntradayPayload(payload: IntradaySelectionReportPayload): string[
     return lines;
   }
   lines.push(
-    "| 排名 | 股票 | 分数 | 置信度 | 板块 | 涨停原因 | 龙头 | 唯一性 |",
-    "| --- | --- | ---: | ---: | --- | --- | --- | --- |",
+    "| 排名 | 股票 | 分数 | 置信度 | 板块 | 板块资金排名 | 涨停原因 | 龙头 | 唯一性 |",
+    "| --- | --- | ---: | ---: | --- | --- | --- | --- | --- |",
     ...payload.recommendations.slice(0, 10).map((item) => {
       const context = item.context;
       return [
@@ -346,6 +346,7 @@ function formatIntradayPayload(payload: IntradaySelectionReportPayload): string[
         tableCell(item.score, 8),
         tableCell(item.confidence, 8),
         tableCell(context?.sectors.join("、") || "数据不足", 30),
+        tableCell(formatSectorFlowRank(context), 30),
         tableCell(context?.limitUpReason || "未找到历史涨停原因", 34),
         tableCell(context?.industryLeader.reason || "数据不足", 38),
         tableCell(context?.uniqueness.reason || "数据不足", 38)
@@ -367,6 +368,12 @@ function formatIntradayPayload(payload: IntradaySelectionReportPayload): string[
 function tableCell(value: string | number, maxLength: number): string {
   const text = String(value).replace(/\|/g, "/").replace(/\s+/g, " ").trim() || "-";
   return text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
+}
+
+function formatSectorFlowRank(context: RecommendationContext | undefined): string {
+  if (!context?.sectorFlowRank) return "数据不足";
+  const rank = context.sectorFlowRank;
+  return `${rank.name} #${rank.rank}（${formatYi(rank.netInflow)}）`;
 }
 
 async function enrichRecommendations(recommendations: ReturnType<typeof rankStocks>, dataset: MarketDataset, dailyBars: DailyBar[]) {
@@ -454,9 +461,26 @@ function buildRecommendationContext(
     limitUpDate: recentLimitUpDate ?? insight?.tradeDate,
     limitUpReason: reason || "未找到历史涨停原因",
     sectors,
+    sectorFlowRank: getBestSectorFlowRank(sectors, dataset),
     industryLeader: inferIndustryLeader(code, name, stock, dataset, sectors, iwencaiContext),
     uniqueness: inferUniqueness(keywords, limitUpInsights, iwencaiContext)
   };
+}
+
+function getBestSectorFlowRank(sectors: string[], dataset: MarketDataset): RecommendationContext["sectorFlowRank"] {
+  const names = new Set(sectors);
+  const matched = [...dataset.sectors]
+    .sort((a, b) => b.netInflow - a.netInflow)
+    .map((sector, index) => ({ ...sector, rank: index + 1 }))
+    .find((sector) => names.has(sector.name));
+  return matched
+    ? {
+        name: matched.name,
+        type: matched.type,
+        rank: matched.rank,
+        netInflow: matched.netInflow
+      }
+    : undefined;
 }
 
 async function fetchIwencaiRecommendationContexts(recommendations: ReturnType<typeof rankStocks>): Promise<Map<string, IwencaiRecommendationContext>> {
