@@ -1,9 +1,6 @@
 name: Send 14:50 intraday selection
 
 on:
-  schedule:
-    # 14:45 Asia/Shanghai on weekdays. The report title/message is the 14:50 selection.
-    - cron: "45 6 * * 1-5"
   workflow_dispatch:
     inputs:
       skip_delivery:
