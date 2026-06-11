@@ -92,6 +92,7 @@ export async function buildIntradaySelectionReport(
   const payload: IntradaySelectionReportPayload = {
     strategy,
     recommendations,
+    sectorFlowLeaders: rankSectorFlows(dataset).slice(0, 5),
     factorLegend
   };
   const hermesResult = await hermes.analyze({
@@ -333,33 +334,54 @@ function formatIntradayPayload(payload: IntradaySelectionReportPayload): string[
   ];
   if (!payload.recommendations.length) {
     lines.push("- 暂无命中新版策略的主板股票。");
+  } else {
+    lines.push(
+      "| 排名 | 股票 | 分数 | 置信度 | 板块 | 板块资金排名 | 涨停原因 | 龙头 | 唯一性 |",
+      "| --- | --- | ---: | ---: | --- | --- | --- | --- | --- |",
+      ...payload.recommendations.slice(0, 10).map((item) => {
+        const context = item.context;
+        return [
+          item.rank,
+          tableCell(`${item.code} ${item.name}`, 18),
+          tableCell(item.score, 8),
+          tableCell(item.confidence, 8),
+          tableCell(context?.sectors.join("、") || "数据不足", 30),
+          tableCell(formatSectorFlowRank(context), 30),
+          tableCell(context?.limitUpReason || "未找到历史涨停原因", 34),
+          tableCell(context?.industryLeader.reason || "数据不足", 38),
+          tableCell(context?.uniqueness.reason || "数据不足", 38)
+        ].join(" | ").replace(/^/, "| ").replace(/$/, " |");
+      }),
+      "",
+      "## 补充说明",
+      ...payload.recommendations.slice(0, 10).map((item) => {
+        const reasons = item.reasons.slice(0, 2).join("；");
+        const risks = item.risks.slice(0, 2).join("；") || "暂无额外风险提示";
+        return `- **${item.rank}. ${item.code} ${item.name}**：形态：${reasons || "暂无形态说明"}。风险：${risks}`;
+      })
+    );
+  }
+  lines.push(
+    "",
+    "## 主力净流入板块 Top 5"
+  );
+  if (!payload.sectorFlowLeaders.length) {
+    lines.push("- 暂无板块主力净流入数据。");
     return lines;
   }
   lines.push(
-    "| 排名 | 股票 | 分数 | 置信度 | 板块 | 板块资金排名 | 涨停原因 | 龙头 | 唯一性 |",
-    "| --- | --- | ---: | ---: | --- | --- | --- | --- | --- |",
-    ...payload.recommendations.slice(0, 10).map((item) => {
-      const context = item.context;
+    "| 排名 | 板块 | 类型 | 主力净流入 | 涨幅 | 涨停数 | 领涨股 |",
+    "| --- | --- | --- | ---: | ---: | ---: | --- |",
+    ...payload.sectorFlowLeaders.map((item) => {
       return [
         item.rank,
-        tableCell(`${item.code} ${item.name}`, 18),
-        tableCell(item.score, 8),
-        tableCell(item.confidence, 8),
-        tableCell(context?.sectors.join("、") || "数据不足", 30),
-        tableCell(formatSectorFlowRank(context), 30),
-        tableCell(context?.limitUpReason || "未找到历史涨停原因", 34),
-        tableCell(context?.industryLeader.reason || "数据不足", 38),
-        tableCell(context?.uniqueness.reason || "数据不足", 38)
+        tableCell(item.name, 18),
+        item.type === "industry" ? "行业" : "概念",
+        formatYi(item.netInflow),
+        formatSignedPct(item.pctChange),
+        item.limitUpCount,
+        tableCell(item.leaderName ? `${item.leaderName} ${formatSignedPct(item.leaderPctChange)}` : "数据不足", 24)
       ].join(" | ").replace(/^/, "| ").replace(/$/, " |");
-    }),
-    "",
-    "## 补充说明"
-  );
-  lines.push(
-    ...payload.recommendations.slice(0, 10).map((item) => {
-      const reasons = item.reasons.slice(0, 2).join("；");
-      const risks = item.risks.slice(0, 2).join("；") || "暂无额外风险提示";
-      return `- **${item.rank}. ${item.code} ${item.name}**：形态：${reasons || "暂无形态说明"}。风险：${risks}`;
     })
   );
   return lines;
@@ -481,6 +503,21 @@ function getBestSectorFlowRank(sectors: string[], dataset: MarketDataset): Recom
         netInflow: matched.netInflow
       }
     : undefined;
+}
+
+function rankSectorFlows(dataset: MarketDataset): IntradaySelectionReportPayload["sectorFlowLeaders"] {
+  return [...dataset.sectors]
+    .sort((a, b) => b.netInflow - a.netInflow)
+    .map((sector, index) => ({
+      rank: index + 1,
+      name: sector.name,
+      type: sector.type,
+      netInflow: sector.netInflow,
+      pctChange: sector.pctChange,
+      limitUpCount: sector.limitUpCount,
+      leaderName: sector.leaderName,
+      leaderPctChange: sector.leaderPctChange
+    }));
 }
 
 async function fetchIwencaiRecommendationContexts(recommendations: ReturnType<typeof rankStocks>): Promise<Map<string, IwencaiRecommendationContext>> {

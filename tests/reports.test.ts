@@ -65,6 +65,18 @@ describe("reports", () => {
             dataAsOf: "2026-06-10T06:50:00.000Z"
           }
         ],
+        sectorFlowLeaders: [
+          {
+            rank: 1,
+            name: "AI应用",
+            type: "concept",
+            netInflow: 4_600_000_000,
+            pctChange: 5.8,
+            limitUpCount: 9,
+            leaderName: "人民网",
+            leaderPctChange: 10
+          }
+        ],
         factorLegend: {}
       },
       analysis: "测试摘要",
@@ -79,5 +91,8 @@ describe("reports", () => {
     expect(markdown).toContain("## 补充说明");
     expect(markdown).toContain("形态：近5日出现实体涨停；今日收阳站上10日线");
     expect(markdown).toContain("风险：盘中推荐为参考结果");
+    expect(markdown).toContain("## 主力净流入板块 Top 5");
+    expect(markdown).toContain("| 排名 | 板块 | 类型 | 主力净流入 | 涨幅 | 涨停数 | 领涨股 |");
+    expect(markdown).toContain("| 1 | AI应用 | 概念 | 46 亿 | +5.8% | 9 | 人民网 +10% |");
   });
 });

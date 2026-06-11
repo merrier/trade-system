@@ -267,6 +267,16 @@ export interface MorningReportPayload {
 export interface IntradaySelectionReportPayload {
   strategy: StrategySnapshot;
   recommendations: RecommendationResult[];
+  sectorFlowLeaders: Array<{
+    rank: number;
+    name: string;
+    type: SectorType;
+    netInflow: number;
+    pctChange: number;
+    limitUpCount: number;
+    leaderName?: string;
+    leaderPctChange: number;
+  }>;
   factorLegend: Record<string, string>;
 }
 
