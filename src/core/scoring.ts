@@ -193,7 +193,7 @@ function buildRisks(stock: StockSnapshot, limitUp: LimitUpSnapshot | undefined, 
 }
 
 function isDailyBarStrategy(dsl: StrategyDsl): boolean {
-  return Boolean(dsl.strategyTemplates?.some((template) => template === "limit_up_pullback" || template === "limit_up_double_volume_bearish"));
+  return Boolean(dsl.strategyTemplates?.some((template) => template === "limit_up_pullback" || template === "limit_up_double_volume_bearish" || template === "limit_up_bearish_pullback"));
 }
 
 function isLimitUpPullbackStrategy(dsl: StrategyDsl): boolean {
@@ -204,8 +204,129 @@ function isLimitUpDoubleVolumeBearishStrategy(dsl: StrategyDsl): boolean {
   return Boolean(dsl.strategyTemplates?.includes("limit_up_double_volume_bearish"));
 }
 
+function isLimitUpBearishPullbackStrategy(dsl: StrategyDsl): boolean {
+  return Boolean(dsl.strategyTemplates?.includes("limit_up_bearish_pullback"));
+}
+
 function evaluateStrategyTemplate(stock: StockSnapshot, dsl: StrategyDsl, dailyBars: DailyBar[] | undefined, tradeDate: string): PullbackEvaluation | null {
-  return evaluateLimitUpDoubleVolumeBearish(stock, dsl, dailyBars, tradeDate) ?? evaluateLimitUpPullback(stock, dsl, dailyBars, tradeDate);
+  return evaluateLimitUpBearishPullback(stock, dsl, dailyBars, tradeDate) ?? evaluateLimitUpDoubleVolumeBearish(stock, dsl, dailyBars, tradeDate) ?? evaluateLimitUpPullback(stock, dsl, dailyBars, tradeDate);
+}
+
+function evaluateLimitUpBearishPullback(stock: StockSnapshot, dsl: StrategyDsl, dailyBars: DailyBar[] | undefined, tradeDate: string): PullbackEvaluation | null {
+  if (!isLimitUpBearishPullbackStrategy(dsl)) return null;
+  const prepared = prepareBarsForEvaluation(stock, dailyBars, tradeDate);
+  if (!prepared) return { matched: false, score: 0, reasons: [], risks: ["缺少30日日线缓存，无法验证涨停回踩阴线条件"], factors: { bearishPullbackMatch: 0 } };
+
+  const { bars, current } = prepared;
+  const currentIndex = bars.findIndex((bar) => bar.tradeDate === current.tradeDate);
+  const previous = currentIndex > 0 ? bars[currentIndex - 1] : undefined;
+  const recentDays = dsl.filters.recentLimitUpDays ?? 5;
+  const recentLimitUp = bars.slice(Math.max(0, currentIndex - recentDays), currentIndex).reverse().find(isSolidLimitUpBar);
+  const limitUpIndex = recentLimitUp ? bars.findIndex((bar) => bar.tradeDate === recentLimitUp.tradeDate) : -1;
+  const adjustmentWindow = limitUpIndex >= 0 ? bars.slice(limitUpIndex + 1, currentIndex + 1) : [];
+  const maBars = bars.slice(0, currentIndex).concat(current);
+  const ma10 = movingAverage(maBars, 10);
+  const twentyDayBars = bars.slice(Math.max(0, currentIndex - 19), currentIndex + 1);
+  const fiveDayBars = bars.slice(Math.max(0, currentIndex - 4), currentIndex + 1);
+  const todayPctChange = current.pctChange || (previous && previous.close > 0 ? ((current.close - previous.close) / previous.close) * 100 : 0);
+  const twentyDayRangePct = twentyDayBars.length >= 20 ? rangePct(twentyDayBars) : undefined;
+  const fiveDayAvgAmount = fiveDayBars.length >= 5 ? avg(fiveDayBars.map((bar) => bar.amount)) : undefined;
+  const lowestPullbackLow = adjustmentWindow.length ? Math.min(...adjustmentWindow.map((bar) => bar.low)) : 0;
+  const bearishAdjustmentBars = adjustmentWindow.filter(isBearishBar);
+
+  const hasRecentSolidLimitUp = Boolean(recentLimitUp);
+  const hasBearishAdjustment = !dsl.filters.requirePostLimitUpBearishPullback || bearishAdjustmentBars.length > 0;
+  const holdsLimitOpen = !dsl.filters.requirePullbackLowAboveLimitOpen || Boolean(recentLimitUp && lowestPullbackLow >= recentLimitUp.open);
+  const bearishToday = !dsl.filters.requireBearishCandle || current.close < current.open;
+  const aboveMa10 = dsl.filters.requireAboveMa !== "ma10" || (ma10 > 0 && current.close >= ma10);
+  const withinTodayGain = dsl.filters.maxTodayPctChange === undefined || todayPctChange < dsl.filters.maxTodayPctChange;
+  const withinTwentyDayRange = dsl.filters.maxTwentyDayRangePct === undefined || (twentyDayRangePct !== undefined && twentyDayRangePct < dsl.filters.maxTwentyDayRangePct);
+  const aboveMinPrice = dsl.filters.minPrice === undefined || current.close > dsl.filters.minPrice;
+  const enoughFiveDayAmount = dsl.filters.minFiveDayAvgAmount === undefined || (fiveDayAvgAmount !== undefined && fiveDayAvgAmount > dsl.filters.minFiveDayAvgAmount);
+  const matched = hasRecentSolidLimitUp && hasBearishAdjustment && holdsLimitOpen && bearishToday && aboveMa10 && withinTodayGain && withinTwentyDayRange && aboveMinPrice && enoughFiveDayAmount;
+
+  if (!matched) {
+    return {
+      matched,
+      score: 0,
+      reasons: [],
+      risks: [
+        !hasRecentSolidLimitUp ? `近${recentDays}个交易日未识别到实体涨停` : "",
+        !hasBearishAdjustment ? "涨停后未出现阴线调整" : "",
+        !holdsLimitOpen ? "调整区间最低价跌破涨停当日开盘价" : "",
+        !bearishToday ? "今日不是阴线" : "",
+        !aboveMa10 ? "今日收盘价跌破10日均线" : "",
+        !withinTodayGain ? `今日涨幅 ${round(todayPctChange)}% 不小于 ${round(dsl.filters.maxTodayPctChange ?? 0)}%` : "",
+        !withinTwentyDayRange
+          ? twentyDayRangePct === undefined
+            ? "近20日K线不足，无法验证最大涨幅"
+            : `近20日最大涨幅 ${round(twentyDayRangePct)}% 不小于 ${round(dsl.filters.maxTwentyDayRangePct ?? 0)}%`
+          : "",
+        !aboveMinPrice ? `股价 ${round(current.close)} 元不大于 ${round(dsl.filters.minPrice ?? 0)} 元` : "",
+        !enoughFiveDayAmount
+          ? fiveDayAvgAmount === undefined
+            ? "近5日成交额数据不足"
+            : `近5日日均成交额 ${formatYi(fiveDayAvgAmount)} 不大于 ${formatYi(dsl.filters.minFiveDayAvgAmount ?? 0)}`
+          : ""
+      ].filter(Boolean),
+      factors: { bearishPullbackMatch: 0 }
+    };
+  }
+
+  const daysAgo = currentIndex - limitUpIndex;
+  const supportDistancePct = recentLimitUp && recentLimitUp.open > 0 ? ((lowestPullbackLow - recentLimitUp.open) / recentLimitUp.open) * 100 : 0;
+  const ma10DistancePct = ma10 > 0 ? ((current.close - ma10) / ma10) * 100 : 99;
+  const volumeExpansionRatio = previous && previous.volume > 0 ? current.volume / previous.volume : 1;
+  const contractionHits = bearishAdjustmentBars.filter((bar) => {
+    const index = bars.findIndex((item) => item.tradeDate === bar.tradeDate);
+    const reference = index > 0 ? bars[index - 1] : undefined;
+    return Boolean(reference && reference.volume > 0 && bar.volume > 0 && bar.volume < reference.volume);
+  }).length;
+  const contractionScore = bearishAdjustmentBars.length ? (contractionHits / bearishAdjustmentBars.length) * 100 : 0;
+  const rangeRoomScore = dsl.filters.maxTwentyDayRangePct && twentyDayRangePct !== undefined
+    ? clamp(scale(dsl.filters.maxTwentyDayRangePct - twentyDayRangePct, 0, dsl.filters.maxTwentyDayRangePct), 0, 100)
+    : 50;
+  const pullbackScore = clamp(
+    48 +
+      clamp(scale(recentDays - daysAgo + 1, 0, recentDays), 0, 100) * 0.18 +
+      clamp(scale(supportDistancePct, 0, 8), 0, 100) * 0.14 +
+      clamp(scale(3 - Math.max(ma10DistancePct, 0), 0, 3), 0, 100) * 0.14 +
+      contractionScore * 0.12 +
+      clamp(scale(volumeExpansionRatio, 0.6, 2), 0, 100) * 0.08 +
+      rangeRoomScore * 0.12 +
+      clamp(scale((fiveDayAvgAmount ?? 0) / 10_000_000, 3, 20), 0, 100) * 0.1,
+    0,
+    100
+  );
+
+  return {
+    matched,
+    score: pullbackScore,
+    reasons: [
+      `近${recentDays}日内 ${recentLimitUp?.tradeDate} 出现实体涨停，涨停日开盘价 ${round(recentLimitUp?.open ?? 0)}`,
+      `涨停后出现 ${bearishAdjustmentBars.length} 根阴线调整，区间最低价 ${round(lowestPullbackLow)} 未跌破涨停日开盘价`,
+      `今日收阴且未跌破10日均线：收盘 ${round(current.close)}，MA10 ${round(ma10)}`,
+      `今日成交量为昨日 ${round(volumeExpansionRatio * 100)}%，涨幅 ${round(todayPctChange)}%`,
+      `近20日最大涨幅 ${round(twentyDayRangePct ?? 0)}%，近5日日均成交额 ${formatYi(fiveDayAvgAmount ?? 0)}`
+    ],
+    risks: [
+      supportDistancePct < 1 ? "调整低点距离涨停日开盘价支撑较近，跌破后形态失效" : "",
+      ma10DistancePct < 1 ? "收盘价贴近10日均线，继续走弱会触发破位" : "",
+      contractionScore < 50 ? "阴线调整缩量不充分，承接质量需继续观察" : ""
+    ].filter(Boolean),
+    factors: {
+      bearishPullbackMatch: round(pullbackScore),
+      limitUpRecency: round(clamp(scale(recentDays - daysAgo + 1, 0, recentDays), 0, 100)),
+      bearishAdjustmentCount: bearishAdjustmentBars.length,
+      pullbackVolumeContraction: round(contractionScore),
+      supportDistancePct: round(supportDistancePct),
+      ma10DistancePct: round(ma10DistancePct),
+      todayVolumeVsYesterday: round(volumeExpansionRatio),
+      todayPctChange: round(todayPctChange),
+      twentyDayRangePct: round(twentyDayRangePct ?? 0),
+      fiveDayAvgAmount: round(fiveDayAvgAmount ?? 0)
+    }
+  };
 }
 
 function evaluateLimitUpDoubleVolumeBearish(stock: StockSnapshot, dsl: StrategyDsl, dailyBars: DailyBar[] | undefined, tradeDate: string): PullbackEvaluation | null {

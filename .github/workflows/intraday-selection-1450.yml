@@ -34,11 +34,15 @@ jobs:
       IWENCAI_SKILL_CLI: "~/.codex/skills/hithink-market-query/scripts/cli.py"
       IWENCAI_TIMEOUT_MS: "30000"
       IWENCAI_CONTEXT_TOP_N: "10"
+      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+      DEEPSEEK_BASE_URL: ${{ vars.DEEPSEEK_BASE_URL || 'https://api.deepseek.com' }}
+      DEEPSEEK_MODEL: ${{ vars.DEEPSEEK_MODEL || 'deepseek-chat' }}
+      HERMES_ANALYSIS_COMMAND: "./scripts/hermes-analysis.sh"
       FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
       FEISHU_WEBHOOK_SECRET: ${{ secrets.FEISHU_WEBHOOK_SECRET }}
       FEISHU_WEBHOOK_MODE: ${{ vars.FEISHU_WEBHOOK_MODE }}
       FEISHU_WEBHOOK_KEYWORD: ${{ vars.FEISHU_WEBHOOK_KEYWORD }}
-      INTRADAY_STRATEGY_PROMPT: "涨停倍量阴策略：主板股票近5日出现实体涨停，涨停后缩量阴线调整，调整区间最低价未跌破涨停当日开盘价，今日收阳线，收盘价站上10日均线，今日成交量大于昨日成交量，今日涨幅小于5%，近20日最大涨幅小于45%，非ST，非科创板，非北交所，非创业板，股价大于5元，近5日日均成交额大于3000万"
+      INTRADAY_STRATEGY_PROMPT: "涨停回踩阴线策略：主板股票近5日出现实体涨停，涨停后有阴线调整，调整区间最低价未跌破涨停当日开盘价，今日收阴线但收盘价不跌破10日均线，今日涨幅小于5%，近20日最大涨幅小于45%，非ST，非科创板，非北交所，非创业板，股价大于5元，近5日日均成交额大于3000万"
 
     steps:
       - name: Checkout dev

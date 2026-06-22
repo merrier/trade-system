@@ -41,6 +41,7 @@ describe("strategy compiler", () => {
     expect(result.dsl.markets).toEqual(["main"]);
     expect(result.dsl.strategyTemplates).toContain("limit_up_double_volume_bearish");
     expect(result.dsl.filters.recentLimitUpDays).toBe(5);
+    expect(result.dsl.markets).toEqual(["main"]);
     expect(result.dsl.filters.requireSolidLimitUp).toBe(true);
     expect(result.dsl.filters.requirePostLimitUpBearishPullback).toBe(true);
     expect(result.dsl.filters.requirePullbackVolumeContraction).toBe(true);
@@ -52,5 +53,32 @@ describe("strategy compiler", () => {
     expect(result.dsl.filters.maxTwentyDayRangePct).toBe(45);
     expect(result.dsl.filters.minPrice).toBe(5);
     expect(result.dsl.filters.minFiveDayAvgAmount).toBe(30_000_000);
+  });
+
+  it("compiles the limit-up bearish pullback strategy template", () => {
+    const result = compileStrategyLocally("涨停回踩阴线策略：主板股票近5日出现实体涨停，涨停后有阴线调整，今日收阴线但不破10日线", ["main", "gem"], "short_term");
+
+    expect(result.dsl.markets).toEqual(["main"]);
+    expect(result.dsl.strategyTemplates).toContain("limit_up_bearish_pullback");
+    expect(result.dsl.filters.recentLimitUpDays).toBe(5);
+    expect(result.dsl.filters.requireSolidLimitUp).toBe(true);
+    expect(result.dsl.filters.requirePostLimitUpBearishPullback).toBe(true);
+    expect(result.dsl.filters.requirePullbackVolumeContraction).toBe(false);
+    expect(result.dsl.filters.requirePullbackLowAboveLimitOpen).toBe(true);
+    expect(result.dsl.filters.requireBearishCandle).toBe(true);
+    expect(result.dsl.filters.requireAboveMa).toBe("ma10");
+    expect(result.dsl.filters.maxMaDistancePct).toBeUndefined();
+    expect(result.dsl.filters.requireVolumeExpansionVsYesterday).toBe(false);
+    expect(result.dsl.filters.maxTodayPctChange).toBe(5);
+    expect(result.dsl.filters.maxTwentyDayGainPct).toBeUndefined();
+    expect(result.dsl.filters.maxTwentyDayRangePct).toBe(45);
+    expect(result.dsl.filters.minPrice).toBe(5);
+    expect(result.dsl.filters.minFiveDayAvgAmount).toBe(30_000_000);
+  });
+
+  it("does not expand markets for excluded board names", () => {
+    const result = compileStrategyLocally("主板股票，非ST，非科创板，非北交所，非创业板", ["main"], "short_term");
+
+    expect(result.dsl.markets).toEqual(["main"]);
   });
 });

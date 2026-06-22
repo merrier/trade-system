@@ -10,7 +10,7 @@
 - 涨停天梯：展示连板高度、封板强度、所属板块。
 - 板块天梯：行业 + 概念板块按涨幅、资金流、涨停家数、领涨股和热度排序。
 - 个股分析：按代码查看走势摘要、资金、板块、龙虎榜、推荐因子与风险。
-- 监控池：把主观看好的股票加入观察，满足模板/自然语言条件后进入触发推荐池。
+- 监控池：把主观看好的股票加入观察，14:50 同步分析趋势、5 日线回踩、量能和风险。
 - 三时报：GitHub Actions 在北京时间 09:00、14:50、16:00 生成晨报、盘中主板选股、收盘复盘，并导出到 `data/reports/*/latest.json`。
 - 30 天主板滑窗：按沪深主板代码前缀缓存最近 30 个 A 股交易日的开收盘价、成交量、成交额、涨跌幅和换手率。
 - 问财主板全量快照：通过 `hithink-market-query` 技能分页抓取 A 股主板全量行情，写入 SQLite 和原始 JSON。
@@ -18,6 +18,7 @@
 - 问财龙虎榜快照：通过 `hithink-market-query` 技能抓取龙虎榜席位明细，并按股票聚合净买入额、买入额、卖出额和席位列表。
 - 公司画像增强：盘后对涨停池股票补所属行业/概念、涨停原因、竞争对手、行业地位/市占率/龙头相关证据和题材唯一性。
 - mootdx 主板日 K 快照：通过通达信线上行情抓取最近 30 个交易日主板日 K，作为后续“涨停倍量阴”等 K 线策略的数据基础。
+- tdx2db 本地历史库：可把通达信离线日线导入 DuckDB，再导出主板前复权日 K 补强本地滑窗缓存。
 - 训练与回测路线：后续可接入 Microsoft Qlib，用每日行情、涨停、龙虎榜和板块数据做模型训练、因子验证和历史回测，见 `docs/modeling.md`。
 
 ## 快速开始
@@ -90,6 +91,8 @@ python3 -m pip install akshare pandas efinance baostock yfinance tushare easyquo
 ```bash
 TUSHARE_TOKEN="..."
 ASHARE_MODULE_PATH="/path/to/Ashare.py"
+TDX2DB_DUCKDB_PATH="data/tdx/tdx.db"
+TDX2DB_VIEW="v_stock_qfq"
 ```
 
 如果 `prisma db push` 在本机 SQLite schema engine 上失败，使用 `npm run db:init` 初始化数据库；运行时仍由 Prisma Client 读写。
@@ -166,6 +169,14 @@ mootdx 主板日 K 抓取会读取最新的 `data/iwencai/main-board-YYYYMMDD.js
 
 这份缓存用于后续讨论和实现“涨停倍量阴”等 K 线策略。mootdx 首次运行需要选择最快通达信服务器；云端 Action 会自动执行 `python3 -m mootdx bestip`。抓取过程设置了 socket 超时并输出批量进度，避免单个通达信连接长期挂住。
 
+tdx2db 可作为本地历史行情底座：先用通达信 `vipdoc` 日线包初始化 DuckDB，再把 `v_stock_qfq` 视图里的主板日 K 导出到本项目缓存。它适合补历史 K 线、前收盘、换手率和市值口径，不提供盘中实时价、涨停原因、龙虎榜或问财自然语言字段。
+
+```bash
+tdx2db init --dburi 'duckdb://./data/tdx/tdx.db' --dayfiledir ./vipdoc
+tdx2db cron --dburi 'duckdb://./data/tdx/tdx.db'
+npm run ingest:tdx2db-daily-bars -- --db=data/tdx/tdx.db --days=90
+```
+
 可选参数：
 
 ```bash
@@ -176,6 +187,7 @@ npm run ingest:iwencai-dragon-tiger -- --limit=100
 npm run enrich:company-context -- --max-codes=80
 npm run ingest:sector-map
 npm run ingest:mootdx-main-daily-bars -- --days=30 --concurrency=8
+npm run ingest:tdx2db-daily-bars -- --db=data/tdx/tdx.db --days=90
 ```
 
 本地每日运行可以使用 macOS `launchd` 或 crontab。例如 crontab 工作日 16:40 执行：
@@ -208,7 +220,7 @@ DEEPSEEK_MODEL="deepseek-chat"
 Hermes Agent 用于报告分析编排和消息网关推送，不直接抓行情、不生成交易指令。可选配置：
 
 ```bash
-HERMES_ANALYSIS_COMMAND=""
+HERMES_ANALYSIS_COMMAND="./scripts/hermes-analysis.sh"
 LARK_CLI_CHAT_ID=""
 LARK_CLI_USER_ID=""
 LARK_CLI_AS="bot"
@@ -219,8 +231,10 @@ FEISHU_WEBHOOK_MODE=""
 FEISHU_WEBHOOK_KEYWORD=""
 HERMES_DELIVERY_COMMAND=""
 HERMES_DELIVERY_WEBHOOK_URL=""
-INTRADAY_STRATEGY_PROMPT="涨停回调策略：主板股票最近10天内有涨停，今天是阴线，但是没有跌破涨停价，收盘价回调至五日线或十日线附近且距离不超过3%，阴线缩量，最近20天涨幅不超过25%，均线呈多头排列"
+INTRADAY_STRATEGY_PROMPT="涨停回踩阴线策略：主板股票近5日出现实体涨停，涨停后有阴线调整，调整区间最低价未跌破涨停当日开盘价，今日收阴线但收盘价不跌破10日均线，今日涨幅小于5%，近20日最大涨幅小于45%，非ST，非科创板，非北交所，非创业板，股价大于5元，近5日日均成交额大于3000万"
 ```
+
+`HERMES_ANALYSIS_COMMAND` 默认可指向 `./scripts/hermes-analysis.sh`。该脚本从 stdin 接收报告 JSON，使用 DeepSeek 兼容 Chat Completions 接口生成 `analysis`、`rankingNarrative` 和 `pushMessage`；需要配置 `DEEPSEEK_API_KEY`，未配置或调用失败时会在 `warnings` 中说明并退回本地摘要。
 
 如果配置 `LARK_CLI_CHAT_ID` 或 `LARK_CLI_USER_ID`，系统会优先使用 `lark-cli im +messages-send` 发送 Markdown 简报。首次使用前需要完成 `lark-cli config init` 和 `lark-cli auth login --recommend`，并确认 `lark-cli auth status` 中 bot 身份可用。`LARK_CLI_AS` 默认是 `bot`。
 
@@ -232,7 +246,17 @@ INTRADAY_STRATEGY_PROMPT="涨停回调策略：主板股票最近10天内有涨�
 
 报告任务会按北京时间自动识别 A 股交易日。周末和已内置的 2026 年交易所休市日会直接跳过，不生成报告、不推送微信；临时休市可用 `A_SHARE_EXTRA_HOLIDAYS=2026-05-25,2026-05-26` 补充。手动调试非交易日时可设置 `FORCE_REPORT_ON_NON_TRADING_DAY=true` 或传 `--force-non-trading`。
 
-14:50 盘中选股任务默认使用“涨停倍量阴策略”：主板股票近 5 日出现实体涨停，涨停后缩量阴线调整，调整区间最低价未跌破涨停当日开盘价，今日收阳线，收盘价站上 10 日均线，今日成交量大于昨日成交量，今日涨幅小于 5%，近 20 日最大涨幅小于 45%，非 ST，非科创板，非北交所，非创业板，股价大于 5 元，近 5 日日均成交额大于 3000 万。该任务读取 `cache/main-daily-bars.json` 的 30 日滑窗日线缓存，并用盘中快照合成今日临时日 K；缓存不足时报告会在 `warnings` 中提示。
+14:50 盘中选股任务默认使用“涨停回踩阴线策略”：主板股票近 5 日出现实体涨停，涨停后有阴线调整，调整区间最低价未跌破涨停当日开盘价，今日收阴线但收盘价不跌破 10 日均线，今日涨幅小于 5%，近 20 日最大涨幅小于 45%，非 ST，非科创板，非北交所，非创业板，股价大于 5 元，近 5 日日均成交额大于 3000 万；调整缩量和今日成交量相对昨日只作为排序因子，不作为硬过滤。该任务读取 `cache/main-daily-bars.json` 的 30 日滑窗日线缓存，并用盘中快照合成今日临时日 K；缓存不足时报告会在 `warnings` 中提示。
+
+14:50 报告还会读取 `data/watchlist/monitor-pool.json` 的监控池，逐只输出是否进入上升趋势、是否回踩或接近 5 日线、相对 10 日线位置、量能和风险。新增或更新监控股票：
+
+```bash
+npm run monitor:pool -- add --code=600226 --name=亨通股份 --thesis=观察涨停后回踩5日线承接
+npm run monitor:pool -- list
+npm run monitor:pool -- disable --code=600226
+```
+
+监控池不会改变策略筛选结果；它是独立的“指定股票状态体检”小节。
 
 ### 微信入站转发
 

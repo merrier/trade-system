@@ -5,10 +5,12 @@ import importlib
 import importlib.util
 import io
 import json
+import math
 import os
 import sys
 from collections import defaultdict
 from datetime import datetime, timedelta
+from numbers import Integral, Real
 from typing import Any, Optional
 
 
@@ -33,7 +35,8 @@ def number(value: Any, default: float = 0) -> float:
     try:
         if value is None or value == "":
             return default
-        return float(value)
+        parsed = float(value)
+        return parsed if math.isfinite(parsed) else default
     except Exception:
         return default
 
@@ -42,9 +45,29 @@ def integer(value: Any, default: int = 0) -> int:
     try:
         if value is None or value == "":
             return default
-        return int(float(value))
+        parsed = float(value)
+        return int(parsed) if math.isfinite(parsed) else default
     except Exception:
         return default
+
+
+def sanitize_for_json(value: Any) -> Any:
+    if value is None or isinstance(value, (str, bool)):
+        return value
+    if isinstance(value, Integral):
+        return int(value)
+    if isinstance(value, Real):
+        parsed = float(value)
+        return parsed if math.isfinite(parsed) else None
+    if isinstance(value, dict):
+        return {str(key): sanitize_for_json(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [sanitize_for_json(item) for item in value]
+    return value
+
+
+def safe_json_dumps(value: Any) -> str:
+    return json.dumps(sanitize_for_json(value), ensure_ascii=False, allow_nan=False)
 
 
 def yyyymmdd(value: datetime) -> str:
@@ -171,19 +194,36 @@ def efinance_dataset(trade_date: str) -> tuple[dict, list[str]]:
 
     quotes = ef.stock.get_realtime_quotes()
     stocks = normalize_spot_rows(quotes, provider="efinance")
+    limit_ups = derive_limit_ups_from_stocks(trade_date, stocks)
+    dragon_tiger = iwencai_dragon_tiger(trade_date)
+    warnings = []
+
+    iwencai_limit_ups = iwencai_limit_up_snapshots(trade_date)
+    if iwencai_limit_ups:
+        limit_ups = merge_limit_ups(limit_ups, iwencai_limit_ups)
+        apply_limit_up_context(stocks, iwencai_limit_ups)
+        warnings.append("efinance 兜底源已使用同日问财快照补充涨停梯队字段。")
+    else:
+        warnings.append("efinance 兜底源不提供完整涨停梯队；涨停池按涨跌幅近似派生，连板与封板字段可能不完整。")
+
+    if dragon_tiger:
+        warnings.append("efinance 兜底源已使用同日问财快照补充龙虎榜字段。")
+    else:
+        warnings.append("efinance 兜底源不提供龙虎榜，且未找到同日问财龙虎榜快照。")
+
     sectors = derive_sectors_from_stocks(trade_date, stocks)
     return (
         {
             "tradeDate": trade_date,
             "dataAsOf": datetime.now().isoformat(),
             "source": "efinance",
-            "warnings": ["efinance 兜底源不提供完整涨停梯队，连板与龙虎榜字段为空。"],
+            "warnings": warnings,
             "stocks": stocks,
-            "limitUps": derive_limit_ups_from_stocks(trade_date, stocks),
-            "dragonTiger": [],
+            "limitUps": limit_ups,
+            "dragonTiger": dragon_tiger,
             "sectors": sectors,
         },
-        [],
+        warnings,
     )
 
 
@@ -238,7 +278,7 @@ def normalize_easyquotation_snapshot(snapshot: dict) -> list[dict]:
                 "open": number(row.get("open", 0)),
                 "high": number(row.get("high", 0)),
                 "low": number(row.get("low", 0)),
-                "volume": turnover,
+                "volume": turnover / 100,
                 "ma5": None,
                 "listedDays": 999,
                 "mainNetInflow": 0,
@@ -401,6 +441,169 @@ def derive_limit_ups_from_stocks(trade_date: str, stocks: list[dict]) -> list[di
             }
         )
     return limit_ups
+
+
+def merge_limit_ups(derived: list[dict], enriched: list[dict]) -> list[dict]:
+    by_code = {item["code"]: item for item in derived}
+    for item in enriched:
+        existing = by_code.get(item["code"], {})
+        by_code[item["code"]] = {**existing, **item}
+    return sorted(by_code.values(), key=lambda row: (number(row.get("consecutive", 0)), number(row.get("sealedAmount", 0))), reverse=True)
+
+
+def apply_limit_up_context(stocks: list[dict], limit_ups: list[dict]) -> None:
+    by_code = {item["code"]: item for item in limit_ups}
+    for stock in stocks:
+        item = by_code.get(stock["code"])
+        if not item:
+            continue
+        stock["industry"] = item.get("industry") or stock.get("industry", "")
+        stock["concepts"] = item.get("concepts") or stock.get("concepts", [])
+
+
+def iwencai_limit_up_snapshots(trade_date: str, data_dir: Optional[str] = None) -> list[dict]:
+    payload = load_iwencai_snapshot("limit-ups", trade_date, data_dir)
+    rows = payload.get("rows", []) if isinstance(payload, dict) else []
+    snapshots: list[dict] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        code = normalize_stock_code(row.get("股票代码"))
+        name = text_cell(row.get("股票简称"))
+        if not code or not name or not is_main_board(code):
+            continue
+        reason = text_value(row, "涨停原因")
+        industry_path = array_text(row.get("所属同花顺行业"))
+        snapshots.append(
+            {
+                "tradeDate": trade_date,
+                "code": code,
+                "name": name,
+                "market": market_from_code(code),
+                "industry": industry_path[0] if industry_path else "",
+                "concepts": unique_strings([*split_reason(reason), *industry_path[1:]]),
+                "consecutive": max(1, integer(number_value(row, "连续涨停天数"), 1)),
+                "firstLimitTime": normalize_time(text_value(row, "首次涨停时间")),
+                "lastLimitTime": normalize_time(text_value(row, "最终涨停时间")),
+                "openCount": max(0, integer(number_value(row, "涨停开板次数"), 0)),
+                "sealedAmount": number_value(row, "涨停封单额"),
+                "turnoverRate": number_value(row, "换手率"),
+                "pctChange": number_value(row, "涨跌幅") or number_value(row, "最新涨跌幅"),
+            }
+        )
+    return snapshots
+
+
+def iwencai_dragon_tiger(trade_date: str, data_dir: Optional[str] = None) -> list[dict]:
+    payload = load_iwencai_snapshot("dragon-tiger", trade_date, data_dir)
+    rows = payload.get("rows", []) if isinstance(payload, dict) else []
+    by_code: dict[str, dict] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        code = normalize_stock_code(row.get("股票代码"))
+        name = text_cell(row.get("股票简称"))
+        if not code or not name or not is_main_board(code):
+            continue
+        buy_amount = number_value(row, "买入额")
+        sell_amount = number_value(row, "卖出额")
+        net_amount = number_value(row, "净买入额") or buy_amount - sell_amount
+        seat = to_dragon_tiger_seat(row, buy_amount, sell_amount, net_amount)
+        existing = by_code.get(code)
+        if existing:
+            existing["buyAmount"] += buy_amount
+            existing["sellAmount"] += sell_amount
+            existing["netAmount"] += net_amount
+            existing["seats"].append(seat)
+            if not existing.get("reason"):
+                existing["reason"] = text_value(row, "上榜原因")
+            continue
+        by_code[code] = {
+            "tradeDate": trade_date,
+            "code": code,
+            "name": name,
+            "reason": text_value(row, "上榜原因"),
+            "buyAmount": buy_amount,
+            "sellAmount": sell_amount,
+            "netAmount": net_amount,
+            "seats": [seat],
+        }
+    return sorted(by_code.values(), key=lambda row: abs(number(row.get("netAmount", 0))), reverse=True)
+
+
+def to_dragon_tiger_seat(row: dict, buy_amount: float, sell_amount: float, net_amount: float) -> dict:
+    position = text_cell(row.get("买卖席位"))
+    side = "sell" if position.startswith("卖") or (sell_amount > buy_amount and not position.startswith("买")) else "buy"
+    return {
+        "name": text_cell(row.get("营业部名称")) or "未知席位",
+        "side": side,
+        "amount": buy_amount if side == "buy" else sell_amount,
+        "buyAmount": buy_amount,
+        "sellAmount": sell_amount,
+        "netAmount": net_amount,
+        "position": position or None,
+        "type": array_text(row.get("营业部类型")),
+    }
+
+
+def load_iwencai_snapshot(prefix: str, trade_date: str, data_dir: Optional[str] = None) -> Optional[dict]:
+    root = data_dir or os.environ.get("IWENCAI_DATA_DIR") or os.path.join(os.getcwd(), "data", "iwencai")
+    path = os.path.join(root, f"{prefix}-{trade_date}.json")
+    if not os.path.exists(path):
+        return None
+    with open(path, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def number_value(row: dict, prefix: str) -> float:
+    direct = number(row.get(prefix))
+    if direct != 0:
+        return direct
+    matched_key = next((key for key in row if key == prefix or key.startswith(f"{prefix}[")), None)
+    return number(row.get(matched_key)) if matched_key else 0
+
+
+def text_value(row: dict, prefix: str) -> str:
+    direct = text_cell(row.get(prefix))
+    if direct:
+        return direct
+    matched_key = next((key for key in row if key == prefix or key.startswith(f"{prefix}[")), None)
+    return text_cell(row.get(matched_key)) if matched_key else ""
+
+
+def text_cell(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, list):
+        return " ".join(text_cell(item) for item in value if text_cell(item)).strip()
+    text = str(value).strip()
+    return "" if text.lower() in ("nan", "none", "null", "--") else text
+
+
+def array_text(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [text_cell(item) for item in value if text_cell(item)]
+
+
+def split_reason(reason: str) -> list[str]:
+    for delimiter in ("＋", "+", "、", "，", ",", "/"):
+        reason = reason.replace(delimiter, " ")
+    return [item.strip() for item in reason.split() if item.strip()]
+
+
+def unique_strings(values: list[str]) -> list[str]:
+    result = []
+    for value in values:
+        if value and value not in result:
+            result.append(value)
+    return result
+
+
+def normalize_time(value: str) -> str:
+    if len(value) >= 19 and value[4] == "-" and value[7] == "-":
+        return value[11:19]
+    return value
 
 
 def derive_sectors_from_stocks(trade_date: str, stocks: list[dict]) -> list[dict]:
@@ -1017,10 +1220,10 @@ def main() -> None:
     try:
         result = run_command(command, args.provider, args.trade_date, args.mode, args.days, args.count, args.frequency, codes, args.allow_sample)
     except Exception as exc:
-        print(json.dumps({"provider": args.provider, "command": command, "status": "failed", "error": f"{type(exc).__name__}: {exc}", "warnings": []}, ensure_ascii=False), file=sys.stderr)
+        print(safe_json_dumps({"provider": args.provider, "command": command, "status": "failed", "error": f"{type(exc).__name__}: {exc}", "warnings": []}), file=sys.stderr)
         raise
 
-    print(json.dumps(result, ensure_ascii=False))
+    print(safe_json_dumps(result))
 
 
 if __name__ == "__main__":

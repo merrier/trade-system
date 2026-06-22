@@ -3,9 +3,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 import { z } from "zod";
-import { compileStrategy } from "./deepseek.js";
+import { assessIndustryLeaderWithDeepSeek, compileStrategy } from "./deepseek.js";
 import { createDefaultStrategy } from "./defaults.js";
 import { HermesAgentClient } from "./hermesAgentClient.js";
+import { evaluateMonitorPool, readMonitorPool } from "./monitorPool.js";
 import { rankSectors, rankStocks } from "./scoring.js";
 import { fetchMarketDataset, fetchUsMarketBrief } from "../data/akshareClient.js";
 import { enrichDatasetWithSectorMap, readSectorMap } from "../data/sectorMap.js";
@@ -20,6 +21,7 @@ import type {
   StockSnapshot,
   StrategySnapshot
 } from "../shared/types.js";
+import type { DeepSeekLeaderAssessmentInput } from "./deepseek.js";
 import type { DailyBar } from "../shared/types.js";
 
 const execFileAsync = promisify(execFile);
@@ -47,7 +49,11 @@ const factorLegend: Record<string, string> = {
   liquidity: "成交额与流动性",
   riskPenalty: "ST、停牌、高位、炸板、过热等风险扣分",
   pullbackMatch: "涨停回调模板综合命中度",
+  doubleVolumeBearishMatch: "涨停倍量阴模板综合命中度",
+  bearishPullbackMatch: "涨停回踩阴线模板综合命中度",
   limitUpRecency: "最近涨停距离当前交易日的近度",
+  bearishAdjustmentCount: "涨停后阴线调整数量",
+  pullbackVolumeContraction: "阴线调整缩量加分项",
   volumeContraction: "阴线缩量程度",
   maSupport: "五日线/十日线支撑强度",
   twentyDayGain: "最近20个交易日涨幅",
@@ -80,6 +86,7 @@ export async function buildIntradaySelectionReport(
     ? await compileStrategy(strategyPrompt, ["main"], "short_term")
     : { dsl: createDefaultStrategy("short_term", ["main"]), warnings: ["未配置策略，使用默认主板短线强势策略。"], unsupported: [] };
   const recommendations = await enrichRecommendations(rankStocks(dataset, compiled.dsl, "intraday", { dailyBars: options.dailyBars }), dataset, options.dailyBars ?? []);
+  const monitorPool = evaluateMonitorPool(await readMonitorPool(), dataset, options.dailyBars ?? []);
   const dailyBarWarnings = buildDailyBarWarnings(compiled.dsl, options.dailyBars ?? []);
   const strategy: StrategySnapshot = {
     prompt: strategyPrompt || "默认主板短线强势策略",
@@ -92,6 +99,7 @@ export async function buildIntradaySelectionReport(
   const payload: IntradaySelectionReportPayload = {
     strategy,
     recommendations,
+    monitorPool,
     sectorFlowLeaders: rankSectorFlows(dataset).slice(0, 5),
     factorLegend
   };
@@ -103,6 +111,7 @@ export async function buildIntradaySelectionReport(
       tradeDate: dataset.tradeDate,
       dataAsOf: dataset.dataAsOf,
       topRecommendations: recommendations.slice(0, 10),
+      monitorPool,
       sectorLeaders: rankSectors(dataset).slice(0, 10)
     }
   });
@@ -330,38 +339,19 @@ function formatIntradayPayload(payload: IntradaySelectionReportPayload): string[
     "## 策略",
     payload.strategy.prompt,
     "",
-    "## 推荐排名"
+    "## 推荐关注"
   ];
   if (!payload.recommendations.length) {
     lines.push("- 暂无命中新版策略的主板股票。");
   } else {
     lines.push(
-      "| 排名 | 股票 | 分数 | 置信度 | 板块 | 板块资金排名 | 涨停原因 | 龙头 | 唯一性 |",
-      "| --- | --- | ---: | ---: | --- | --- | --- | --- | --- |",
-      ...payload.recommendations.slice(0, 10).map((item) => {
-        const context = item.context;
-        return [
-          item.rank,
-          tableCell(`${item.code} ${item.name}`, 18),
-          tableCell(item.score, 8),
-          tableCell(item.confidence, 8),
-          tableCell(context?.sectors.join("、") || "数据不足", 30),
-          tableCell(formatSectorFlowRank(context), 30),
-          tableCell(context?.limitUpReason || "未找到历史涨停原因", 34),
-          tableCell(context?.industryLeader.reason || "数据不足", 38),
-          tableCell(context?.uniqueness.reason || "数据不足", 38)
-        ].join(" | ").replace(/^/, "| ").replace(/$/, " |");
-      }),
-      "",
-      "## 补充说明",
-      ...payload.recommendations.slice(0, 10).map((item) => {
-        const reasons = item.reasons.slice(0, 2).join("；");
-        const risks = item.risks.slice(0, 2).join("；") || "暂无额外风险提示";
-        return `- **${item.rank}. ${item.code} ${item.name}**：形态：${reasons || "暂无形态说明"}。风险：${risks}`;
-      })
+      ...payload.recommendations.slice(0, 10).flatMap((item, index) => formatIntradayRecommendation(item, index))
     );
   }
   lines.push(
+    "",
+    "## 监控池分析",
+    ...formatMonitorPool(payload),
     "",
     "## 主力净流入板块 Top 5"
   );
@@ -387,6 +377,48 @@ function formatIntradayPayload(payload: IntradaySelectionReportPayload): string[
   return lines;
 }
 
+function formatMonitorPool(payload: IntradaySelectionReportPayload): string[] {
+  const monitorPool = payload.monitorPool ?? [];
+  if (!monitorPool.length) return ["- 暂无监控池股票。"];
+  return monitorPool.flatMap((item, index) => {
+    const thesis = item.thesis ? [`   - 观察理由：${tableCell(item.thesis, 72)}`] : [];
+    return [
+      `${index + 1}. **${tableCell(item.name, 24)}**`,
+      `   - 趋势：${tableCell(item.trend.reason, 72)}`,
+      `   - 5日线：${tableCell(item.ma.reason, 72)}`,
+      `   - 当前：${formatMonitorPrice(item)}；10日线：${formatMonitorMa10(item)}`,
+      `   - 板块：${tableCell(item.sectors.join("、") || "数据不足", 56)}；量能：${tableCell(item.volume.reason, 48)}`,
+      ...thesis,
+      `   - 风险：${tableCell(item.risks.join("；") || "暂无额外风险提示", 72)}`
+    ];
+  });
+}
+
+function formatIntradayRecommendation(item: IntradaySelectionReportPayload["recommendations"][number], index: number): string[] {
+  const context = item.context;
+  const reasons = item.reasons.slice(0, 2).join("；") || "暂无形态说明";
+  const risks = item.risks.slice(0, 2).join("；") || "暂无额外风险提示";
+  return [
+    `${index + 1}. **${tableCell(item.name, 24)}**（置信度 ${item.confidence}）`,
+    `   - 板块：${tableCell(context?.sectors.join("、") || "数据不足", 48)}；板块资金：${tableCell(formatSectorFlowRank(context), 36)}`,
+    `   - 最近涨停原因：${tableCell(context?.limitUpReason || "未找到历史涨停原因", 64)}`,
+    `   - 唯一性：${tableCell(context?.uniqueness.reason || "数据不足", 72)}`,
+    `   - 龙头描述：${tableCell(context?.industryLeader.reason || "数据不足", 72)}`,
+    `   - 形态：${tableCell(reasons, 72)}；风险：${tableCell(risks, 56)}`
+  ];
+}
+
+function formatMonitorPrice(item: IntradaySelectionReportPayload["monitorPool"][number]): string {
+  if (item.price === undefined || item.pctChange === undefined) return "数据不足";
+  return `${item.price}（${formatSignedPct(item.pctChange)}）`;
+}
+
+function formatMonitorMa10(item: IntradaySelectionReportPayload["monitorPool"][number]): string {
+  if (item.ma.ma10 === undefined) return "数据不足";
+  const distance = item.ma.ma10DistancePct === undefined ? "" : `，距离 ${formatSignedPct(item.ma.ma10DistancePct)}`;
+  return `${item.ma.ma10}${distance}`;
+}
+
 function tableCell(value: string | number, maxLength: number): string {
   const text = String(value).replace(/\|/g, "/").replace(/\s+/g, " ").trim() || "-";
   return text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
@@ -406,10 +438,21 @@ async function enrichRecommendations(recommendations: ReturnType<typeof rankStoc
   const liveContexts = await fetchIwencaiRecommendationContexts(missingContextRecommendations);
   const companyContexts = new Map([...cachedContexts, ...liveContexts]);
   const stocksByCode = new Map(dataset.stocks.map((stock) => [stock.code, stock]));
-  return recommendations.map((item) => ({
-    ...item,
-    context: buildRecommendationContext(item.code, item.name, stocksByCode.get(item.code), dataset, dailyBars, limitUpInsights, companyContexts.get(item.code))
-  }));
+  const displayCodes = new Set(recommendations.slice(0, 10).map((item) => item.code));
+  const enriched: typeof recommendations = [];
+  for (const item of recommendations) {
+    const stock = stocksByCode.get(item.code);
+    const iwencaiContext = companyContexts.get(item.code);
+    const context = buildRecommendationContext(item.code, item.name, stock, dataset, dailyBars, limitUpInsights, iwencaiContext);
+    if (displayCodes.has(item.code) && context.industryLeader.status === "unknown") {
+      const deepseekAssessment = await assessIndustryLeaderWithDeepSeek(
+        buildLeaderAssessmentInput(item.code, item.name, stock, dataset, context, iwencaiContext)
+      );
+      if (deepseekAssessment) context.industryLeader = deepseekAssessment;
+    }
+    enriched.push({ ...item, context });
+  }
+  return enriched;
 }
 
 interface LimitUpInsight {
@@ -489,6 +532,64 @@ function buildRecommendationContext(
   };
 }
 
+function buildLeaderAssessmentInput(
+  code: string,
+  name: string,
+  stock: StockSnapshot | undefined,
+  dataset: MarketDataset,
+  context: RecommendationContext,
+  iwencaiContext?: IwencaiRecommendationContext
+): DeepSeekLeaderAssessmentInput {
+  const sectorNames = new Set(context.sectors);
+  const sectorEvidence = dataset.sectors
+    .filter((sector) => sectorNames.has(sector.name))
+    .slice(0, 6)
+    .map((sector) => ({
+      name: sector.name,
+      type: sector.type,
+      leaderCode: sector.leaderCode,
+      leaderName: sector.leaderName,
+      leaderPctChange: sector.leaderPctChange,
+      pctChange: sector.pctChange,
+      netInflow: sector.netInflow,
+      companyCount: sector.companyCount,
+      limitUpCount: sector.limitUpCount
+    }));
+  const peerLeaders = stock?.industry
+    ? dataset.stocks
+        .filter((item) => item.industry === stock.industry)
+        .sort((a, b) => b.pctChange - a.pctChange || b.turnoverAmount - a.turnoverAmount)
+        .slice(0, 5)
+        .map((item) => ({
+          code: item.code,
+          name: item.name,
+          pctChange: item.pctChange,
+          turnoverAmount: item.turnoverAmount
+        }))
+    : [];
+
+  return {
+    code,
+    name,
+    limitUpReason: context.limitUpReason,
+    sectors: context.sectors,
+    sectorFlowRank: context.sectorFlowRank,
+    stock: stock
+      ? {
+          industry: stock.industry,
+          concepts: stock.concepts,
+          pctChange: stock.pctChange,
+          turnoverAmount: stock.turnoverAmount,
+          turnoverRate: stock.turnoverRate,
+          mainNetInflow: stock.mainNetInflow
+        }
+      : undefined,
+    sectorEvidence,
+    peerLeaders,
+    localReason: iwencaiContext?.leaderEvidence || context.industryLeader.reason
+  };
+}
+
 function getBestSectorFlowRank(sectors: string[], dataset: MarketDataset): RecommendationContext["sectorFlowRank"] {
   const names = new Set(sectors);
   const matched = [...dataset.sectors]
@@ -505,19 +606,72 @@ function getBestSectorFlowRank(sectors: string[], dataset: MarketDataset): Recom
     : undefined;
 }
 
-function rankSectorFlows(dataset: MarketDataset): IntradaySelectionReportPayload["sectorFlowLeaders"] {
+export function rankSectorFlows(dataset: MarketDataset): IntradaySelectionReportPayload["sectorFlowLeaders"] {
+  const firstLimitUps = firstLimitUpsBySector(dataset);
   return [...dataset.sectors]
     .sort((a, b) => b.netInflow - a.netInflow)
-    .map((sector, index) => ({
-      rank: index + 1,
-      name: sector.name,
-      type: sector.type,
-      netInflow: sector.netInflow,
-      pctChange: sector.pctChange,
-      limitUpCount: sector.limitUpCount,
-      leaderName: sector.leaderName,
-      leaderPctChange: sector.leaderPctChange
-    }));
+    .map((sector, index) => {
+      const firstLimitUp = firstLimitUps.get(sector.name);
+      return {
+        rank: index + 1,
+        name: sector.name,
+        type: sector.type,
+        netInflow: sector.netInflow,
+        pctChange: sector.pctChange,
+        limitUpCount: sector.limitUpCount,
+        leaderName: firstLimitUp?.name ?? sector.leaderName,
+        leaderPctChange: firstLimitUp?.pctChange ?? sector.leaderPctChange
+      };
+    });
+}
+
+interface FirstLimitUpCandidate {
+  code: string;
+  name: string;
+  pctChange: number;
+  firstLimitTime?: string;
+  index: number;
+}
+
+function firstLimitUpsBySector(dataset: MarketDataset): Map<string, FirstLimitUpCandidate> {
+  const stocksByCode = new Map(dataset.stocks.map((stock) => [stock.code, stock]));
+  const result = new Map<string, FirstLimitUpCandidate>();
+  dataset.limitUps.forEach((limitUp, index) => {
+    const candidate: FirstLimitUpCandidate = {
+      code: limitUp.code,
+      name: limitUp.name,
+      pctChange: limitUp.pctChange,
+      firstLimitTime: limitUp.firstLimitTime,
+      index
+    };
+    for (const sectorName of sectorNamesForLimitUp(limitUp, stocksByCode.get(limitUp.code))) {
+      const existing = result.get(sectorName);
+      if (!existing || compareFirstLimitUp(candidate, existing) < 0) {
+        result.set(sectorName, candidate);
+      }
+    }
+  });
+  return result;
+}
+
+function sectorNamesForLimitUp(limitUp: MarketDataset["limitUps"][number], stock: StockSnapshot | undefined): string[] {
+  return uniqueStrings([
+    limitUp.industry,
+    ...(limitUp.concepts ?? []),
+    stock?.industry,
+    ...(stock?.concepts ?? [])
+  ]).filter(isRealSectorName);
+}
+
+function compareFirstLimitUp(a: FirstLimitUpCandidate, b: FirstLimitUpCandidate): number {
+  const timeDelta = limitTimeValue(a.firstLimitTime) - limitTimeValue(b.firstLimitTime);
+  return timeDelta || a.index - b.index;
+}
+
+function limitTimeValue(value: string | undefined): number {
+  const match = value?.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if (!match) return Number.POSITIVE_INFINITY;
+  return Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3] ?? 0);
 }
 
 async function fetchIwencaiRecommendationContexts(recommendations: ReturnType<typeof rankStocks>): Promise<Map<string, IwencaiRecommendationContext>> {

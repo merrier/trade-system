@@ -32,10 +32,12 @@ export type DailyBarCache = z.infer<typeof dailyBarCacheSchema>;
 export function mergeDailyBarCache(previous: DailyBarCache | null, incoming: DailyBar[], source: string, warnings: string[], windowSize = 30): DailyBarCache {
   const byKey = new Map<string, DailyBar>();
   for (const bar of previous?.bars ?? []) {
-    if (isMainBoardCode(bar.code)) byKey.set(`${bar.tradeDate}:${bar.code}`, bar);
+    const normalized = normalizeDailyBar(bar);
+    if (isMainBoardCode(normalized.code)) byKey.set(`${normalized.tradeDate}:${normalized.code}`, normalized);
   }
   for (const bar of incoming) {
-    if (isMainBoardCode(bar.code)) byKey.set(`${bar.tradeDate}:${bar.code}`, bar);
+    const normalized = normalizeDailyBar(bar);
+    if (isMainBoardCode(normalized.code)) byKey.set(`${normalized.tradeDate}:${normalized.code}`, normalized);
   }
 
   const sortedDates = [...new Set([...byKey.values()].map((bar) => bar.tradeDate))].sort();
@@ -57,7 +59,8 @@ export async function readDailyBarCache(root: string): Promise<DailyBarCache | n
   const filePath = path.join(root, "cache", "main-daily-bars.json");
   try {
     const text = await fs.readFile(filePath, "utf8");
-    return dailyBarCacheSchema.parse(JSON.parse(text));
+    const parsed = dailyBarCacheSchema.parse(JSON.parse(text));
+    return { ...parsed, bars: normalizeDailyBars(parsed.bars) };
   } catch {
     return null;
   }
@@ -72,4 +75,21 @@ export async function writeDailyBarCache(root: string, cache: DailyBarCache): Pr
 
 function isMainBoardCode(code: string): boolean {
   return /^(000|001|002|600|601|603|605)/.test(code);
+}
+
+function normalizeDailyBar(bar: DailyBar): DailyBar {
+  return { ...bar, code: normalizeStockCode(bar.code) };
+}
+
+function normalizeStockCode(code: string): string {
+  return code.trim().toUpperCase().replace(/\.(SH|SZ)$/, "");
+}
+
+function normalizeDailyBars(bars: DailyBar[]): DailyBar[] {
+  const byKey = new Map<string, DailyBar>();
+  for (const bar of bars) {
+    const normalized = normalizeDailyBar(bar);
+    if (isMainBoardCode(normalized.code)) byKey.set(`${normalized.tradeDate}:${normalized.code}`, normalized);
+  }
+  return [...byKey.values()].sort((a, b) => a.tradeDate.localeCompare(b.tradeDate) || a.code.localeCompare(b.code));
 }

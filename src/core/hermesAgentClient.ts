@@ -133,7 +133,7 @@ function buildPrompt(request: HermesRequest): string {
   return JSON.stringify(
     {
       role: "A股主板研究报告编排",
-      output: "只返回JSON，字段为 analysis, rankingNarrative, pushMessage。pushMessage 使用 Markdown 简报格式，适合飞书渲染。",
+      output: "只返回JSON，字段为 analysis, rankingNarrative, pushMessage。盘中选股简报按候选顺序展示即可，不要把排名单独做成表格列；不要突出股票代码和得分；重点写股票名称、板块、最近涨停原因、唯一性和龙头描述。",
       request
     },
     null,

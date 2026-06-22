@@ -2,7 +2,7 @@ export type Market = "main" | "gem" | "star" | "bse";
 export type RunMode = "intraday" | "post_close";
 export type SectorType = "industry" | "concept";
 export type StrategyStyle = "short_term" | "stable" | "custom";
-export type StrategyTemplate = "limit_up_pullback" | "limit_up_double_volume_bearish";
+export type StrategyTemplate = "limit_up_pullback" | "limit_up_double_volume_bearish" | "limit_up_bearish_pullback";
 export type MarketDataSource = "akshare" | "akshare_partial" | "efinance" | "easyquotation" | "baostock" | "tushare" | "ashare" | "provider_chain" | "sample";
 export type ReportKind = "morning" | "intraday-selection" | "close";
 
@@ -211,13 +211,59 @@ export interface RecommendationContext {
     netInflow: number;
   };
   industryLeader: {
-    status: "likely" | "unknown";
+    status: "confirmed" | "likely" | "unknown";
     reason: string;
   };
   uniqueness: {
     status: "high" | "medium" | "unknown";
     reason: string;
   };
+}
+
+export interface MonitorPoolItem {
+  code: string;
+  name: string;
+  market: Market;
+  thesis?: string;
+  isActive: boolean;
+  addedAt: string;
+  updatedAt?: string;
+}
+
+export interface MonitorPoolSnapshot {
+  version: 1;
+  updatedAt: string;
+  items: MonitorPoolItem[];
+}
+
+export interface MonitorPoolEvaluation {
+  code: string;
+  name: string;
+  market: Market;
+  thesis?: string;
+  dataAsOf: string;
+  price?: number;
+  pctChange?: number;
+  sectors: string[];
+  trend: {
+    status: "uptrend" | "forming" | "weak" | "unknown";
+    reason: string;
+  };
+  ma: {
+    ma5?: number;
+    ma10?: number;
+    ma20?: number;
+    ma5DistancePct?: number;
+    ma10DistancePct?: number;
+    pullbackToMa5: "held" | "near" | "below" | "extended" | "unknown";
+    reason: string;
+  };
+  volume: {
+    ratioVsPrevious?: number;
+    reason: string;
+  };
+  reasons: string[];
+  risks: string[];
 }
 
 export interface CompileResult {
@@ -267,6 +313,7 @@ export interface MorningReportPayload {
 export interface IntradaySelectionReportPayload {
   strategy: StrategySnapshot;
   recommendations: RecommendationResult[];
+  monitorPool: MonitorPoolEvaluation[];
   sectorFlowLeaders: Array<{
     rank: number;
     name: string;

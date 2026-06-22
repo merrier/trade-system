@@ -15,12 +15,21 @@
 | 可选优先 | [Tushare](https://tushare.pro/document/2) | 30 天日线滑窗缓存 | open、high、low、close、volume、amount、pctChange、turnoverRate、股票中文名 | 配置 `TUSHARE_TOKEN` 后优先用于 `daily-bars`；未配置时不参与链路 |
 | 可选兜底 | [Ashare](https://github.com/mpquant/Ashare) | 日线/分钟线 K 线兜底 | open、high、low、close、volume | 通过 `ASHARE_MODULE_PATH` 加载单文件模块；接入 `daily-bars` 和按代码拉取的 `minute-bars` |
 | 可选兜底 | [mootdx](https://github.com/mootdx/mootdx) | 通达信线上日 K、指数、分钟线 | open、high、low、close、volume、amount、datetime | 当前通过独立 GitHub Action 抓取主板最近 30 根日 K，写入 `cache/main-daily-bars.json`，服务于“涨停倍量阴”等 K 线策略 |
+| 可选本地库 | [tdx2db](https://github.com/jing2uo/tdx2db) | 通达信历史行情导入 DuckDB/ClickHouse | 前复权/后复权/不复权日线、preclose、turnover、floatmv、totalmv | 当前通过 `npm run ingest:tdx2db-daily-bars` 从 DuckDB 导出主板日线，补强 `cache/main-daily-bars.json`；不参与实时快照兜底 |
 
 Tushare 当前接入 [日线行情接口](https://tushare.pro/document/2?doc_id=27)，用于 14:50 涨停回调策略所需的近 30 个交易日 K 线窗口；实时快照、涨停池和板块热度仍由 AKShare/efinance/easyquotation/BaoStock 链路提供。
 
 Ashare 当前作为 `daily-bars` 末级兜底：当 Tushare、BaoStock、efinance、AKShare 日线都失败时，系统用 Ashare 的日线 K 线补窗口；由于 Ashare 日线不直接给成交额和换手率，成交额会用 `close * volume` 近似，换手率记为 `0` 并通过 provider warning/报告风险提示暴露。分钟线通过 `minute-bars` 按股票代码拉取，支持 `1m/5m/15m/30m/60m`，主要给后续盘中细化和小范围候选验证使用，避免全市场分钟线请求过重。
 
 mootdx 当前作为独立的主板日 K 快照任务运行：`Ingest Mootdx main daily bars` 在工作日北京时间 17:05 读取最新问财主板股票池，抓取最近 30 根日 K，并写入 `data/mootdx/main-daily-bars-YYYYMMDD.json` 与 `cache/main-daily-bars.json`。它不提供涨停原因、龙虎榜席位或自然语言选股，因此不替代问财；定位是 K 线/指数/分钟线兜底源。首次运行需要生成通达信最优服务器配置，Action 会先执行 `python3 -m mootdx bestip`。
+
+tdx2db 当前定位为可选本地历史行情库：它把通达信离线日线导入 DuckDB，本项目再从默认 `v_stock_qfq` 视图导出沪深主板日 K，并合并进 `cache/main-daily-bars.json`。如果要改口径，可通过 `TDX2DB_VIEW` 或 `--view=v_stock_bfq|v_stock_qfq|v_stock_hfq` 切换不复权、前复权或后复权。它不提供盘中实时价、涨停原因、龙虎榜席位或自然语言问财字段，因此只补历史 K 线，不替代 AKShare/efinance/easyquotation/问财链路。
+
+```bash
+tdx2db init --dburi 'duckdb://./data/tdx/tdx.db' --dayfiledir ./vipdoc
+tdx2db cron --dburi 'duckdb://./data/tdx/tdx.db'
+npm run ingest:tdx2db-daily-bars -- --db=data/tdx/tdx.db --days=90
+```
 
 ## 后续候选数据源
 
@@ -85,7 +94,7 @@ mootdx 当前作为独立的主板日 K 快照任务运行：`Ingest Mootdx main
 
 可选环境变量：
 
-- `HERMES_ANALYSIS_COMMAND`：接收 JSON prompt，返回 `{ analysis, rankingNarrative, pushMessage }` JSON。
+- `HERMES_ANALYSIS_COMMAND`：接收 JSON prompt，返回 `{ analysis, rankingNarrative, pushMessage }` JSON；默认可使用 `./scripts/hermes-analysis.sh`，通过 DeepSeek 兼容接口生成报告摘要。
 - `HERMES_SEND_TARGET`：优先使用 `hermes send --to` 发送报告，例如 `weixin` 或 `weixin:<chat_id>`。
 - `HERMES_DELIVERY_COMMAND`：从 stdin 接收推送文本。
 - `HERMES_DELIVERY_WEBHOOK_URL`：接收报告 artifact JSON 的 webhook。

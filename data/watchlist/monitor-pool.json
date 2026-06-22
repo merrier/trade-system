@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "updatedAt": "2026-06-22T07:34:38.302Z",
+  "items": [
+    {
+      "code": "603330",
+      "name": "天洋新材",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-13T14:56:47.764Z",
+      "updatedAt": "2026-06-13T14:56:47.764Z"
+    },
+    {
+      "code": "002709",
+      "name": "天赐材料",
+      "market": "main",
+      "isActive": true,
+      "addedAt": "2026-06-16T06:24:16.038Z",
+      "updatedAt": "2026-06-16T06:24:16.038Z"
+    },
+    {
+      "code": "603026",
+      "name": "石大胜华",
+      "market": "main",
+      "isActive": true,
+      "addedAt": "2026-06-16T06:24:33.542Z",
+      "updatedAt": "2026-06-16T06:24:33.542Z"
+    },
+    {
+      "code": "000973",
+      "name": "佛塑科技",
+      "market": "main",
+      "isActive": true,
+      "addedAt": "2026-06-16T06:24:39.239Z",
+      "updatedAt": "2026-06-16T06:24:39.239Z"
+    },
+    {
+      "code": "600460",
+      "name": "士兰微",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-22T07:34:01.160Z",
+      "updatedAt": "2026-06-22T07:34:01.160Z"
+    },
+    {
+      "code": "600961",
+      "name": "株冶集团",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-22T07:34:38.302Z",
+      "updatedAt": "2026-06-22T07:34:38.302Z"
+    }
+  ]
+}

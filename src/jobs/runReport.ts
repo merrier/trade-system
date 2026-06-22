@@ -1,13 +1,16 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import dotenv from "dotenv";
 import { buildReport, deliverReport, defaultStrategyPrompt, writeReportArtifact } from "./reportArtifacts.js";
 import { fetchDailyBars } from "../data/akshareClient.js";
 import { mergeDailyBarCache, readDailyBarCache, writeDailyBarCache } from "../data/dailyBarCache.js";
 import { tradingDayDecision } from "../data/tradingCalendar.js";
 import type { DailyBar, ReportKind } from "../shared/types.js";
 
+dotenv.config();
+
 const outputRoot = path.resolve(process.cwd(), "dist-web", "data");
-const previousRoot = path.resolve(process.cwd(), process.env.PREVIOUS_STATIC_DATA_DIR ?? "data");
+const previousRoot = path.resolve(process.cwd(), process.env.PREVIOUS_STATIC_DATA_DIR ?? ".");
 const kind = (process.argv.find((arg) => arg.startsWith("--kind="))?.split("=")[1] ?? "close") as ReportKind | "all";
 const tradeDate = process.argv.find((arg) => arg.startsWith("--trade-date="))?.split("=")[1];
 const strategyArg = process.argv.find((arg) => arg.startsWith("--strategy-prompt="))?.slice("--strategy-prompt=".length).trim();
@@ -17,7 +20,7 @@ const skipDelivery = process.env.SKIP_REPORT_DELIVERY === "true" || process.argv
 const skipDailyBarRefresh = process.env.SKIP_DAILY_BAR_REFRESH === "true" || process.argv.includes("--skip-daily-bar-refresh");
 
 const kinds: ReportKind[] = kind === "all" ? ["morning", "intraday-selection", "close"] : [kind];
-if (/涨停.*回调|阴线.*缩量|倍量阴/.test(strategyPrompt)) {
+if (/涨停.*回调|涨停.*回踩|回踩阴线|阴线.*缩量|倍量阴/.test(strategyPrompt)) {
   process.env.DAILY_BARS_LIMIT_UP_UNIVERSE ??= "true";
 }
 await fs.mkdir(outputRoot, { recursive: true });

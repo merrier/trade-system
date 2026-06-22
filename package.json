@@ -19,6 +19,7 @@
     "ingest:iwencai-limit-ups": "tsx src/jobs/ingestIwencaiLimitUps.ts",
     "ingest:iwencai-dragon-tiger": "tsx src/jobs/ingestIwencaiDragonTiger.ts",
     "ingest:mootdx-main-daily-bars": "tsx src/jobs/ingestMootdxMainDailyBars.ts",
+    "ingest:tdx2db-daily-bars": "tsx src/jobs/ingestTdx2dbDailyBars.ts",
     "ingest:sector-map": "python3 python/sector_map.py",
     "enrich:company-context": "tsx src/jobs/enrichCompanyContext.ts",
     "export:static-data": "tsx src/jobs/exportStaticData.ts",
@@ -26,6 +27,7 @@
     "reports:morning": "tsx src/jobs/runReport.ts --kind=morning",
     "reports:intraday": "tsx src/jobs/runReport.ts --kind=intraday-selection",
     "reports:close": "tsx src/jobs/runReport.ts --kind=close",
+    "monitor:pool": "tsx src/jobs/monitorPool.ts",
     "inbox:weixin:test": "python3 scripts/record-weixin-inbox.py --print-path"
   },
   "dependencies": {

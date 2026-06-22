@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createDefaultStrategy, createLimitUpDoubleVolumeBearishStrategy, createLimitUpPullbackStrategy } from "./defaults.js";
+import { createDefaultStrategy, createLimitUpBearishPullbackStrategy, createLimitUpDoubleVolumeBearishStrategy, createLimitUpPullbackStrategy } from "./defaults.js";
 import type { CompileResult, Market, StrategyDsl, StrategyStyle, WatchConditionDsl, WatchTemplate } from "../shared/types.js";
 
 const marketSchema = z.enum(["main", "gem", "star", "bse"]);
@@ -8,7 +8,7 @@ const styleSchema = z.enum(["short_term", "stable", "custom"]);
 export const strategyDslSchema: z.ZodType<StrategyDsl> = z.object({
   style: styleSchema,
   markets: z.array(marketSchema).min(1),
-  strategyTemplates: z.array(z.enum(["limit_up_pullback", "limit_up_double_volume_bearish"])).optional().default([]),
+    strategyTemplates: z.array(z.enum(["limit_up_pullback", "limit_up_double_volume_bearish", "limit_up_bearish_pullback"])).optional().default([]),
   include: z.array(z.string()),
   exclude: z.array(z.string()),
   weights: z.object({
@@ -87,18 +87,22 @@ export function compileStrategyLocally(prompt: string, markets: Market[] = ["mai
   if (isLimitUpDoubleVolumeBearishPrompt(prompt)) {
     Object.assign(dsl, createLimitUpDoubleVolumeBearishStrategy(["main"]));
   }
+  if (isLimitUpBearishPullbackPrompt(prompt)) {
+    Object.assign(dsl, createLimitUpBearishPullbackStrategy(["main"]));
+  }
 
+  const isBearishPullbackTemplate = dsl.strategyTemplates?.includes("limit_up_bearish_pullback");
   const twentyDayGainMatch = prompt.match(/(?:近|最近)?\s*20\s*(?:天|日).*?(?:涨幅|涨跌幅).*?(?:不超过|不要超过|小于|低于|<=|≤)\s*(\d+(?:\.\d+)?)\s*%?/);
-  if (twentyDayGainMatch?.[1]) {
+  if (twentyDayGainMatch?.[1] && !isBearishPullbackTemplate) {
     dsl.filters.maxTwentyDayGainPct = Number(twentyDayGainMatch[1]);
   }
   if (/多头排列|均线多头/.test(prompt)) {
     dsl.filters.requireBullishMaAlignment = true;
   }
   const maDistanceMatch = prompt.match(/(?:均线|五日线|5日线|十日线|10日线).*?(?:距离|乖离|附近|接近|贴近|靠近|回踩).*?(?:不超过|不要超过|小于|低于|<=|≤|在)?\s*(\d+(?:\.\d+)?)\s*%/);
-  if (maDistanceMatch?.[1]) {
+  if (maDistanceMatch?.[1] && !isBearishPullbackTemplate) {
     dsl.filters.maxMaDistancePct = Number(maDistanceMatch[1]);
-  } else if (/附近|接近|贴近|靠近|回踩/.test(prompt) && /五日线|5日线|十日线|10日线|均线/.test(prompt)) {
+  } else if (!isBearishPullbackTemplate && /附近|接近|贴近|靠近|回踩/.test(prompt) && /五日线|5日线|十日线|10日线|均线/.test(prompt)) {
     dsl.filters.maxMaDistancePct ??= 3;
   }
 
@@ -107,13 +111,13 @@ export function compileStrategyLocally(prompt: string, markets: Market[] = ["mai
     dsl.include.push("稳健低回撤");
   }
 
-  if (normalized.includes("创业板")) {
+  if (mentionsIncludedMarket(normalized, "创业板")) {
     dsl.markets = uniqueMarkets([...dsl.markets, "gem"]);
   }
-  if (normalized.includes("科创")) {
+  if (mentionsIncludedMarket(normalized, "科创")) {
     dsl.markets = uniqueMarkets([...dsl.markets, "star"]);
   }
-  if (normalized.includes("北交")) {
+  if (mentionsIncludedMarket(normalized, "北交")) {
     dsl.markets = uniqueMarkets([...dsl.markets, "bse"]);
   }
   if (normalized.includes("全a") || normalized.includes("全 A".toLowerCase())) {
@@ -165,6 +169,18 @@ function isLimitUpDoubleVolumeBearishPrompt(prompt: string): boolean {
   );
 }
 
+function isLimitUpBearishPullbackPrompt(prompt: string): boolean {
+  const text = prompt.trim();
+  return Boolean(
+    /涨停.*回踩.*阴线|回踩阴线/.test(text) ||
+    (
+      text.includes("实体涨停") &&
+      /今日收阴|今日阴线|收阴线/.test(text) &&
+      /不破10日|不跌破10日|站上10日|10日均线|十日均线|10日线|十日线/.test(text)
+    )
+  );
+}
+
 export function compileWatchConditionLocally(prompt: string, markets: Market[] = ["main"]): WatchConditionDsl {
   const templates: WatchTemplate[] = [];
   const text = prompt.trim();
@@ -201,7 +217,7 @@ export function normalizeMarkets(input?: unknown): Market[] {
 }
 
 export function strategyRequiresDailyBars(dsl: StrategyDsl): boolean {
-  return Boolean(dsl.strategyTemplates?.some((template) => template === "limit_up_pullback" || template === "limit_up_double_volume_bearish"));
+  return Boolean(dsl.strategyTemplates?.some((template) => template === "limit_up_pullback" || template === "limit_up_double_volume_bearish" || template === "limit_up_bearish_pullback"));
 }
 
 function addKeyword(target: string[], prompt: string, terms: string[]) {
@@ -212,4 +228,9 @@ function addKeyword(target: string[], prompt: string, terms: string[]) {
 
 function uniqueMarkets(markets: Market[]): Market[] {
   return [...new Set(markets)];
+}
+
+function mentionsIncludedMarket(text: string, term: string): boolean {
+  if (!text.includes(term)) return false;
+  return !new RegExp(`(?:非|不含|排除|剔除|不要)${term}`).test(text);
 }
