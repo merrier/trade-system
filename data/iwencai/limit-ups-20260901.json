@@ -1,0 +1,15 @@
+{
+  "source": "iwencai",
+  "query": "今日A股涨停股票 股票代码 股票简称 最新价 最新涨跌幅 涨停原因 连续涨停天数 首次涨停时间 最终涨停时间 涨停封单额 涨停封单量 涨停开板次数 所属同花顺行业",
+  "fetchedAt": "2026-08-31T16:24:01.082Z",
+  "codeCount": 0,
+  "rows": [],
+  "pages": [
+    {
+      "page": "1",
+      "returnedCount": 0,
+      "hasMore": false,
+      "traceId": "0755cb7a7f915a24c889aaf59c90e6fdc5762d725e0fafa7dc9799b201be07bf"
+    }
+  ]
+}
