@@ -51,12 +51,9 @@ export interface DeepSeekLeaderAssessment {
 }
 
 export async function compileStrategy(prompt: string, markets: Market[], style: StrategyStyle): Promise<CompileResult> {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) {
-    return compileStrategyLocally(prompt, markets, style);
-  }
-
   const fallback = compileStrategyLocally(prompt, markets, style);
+  // Keep the named MA5 strategy deterministic across local and CI runs.
+  if (fallback.dsl.strategyTemplates?.includes("ma5_pullback") || !process.env.DEEPSEEK_API_KEY) return fallback;
   try {
     const data = await callDeepSeek([
       {

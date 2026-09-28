@@ -28,6 +28,7 @@ jobs:
       FUYAO_API_KEY: ${{ secrets.FUYAO_API_KEY }}
       PREVIOUS_STATIC_DATA_DIR: "."
       SKIP_DAILY_BAR_REFRESH: "true"
+      DAILY_BARS_LIMIT_UP_UNIVERSE: "false"
       DATA_PROVIDER_TIMEOUT_MS: "60000"
       IWENCAI_API_KEY: ${{ secrets.IWENCAI_API_KEY }}
       IWENCAI_API_KEY_FALLBACK: ${{ secrets.IWENCAI_API_KEY_FALLBACK }}
@@ -43,13 +44,10 @@ jobs:
       FEISHU_WEBHOOK_SECRET: ${{ secrets.FEISHU_WEBHOOK_SECRET }}
       FEISHU_WEBHOOK_MODE: ${{ vars.FEISHU_WEBHOOK_MODE }}
       FEISHU_WEBHOOK_KEYWORD: ${{ vars.FEISHU_WEBHOOK_KEYWORD }}
-      INTRADAY_STRATEGY_PROMPT: "涨停回踩阴线策略：主板股票近5日出现实体涨停，涨停后有阴线调整，调整区间最低价未跌破涨停当日开盘价，今日收阴线但收盘价不跌破10日均线，今日涨幅小于5%，近20日最大涨幅小于45%，非ST，非科创板，非北交所，非创业板，股价大于5元，近5日日均成交额大于3000万"
 
     steps:
-      - name: Checkout dev
+      - name: Checkout selected branch
         uses: actions/checkout@v4
-        with:
-          ref: dev
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

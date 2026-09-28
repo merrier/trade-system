@@ -1,4 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { compileStrategy } from "../src/core/deepseek.js";
+import { MA5_PULLBACK_PROMPT, createMa5PullbackStrategy } from "../src/core/defaults.js";
+import { describe, expect, it, vi } from "vitest";
 import { compileStrategyLocally, compileWatchConditionLocally } from "../src/core/strategy.js";
 
 describe("strategy compiler", () => {
@@ -76,9 +79,51 @@ describe("strategy compiler", () => {
     expect(result.dsl.filters.minFiveDayAvgAmount).toBe(30_000_000);
   });
 
+  it("compiles the MA5 pullback strategy template", () => {
+    const result = compileStrategyLocally("沿五日线回调策略：主板股票，今日14:50最新价在5日线上方，距离5日线0%到2%，今日最低价回踩五日线但未有效跌破，五日线止损", ["main", "gem"], "short_term");
+
+    expect(result.dsl.markets).toEqual(["main"]);
+    expect(result.dsl.strategyTemplates).toContain("ma5_pullback");
+    expect(result.dsl.filters.requireMa5RisingDays).toBe(3);
+    expect(result.dsl.filters.minCloseAboveMa5Days).toBe(5);
+    expect(result.dsl.filters.requireBearishCandle).toBe(true);
+    expect(result.dsl.filters.maxMaDistancePct).toBe(2);
+    expect(result.dsl.filters.maxLowMa5DistancePct).toBe(1.5);
+    expect(result.dsl.filters.maxIntradayBreakMa5Pct).toBe(0.8);
+    expect(result.dsl.filters.minTodayPctChange).toBe(-2);
+    expect(result.dsl.filters.maxTodayPctChange).toBe(2.5);
+    expect(result.dsl.filters.maxFiveDayRangePct).toBe(15);
+    expect(result.dsl.filters.maxTwentyDayRangePct).toBe(35);
+    expect(result.dsl.filters.minVolumeRatio).toBe(0.7);
+    expect(result.dsl.filters.maxVolumeRatio).toBe(1.8);
+  });
+
   it("does not expand markets for excluded board names", () => {
     const result = compileStrategyLocally("主板股票，非ST，非科创板，非北交所，非创业板", ["main"], "short_term");
 
     expect(result.dsl.markets).toEqual(["main"]);
   });
+});
+
+
+it("uses one MA5 default in manual CI and keeps its thresholds when DeepSeek is configured", async () => {
+  const workflow = readFileSync(new URL("../.github/workflows/intraday-selection-1450.yml", import.meta.url), "utf8");
+  expect(workflow).not.toContain("INTRADAY_STRATEGY_PROMPT:");
+  expect(workflow).not.toContain("ref: dev");
+  expect(workflow).toContain('DAILY_BARS_LIMIT_UP_UNIVERSE: "false"');
+  vi.stubEnv("INTRADAY_STRATEGY_PROMPT", "");
+  vi.stubEnv("DEEPSEEK_API_KEY", "test-only");
+  const fetch = vi.fn();
+  vi.stubGlobal("fetch", fetch);
+  try {
+    const { defaultStrategyPrompt } = await import("../src/jobs/reportArtifacts.js");
+    expect(defaultStrategyPrompt).toBe(MA5_PULLBACK_PROMPT);
+    const result = await compileStrategy(defaultStrategyPrompt, ["main"], "short_term");
+    expect(result.dsl.strategyTemplates).toEqual(["ma5_pullback"]);
+    expect(result.dsl.filters).toEqual(createMa5PullbackStrategy().filters);
+    expect(fetch).not.toHaveBeenCalled();
+  } finally {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  }
 });

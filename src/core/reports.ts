@@ -4,6 +4,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { z } from "zod";
 import { assessIndustryLeaderWithDeepSeek, compileStrategy } from "./deepseek.js";
+import { strategyRequiresDailyBars } from "./strategy.js";
 import { createDefaultStrategy } from "./defaults.js";
 import { HermesAgentClient } from "./hermesAgentClient.js";
 import { evaluateMonitorPool, readMonitorPool } from "./monitorPool.js";
@@ -85,7 +86,7 @@ export async function buildIntradaySelectionReport(
   const compiled = strategyPrompt.trim()
     ? await compileStrategy(strategyPrompt, ["main"], "short_term")
     : { dsl: createDefaultStrategy("short_term", ["main"]), warnings: ["未配置策略，使用默认主板短线强势策略。"], unsupported: [] };
-  const recommendations = await enrichRecommendations(rankStocks(dataset, compiled.dsl, "intraday", { dailyBars: options.dailyBars }), dataset, options.dailyBars ?? []);
+  const recommendations = prioritizeDistinctiveRecommendations(await enrichRecommendations(rankStocks(dataset, compiled.dsl, "intraday", { dailyBars: options.dailyBars }), dataset, options.dailyBars ?? [])).slice(0, 5);
   const monitorPool = evaluateMonitorPool(await readMonitorPool(), dataset, options.dailyBars ?? []);
   const dailyBarWarnings = buildDailyBarWarnings(compiled.dsl, options.dailyBars ?? []);
   const strategy: StrategySnapshot = {
@@ -110,7 +111,7 @@ export async function buildIntradaySelectionReport(
     marketContext: {
       tradeDate: dataset.tradeDate,
       dataAsOf: dataset.dataAsOf,
-      topRecommendations: recommendations.slice(0, 10),
+      topRecommendations: recommendations.slice(0, 5),
       monitorPool,
       sectorLeaders: rankSectors(dataset).slice(0, 10)
     }
@@ -345,7 +346,7 @@ function formatIntradayPayload(payload: IntradaySelectionReportPayload): string[
     lines.push("- 暂无命中新版策略的主板股票。");
   } else {
     lines.push(
-      ...payload.recommendations.slice(0, 10).flatMap((item, index) => formatIntradayRecommendation(item, index))
+      ...payload.recommendations.slice(0, 5).flatMap((item, index) => formatIntradayRecommendation(item, index))
     );
   }
   lines.push(
@@ -453,6 +454,19 @@ async function enrichRecommendations(recommendations: ReturnType<typeof rankStoc
     enriched.push({ ...item, context });
   }
   return enriched;
+}
+
+function prioritizeDistinctiveRecommendations(recommendations: ReturnType<typeof rankStocks>): ReturnType<typeof rankStocks> {
+  return [...recommendations]
+    .sort((a, b) => distinctiveScore(b) - distinctiveScore(a) || b.score - a.score)
+    .map((item, index) => ({ ...item, rank: index + 1 }));
+}
+
+function distinctiveScore(item: ReturnType<typeof rankStocks>[number]): number {
+  const leaderScore = item.context?.industryLeader.status === "confirmed" ? 22 : item.context?.industryLeader.status === "likely" ? 14 : 0;
+  const uniqueScore = item.context?.uniqueness.status === "high" ? 22 : item.context?.uniqueness.status === "medium" ? 10 : 0;
+  const sectorScore = item.context?.sectorFlowRank ? Math.max(0, 12 - item.context.sectorFlowRank.rank) : 0;
+  return item.score + leaderScore + uniqueScore + sectorScore;
 }
 
 interface LimitUpInsight {
@@ -957,7 +971,7 @@ function round(value: number): number {
 }
 
 function buildDailyBarWarnings(dsl: StrategySnapshot["compiledDsl"], dailyBars: DailyBar[]): string[] {
-  const needsDailyBars = dsl.strategyTemplates?.some((template) => template === "limit_up_pullback" || template === "limit_up_double_volume_bearish");
+  const needsDailyBars = strategyRequiresDailyBars(dsl);
   if (!needsDailyBars) return [];
   if (!dailyBars.length) return ["该策略需要30日日线缓存；当前未读取到日线缓存，无法验证形态条件。"];
   const dates = new Set(dailyBars.map((bar) => bar.tradeDate));

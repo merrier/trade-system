@@ -2,7 +2,7 @@ export type Market = "main" | "gem" | "star" | "bse";
 export type RunMode = "intraday" | "post_close";
 export type SectorType = "industry" | "concept";
 export type StrategyStyle = "short_term" | "stable" | "custom";
-export type StrategyTemplate = "limit_up_pullback" | "limit_up_double_volume_bearish" | "limit_up_bearish_pullback";
+export type StrategyTemplate = "limit_up_pullback" | "limit_up_double_volume_bearish" | "limit_up_bearish_pullback" | "ma5_pullback";
 export type MarketDataSource = "fuyao" | "akshare" | "akshare_partial" | "efinance" | "easyquotation" | "baostock" | "tushare" | "ashare" | "provider_chain" | "sample";
 export type ReportKind = "morning" | "intraday-selection" | "close";
 
@@ -44,9 +44,18 @@ export interface StrategyDsl {
     requireBullishClose?: boolean;
     requireVolumeExpansionVsYesterday?: boolean;
     maxTodayPctChange?: number;
+    minTodayPctChange?: number;
     maxTwentyDayRangePct?: number;
+    maxFiveDayRangePct?: number;
     minPrice?: number;
     minFiveDayAvgAmount?: number;
+    requireMa5RisingDays?: number;
+    closeAboveMa5LookbackDays?: number;
+    minCloseAboveMa5Days?: number;
+    maxLowMa5DistancePct?: number;
+    maxIntradayBreakMa5Pct?: number;
+    minVolumeRatio?: number;
+    maxVolumeRatio?: number;
   };
 }
 

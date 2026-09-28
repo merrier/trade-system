@@ -193,7 +193,7 @@ function buildRisks(stock: StockSnapshot, limitUp: LimitUpSnapshot | undefined, 
 }
 
 function isDailyBarStrategy(dsl: StrategyDsl): boolean {
-  return Boolean(dsl.strategyTemplates?.some((template) => template === "limit_up_pullback" || template === "limit_up_double_volume_bearish" || template === "limit_up_bearish_pullback"));
+  return Boolean(dsl.strategyTemplates?.some((template) => template === "limit_up_pullback" || template === "limit_up_double_volume_bearish" || template === "limit_up_bearish_pullback" || template === "ma5_pullback"));
 }
 
 function isLimitUpPullbackStrategy(dsl: StrategyDsl): boolean {
@@ -208,8 +208,135 @@ function isLimitUpBearishPullbackStrategy(dsl: StrategyDsl): boolean {
   return Boolean(dsl.strategyTemplates?.includes("limit_up_bearish_pullback"));
 }
 
+function isMa5PullbackStrategy(dsl: StrategyDsl): boolean {
+  return Boolean(dsl.strategyTemplates?.includes("ma5_pullback"));
+}
+
 function evaluateStrategyTemplate(stock: StockSnapshot, dsl: StrategyDsl, dailyBars: DailyBar[] | undefined, tradeDate: string): PullbackEvaluation | null {
-  return evaluateLimitUpBearishPullback(stock, dsl, dailyBars, tradeDate) ?? evaluateLimitUpDoubleVolumeBearish(stock, dsl, dailyBars, tradeDate) ?? evaluateLimitUpPullback(stock, dsl, dailyBars, tradeDate);
+  return evaluateMa5Pullback(stock, dsl, dailyBars, tradeDate) ?? evaluateLimitUpBearishPullback(stock, dsl, dailyBars, tradeDate) ?? evaluateLimitUpDoubleVolumeBearish(stock, dsl, dailyBars, tradeDate) ?? evaluateLimitUpPullback(stock, dsl, dailyBars, tradeDate);
+}
+
+function evaluateMa5Pullback(stock: StockSnapshot, dsl: StrategyDsl, dailyBars: DailyBar[] | undefined, tradeDate: string): PullbackEvaluation | null {
+  if (!isMa5PullbackStrategy(dsl)) return null;
+  const prepared = prepareBarsForEvaluation(stock, dailyBars, tradeDate);
+  if (!prepared) return { matched: false, score: 0, reasons: [], risks: ["缺少30日日线缓存，无法验证沿五日线回调条件"], factors: { ma5PullbackMatch: 0 } };
+
+  const { bars, current } = prepared;
+  const currentIndex = bars.findIndex((bar) => bar.tradeDate === current.tradeDate);
+  const previous = currentIndex > 0 ? bars[currentIndex - 1] : undefined;
+  const ma5 = movingAverageAt(bars, currentIndex + 1, 5);
+  const ma10 = movingAverageAt(bars, currentIndex + 1, 10);
+  const ma20 = movingAverageAt(bars, currentIndex + 1, 20);
+  const risingDays = dsl.filters.requireMa5RisingDays ?? 3;
+  const lookbackDays = dsl.filters.closeAboveMa5LookbackDays ?? 5;
+  const minCloseAboveMa5Days = dsl.filters.minCloseAboveMa5Days ?? 5;
+  const latestFive = bars.slice(Math.max(0, currentIndex - 4), currentIndex + 1);
+  const latestTwenty = bars.slice(Math.max(0, currentIndex - 19), currentIndex + 1);
+  const fiveDayAvgAmount = latestFive.length >= 5 ? avg(latestFive.map((bar) => bar.amount)) : undefined;
+  const fiveDayRangePct = latestFive.length >= 5 ? rangePct(latestFive) : undefined;
+  const twentyDayRangePct = latestTwenty.length >= 20 ? rangePct(latestTwenty) : undefined;
+  const todayPctChange = current.pctChange || (previous && previous.close > 0 ? ((current.close - previous.close) / previous.close) * 100 : 0);
+  const ma5DistancePct = ma5 > 0 ? ((current.close - ma5) / ma5) * 100 : 99;
+  const lowMa5DistancePct = ma5 > 0 ? ((current.low - ma5) / ma5) * 100 : 99;
+  const volumeRatio = stock.volumeRatio > 0 ? stock.volumeRatio : previous && previous.volume > 0 ? current.volume / previous.volume : 1;
+  const upperShadowPct = current.close > 0 ? ((current.high - Math.max(current.open, current.close)) / current.close) * 100 : 0;
+  const bodyPct = current.open > 0 ? ((current.close - current.open) / current.open) * 100 : 0;
+  const closeAboveMa5Days = countClosesAboveMa(bars, currentIndex - 1, lookbackDays, 5);
+  const ma5Rising = isMovingAverageRising(bars, currentIndex, 5, risingDays);
+
+  const bullishMaAlignment = !dsl.filters.requireBullishMaAlignment || (ma5 > 0 && ma10 > 0 && ma20 > 0 && ma5 > ma10 && ma10 > ma20);
+  const enoughMaHistory = ma5 > 0 && ma10 > 0 && ma20 > 0;
+  const aboveMa5 = current.close >= ma5;
+  const closeNearMa5 = ma5DistancePct >= 0 && ma5DistancePct <= (dsl.filters.maxMaDistancePct ?? 2);
+  const lowNearMa5 = lowMa5DistancePct <= (dsl.filters.maxLowMa5DistancePct ?? 1.5);
+  const holdsMa5 = lowMa5DistancePct >= -(dsl.filters.maxIntradayBreakMa5Pct ?? 0.8);
+  const enoughClosesAboveMa5 = closeAboveMa5Days >= minCloseAboveMa5Days;
+  const withinTodayGain = todayPctChange >= (dsl.filters.minTodayPctChange ?? -2) && todayPctChange <= (dsl.filters.maxTodayPctChange ?? 2.5);
+  const withinFiveDayRange = dsl.filters.maxFiveDayRangePct === undefined || (fiveDayRangePct !== undefined && fiveDayRangePct <= dsl.filters.maxFiveDayRangePct);
+  const withinTwentyDayRange = dsl.filters.maxTwentyDayRangePct === undefined || (twentyDayRangePct !== undefined && twentyDayRangePct <= dsl.filters.maxTwentyDayRangePct);
+  const aboveMinPrice = dsl.filters.minPrice === undefined || current.close > dsl.filters.minPrice;
+  const enoughFiveDayAmount = dsl.filters.minFiveDayAvgAmount === undefined || (fiveDayAvgAmount !== undefined && fiveDayAvgAmount > dsl.filters.minFiveDayAvgAmount);
+  const volumeRatioOk = volumeRatio >= (dsl.filters.minVolumeRatio ?? 0.7) && volumeRatio <= (dsl.filters.maxVolumeRatio ?? 1.8);
+  const notLimitMove = todayPctChange > -9.5 && todayPctChange < 9.5;
+  const noLongUpperShadow = upperShadowPct <= 3.5;
+  const noHeavyBearishBody = bodyPct >= -3;
+  const bearishToday = !dsl.filters.requireBearishCandle || isBearishBar(current);
+  const matched = enoughMaHistory && ma5Rising && bullishMaAlignment && aboveMa5 && closeNearMa5 && lowNearMa5 && holdsMa5 && enoughClosesAboveMa5 && bearishToday && withinTodayGain && withinFiveDayRange && withinTwentyDayRange && aboveMinPrice && enoughFiveDayAmount && volumeRatioOk && notLimitMove && noLongUpperShadow && noHeavyBearishBody;
+
+  if (!matched) {
+    return {
+      matched,
+      score: 0,
+      reasons: [],
+      risks: [
+        !enoughMaHistory ? "缺少20日以上日线，无法计算MA5/MA10/MA20" : "",
+        !ma5Rising ? `MA5未连续${risingDays}日上行` : "",
+        !bullishMaAlignment ? "均线未形成 MA5 > MA10 > MA20 的多头排列" : "",
+        !aboveMa5 ? "14:50最新价已跌破5日线" : "",
+        !closeNearMa5 ? `14:50最新价距离5日线 ${round(ma5DistancePct)}%，不在0到${round(dsl.filters.maxMaDistancePct ?? 2)}%内` : "",
+        !lowNearMa5 ? `今日最低价距离5日线 ${round(lowMa5DistancePct)}%，未触碰或接近5日线` : "",
+        !holdsMa5 ? `盘中跌破5日线 ${round(Math.abs(lowMa5DistancePct))}%，超过 ${round(dsl.filters.maxIntradayBreakMa5Pct ?? 0.8)}%` : "",
+        !enoughClosesAboveMa5 ? `今日之前${lookbackDays}个完整交易日中仅${closeAboveMa5Days}日收在5日线上方` : "",
+        !bearishToday ? "今日14:50不是阴线回调" : "",
+        !withinTodayGain ? `今日涨幅 ${round(todayPctChange)}% 不在 ${round(dsl.filters.minTodayPctChange ?? -2)}% 到 ${round(dsl.filters.maxTodayPctChange ?? 2.5)}%` : "",
+        !withinFiveDayRange ? (fiveDayRangePct === undefined ? "近5日K线不足" : `近5日最大振幅 ${round(fiveDayRangePct)}% 超过 ${round(dsl.filters.maxFiveDayRangePct ?? 0)}%`) : "",
+        !withinTwentyDayRange ? (twentyDayRangePct === undefined ? "近20日K线不足" : `近20日最大振幅 ${round(twentyDayRangePct)}% 超过 ${round(dsl.filters.maxTwentyDayRangePct ?? 0)}%`) : "",
+        !aboveMinPrice ? `股价 ${round(current.close)} 元不大于 ${round(dsl.filters.minPrice ?? 0)} 元` : "",
+        !enoughFiveDayAmount ? (fiveDayAvgAmount === undefined ? "近5日成交额数据不足" : `近5日日均成交额 ${formatYi(fiveDayAvgAmount)} 不大于 ${formatYi(dsl.filters.minFiveDayAvgAmount ?? 0)}`) : "",
+        !volumeRatioOk ? `今日量比 ${round(volumeRatio)} 不在 ${round(dsl.filters.minVolumeRatio ?? 0.7)} 到 ${round(dsl.filters.maxVolumeRatio ?? 1.8)}` : "",
+        !notLimitMove ? "今日接近涨停或跌停，不符合回踩低吸形态" : "",
+        !noLongUpperShadow ? `上影线 ${round(upperShadowPct)}% 偏长` : "",
+        !noHeavyBearishBody ? `实体跌幅 ${round(Math.abs(bodyPct))}% 偏大` : ""
+      ].filter(Boolean),
+      factors: { ma5PullbackMatch: 0 }
+    };
+  }
+
+  const maDistanceScore = clamp(scale((dsl.filters.maxMaDistancePct ?? 2) - ma5DistancePct, 0, dsl.filters.maxMaDistancePct ?? 2), 0, 100);
+  const lowTouchScore = clamp(scale((dsl.filters.maxLowMa5DistancePct ?? 1.5) - Math.abs(lowMa5DistancePct), 0, dsl.filters.maxLowMa5DistancePct ?? 1.5), 0, 100);
+  const trendScore = ma5Rising && bullishMaAlignment ? 100 : 0;
+  const volumeScore = clamp(scale((dsl.filters.maxVolumeRatio ?? 1.8) - Math.abs(volumeRatio - 1.05), 0, dsl.filters.maxVolumeRatio ?? 1.8), 0, 100);
+  const rangeScore = dsl.filters.maxFiveDayRangePct && fiveDayRangePct !== undefined
+    ? clamp(scale(dsl.filters.maxFiveDayRangePct - fiveDayRangePct, 0, dsl.filters.maxFiveDayRangePct), 0, 100)
+    : 50;
+  const pullbackScore = clamp(
+    46 +
+      maDistanceScore * 0.16 +
+      lowTouchScore * 0.16 +
+      trendScore * 0.18 +
+      (closeAboveMa5Days >= lookbackDays ? 100 : clamp(scale(closeAboveMa5Days, minCloseAboveMa5Days, lookbackDays), 0, 100)) * 0.12 +
+      volumeScore * 0.1 +
+      rangeScore * 0.1,
+    0,
+    100
+  );
+
+  return {
+    matched,
+    score: pullbackScore,
+    reasons: [
+      `MA5连续${risingDays}日上行，MA5 ${round(ma5)} > MA10 ${round(ma10)} > MA20 ${round(ma20)}；前${lookbackDays}个完整交易日均收在5日线上方`,
+      `今日14:50呈阴线回调，最新价 ${round(current.close)} 距5日线 ${round(ma5DistancePct)}%，最低价距5日线 ${round(lowMa5DistancePct)}%；涨幅 ${round(todayPctChange)}%，量比 ${round(volumeRatio)}，近5日日均成交额 ${formatYi(fiveDayAvgAmount ?? 0)}`,
+      `近5日最大振幅 ${round(fiveDayRangePct ?? 0)}%`,
+    ],
+    risks: [
+      "止损线：14:50或收盘价有效跌破5日线超过0.8%，或连续2日收盘低于5日线",
+      lowMa5DistancePct < 0 ? "盘中曾短暂跌破5日线，需确认收回力度" : "",
+      ma5DistancePct > (dsl.filters.maxMaDistancePct ?? 2) * 0.75 ? "距离5日线接近上限，追高性价比下降" : ""
+    ].filter(Boolean),
+    factors: {
+      ma5PullbackMatch: round(pullbackScore),
+      ma5DistancePct: round(ma5DistancePct),
+      lowMa5DistancePct: round(lowMa5DistancePct),
+      closeAboveMa5Days,
+      ma5RisingDays: risingDays,
+      todayPctChange: round(todayPctChange),
+      volumeRatio: round(volumeRatio),
+      fiveDayRangePct: round(fiveDayRangePct ?? 0),
+      twentyDayRangePct: round(twentyDayRangePct ?? 0),
+      fiveDayAvgAmount: round(fiveDayAvgAmount ?? 0)
+    }
+  };
 }
 
 function evaluateLimitUpBearishPullback(stock: StockSnapshot, dsl: StrategyDsl, dailyBars: DailyBar[] | undefined, tradeDate: string): PullbackEvaluation | null {
@@ -656,6 +783,31 @@ function closestMaProximity(close: number, ma5: number, ma10: number): { label: 
     .sort((a, b) => a.distancePct - b.distancePct);
 
   return candidates[0] ?? null;
+}
+
+function countClosesAboveMa(bars: DailyBar[], currentIndex: number, lookbackDays: number, maDays: number): number {
+  let count = 0;
+  const start = Math.max(0, currentIndex - lookbackDays + 1);
+  for (let index = start; index <= currentIndex; index += 1) {
+    const ma = movingAverageAt(bars, index + 1, maDays);
+    if (ma > 0 && bars[index]?.close >= ma) count += 1;
+  }
+  return count;
+}
+
+function isMovingAverageRising(bars: DailyBar[], currentIndex: number, maDays: number, points: number): boolean {
+  if (points <= 1) return true;
+  const values: number[] = [];
+  for (let end = currentIndex + 2 - points; end <= currentIndex + 1; end += 1) {
+    values.push(movingAverageAt(bars, end, maDays));
+  }
+  return values.every((value) => value > 0) && values.every((value, index) => index === 0 || value > values[index - 1]);
+}
+
+function movingAverageAt(bars: DailyBar[], endExclusive: number, days: number): number {
+  const values = bars.slice(Math.max(0, endExclusive - days), endExclusive).map((bar) => bar.close).filter((value) => value > 0);
+  if (values.length < days) return 0;
+  return avg(values);
 }
 
 function movingAverage(bars: DailyBar[], days: number): number {

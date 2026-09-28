@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createDefaultStrategy, createLimitUpBearishPullbackStrategy, createLimitUpDoubleVolumeBearishStrategy, createLimitUpPullbackStrategy } from "../src/core/defaults.js";
+import { createDefaultStrategy, createLimitUpBearishPullbackStrategy, createLimitUpDoubleVolumeBearishStrategy, createLimitUpPullbackStrategy, createMa5PullbackStrategy } from "../src/core/defaults.js";
 import { rankSectors, rankStocks } from "../src/core/scoring.js";
 import { evaluateWatchCondition } from "../src/core/watchlist.js";
 import { createSampleDataset } from "../src/data/sampleDataset.js";
@@ -142,6 +142,44 @@ describe("ranking", () => {
     expect(results[0].reasons.join(" ")).toContain("今日收阴且未跌破10日均线");
   });
 
+  it("filters and ranks the MA5 pullback strategy from daily bars", () => {
+    const dataset: MarketDataset = {
+      tradeDate: "20260522",
+      dataAsOf: "2026-05-22T06:50:00.000Z",
+      source: "sample",
+      warnings: [],
+      stocks: [
+        { ...stock("600301", "五日线回踩", 10.78, 120_000_000), pctChange: -0.37, open: 10.82, high: 10.86, low: 10.62, volumeRatio: 1.1 },
+        { ...stock("600305", "阳线回踩", 10.78, 120_000_000), pctChange: 0.56, open: 10.75, high: 10.86, low: 10.62, volumeRatio: 1.1 },
+        { ...stock("600302", "距离过远", 11.2, 120_000_000), pctChange: 4.47, open: 10.75, high: 11.25, low: 10.9, volumeRatio: 1.1 },
+        { ...stock("600303", "跌破五日线", 10.78, 120_000_000), pctChange: 0.56, open: 10.75, high: 10.86, low: 10.3, volumeRatio: 1.1 },
+        { ...stock("600304", "量比过高", 10.78, 120_000_000), pctChange: 0.56, open: 10.75, high: 10.86, low: 10.62, volumeRatio: 2.3 }
+      ],
+      limitUps: [],
+      dragonTiger: [],
+      sectors: []
+    };
+    const bars = [
+      ...ma5PullbackBars("600301", { currentOpen: 10.82, pctChange: -0.37 }),
+      ...ma5PullbackBars("600305"),
+      ...ma5PullbackBars("600302", { currentClose: 11.2, currentLow: 10.9, pctChange: 4.47 }),
+      ...ma5PullbackBars("600303", { currentLow: 10.3 }),
+      ...ma5PullbackBars("600304")
+    ];
+
+    const results = rankStocks(dataset, createMa5PullbackStrategy(["main"]), "intraday", { dailyBars: bars });
+
+    expect(results.map((item) => item.code)).toEqual(["600301"]);
+    expect(results[0].factors.ma5PullbackMatch).toBeGreaterThan(60);
+    expect(results[0].factors.ma5DistancePct).toBeLessThanOrEqual(2);
+    expect(results[0].factors.lowMa5DistancePct).toBeGreaterThanOrEqual(-0.8);
+    expect(results[0].reasons.join(" ")).toContain("MA5连续3日上行");
+    expect(results[0].reasons.join(" ")).toContain("前5个完整交易日均收在5日线上方");
+    expect(results[0].reasons.join(" ")).toContain("今日14:50呈阴线回调");
+    expect(results[0].reasons.join(" ")).toContain("距5日线");
+    expect(results[0].risks.join(" ")).toContain("止损线");
+  });
+
   it("uses intraday snapshot as the current bar when daily cache lacks today", () => {
     const dataset: MarketDataset = {
       tradeDate: "20260522",
@@ -233,6 +271,51 @@ function pullbackBars(code: string, currentVolume: number, options: { firstClose
       volume: isCurrent ? currentVolume : tradeDate === "20260521" ? 1200 : 1000,
       amount: 100_000_000,
       pctChange: isLimitUp ? 10 : isCurrent ? -1.6 : 0.5,
+      turnoverRate: 3,
+      provider: "test"
+    };
+  });
+}
+
+function ma5PullbackBars(code: string, options: { currentClose?: number; currentOpen?: number; currentLow?: number; pctChange?: number } = {}): DailyBar[] {
+  const dates = [
+    "20260422",
+    "20260423",
+    "20260424",
+    "20260427",
+    "20260428",
+    "20260429",
+    "20260430",
+    "20260506",
+    "20260507",
+    "20260508",
+    "20260511",
+    "20260512",
+    "20260513",
+    "20260514",
+    "20260515",
+    "20260518",
+    "20260519",
+    "20260520",
+    "20260521",
+    "20260522"
+  ];
+  return dates.map((tradeDate, index) => {
+    const isCurrent = tradeDate === "20260522";
+    const close = isCurrent ? options.currentClose ?? 10.78 : 10 + index * 0.04;
+    const open = isCurrent ? options.currentOpen ?? 10.75 : close - 0.02;
+    return {
+      tradeDate,
+      code,
+      name: code,
+      market: "main" as const,
+      open,
+      high: isCurrent ? Math.max(open, close) + 0.08 : close + 0.04,
+      low: isCurrent ? options.currentLow ?? 10.62 : close - 0.04,
+      close,
+      volume: isCurrent ? 1100 : 1000,
+      amount: 80_000_000,
+      pctChange: isCurrent ? options.pctChange ?? 0.56 : 0.4,
       turnoverRate: 3,
       provider: "test"
     };
