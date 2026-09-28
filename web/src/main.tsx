@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Activity, BellRing, CandlestickChart, Clock3, FileText, Layers3, Play, Plus, RefreshCw, Search, ShieldAlert, Star, Sun } from "lucide-react";
 import "./styles.css";
+import { StockChartProvider, StockLink, StockText } from "./StockChartDialog.js";
 
 const StockChartPanel = React.lazy(() => import("./StockKLineChart.js"));
 
@@ -33,6 +34,7 @@ type Sector = {
   pctChange: number;
   netInflow: number;
   limitUpCount: number;
+  leaderCode?: string;
   leaderName?: string;
   leaderPctChange: number;
   heatScore: number;
@@ -315,7 +317,7 @@ function App() {
           </div>
           <div className="status">
             <SourceBadge status={dataStatus} />
-            {topRecommendation ? <strong>Top 1：{topRecommendation.name} {topRecommendation.score}</strong> : <strong>暂无推荐</strong>}
+            {topRecommendation ? <strong>Top 1：<StockLink code={topRecommendation.code} name={topRecommendation.name} /> {topRecommendation.score}</strong> : <strong>暂无推荐</strong>}
             <button className="ghost" onClick={refreshDashboard} disabled={busy}>
               <RefreshCw size={16} />
               刷新
@@ -364,8 +366,8 @@ function ReportPanel({ title, report }: { title: string; report?: ReportArtifact
           <span>{report.provider}</span>
           <span>{new Date(report.dataAsOf).toLocaleString()}</span>
         </div>
-        <p className="report-text">{report.analysis}</p>
-        <p className="report-push">{report.pushMessage}</p>
+        <p className="report-text"><StockText>{report.analysis}</StockText></p>
+        <p className="report-push"><StockText>{report.pushMessage}</StockText></p>
       </section>
       <section className="table-section">
         <div className="section-title">
@@ -373,7 +375,7 @@ function ReportPanel({ title, report }: { title: string; report?: ReportArtifact
           <h2>关键线索</h2>
         </div>
         <div className="metric-grid">
-          {(report.payload?.aShareReadThrough ?? []).map((item: string, index: number) => <p key={index}>{item}</p>)}
+          {(report.payload?.aShareReadThrough ?? []).map((item: string, index: number) => <p key={index}><StockText>{item}</StockText></p>)}
           {report.warnings.map((item, index) => <p key={`warning-${index}`}>{item}</p>)}
         </div>
       </section>
@@ -390,8 +392,8 @@ function IntradayReportPanel({ report }: { report?: ReportArtifact }) {
           <Clock3 size={18} />
           <h2>策略与摘要</h2>
         </div>
-        <p className="report-text">{report.analysis}</p>
-        {report.rankingNarrative && <p className="report-push">{report.rankingNarrative}</p>}
+        <p className="report-text"><StockText>{report.analysis}</StockText></p>
+        {report.rankingNarrative && <p className="report-push"><StockText>{report.rankingNarrative}</StockText></p>}
         <InfoBlock title="策略" items={[report.payload?.strategy?.prompt ?? "默认策略"]} />
       </section>
       <section className="table-section span-2">
@@ -411,7 +413,7 @@ function CloseReportPanel({ report }: { report?: ReportArtifact }) {
           <FileText size={18} />
           <h2>收盘复盘</h2>
         </div>
-        <p className="report-text">{report.analysis}</p>
+        <p className="report-text"><StockText>{report.analysis}</StockText></p>
         {breadth && (
           <div className="summary-grid">
             <Metric label="上涨" value={breadth.up} />
@@ -477,7 +479,7 @@ function LadderPanel({ limitUps, sectors }: { limitUps: LimitUp[]; sectors: Sect
           <tbody>
             {limitUps.map((item) => (
               <tr key={item.code}>
-                <td><strong>{item.name}</strong><span>{item.code} {item.industry}</span></td>
+                <td><StockLink code={item.code} name={item.name}><strong>{item.name}</strong><span>{item.code}</span></StockLink><span>{item.industry}</span></td>
                 <td>{item.consecutive}</td>
                 <td>{Math.round(item.strengthScore)}</td>
                 <td>{formatYi(item.sealedAmount)}</td>
@@ -498,7 +500,7 @@ function LadderPanel({ limitUps, sectors }: { limitUps: LimitUp[]; sectors: Sect
           <tbody>
             {sectors.map((item) => (
               <tr key={`${item.type}-${item.name}`}>
-                <td><strong>{item.name}</strong><span>{item.type === "industry" ? "行业" : "概念"} 领涨 {item.leaderName ?? "-"}</span></td>
+                <td><strong>{item.name}</strong><span>{item.type === "industry" ? "行业" : "概念"} 领涨 <StockLink code={item.leaderCode ?? ""} name={item.leaderName ?? "-"} /></span></td>
                 <td><HeatBar value={item.heatScore} /></td>
                 <td>{formatYi(item.netInflow)}</td>
                 <td>{item.limitUpCount}</td>
@@ -526,7 +528,7 @@ function StockPanel({ analysisCode, setAnalysisCode, loadAnalysis, analysis }: a
         </div>
         {score && (
           <div className="score-box">
-            <strong>{score.name} {score.score}</strong>
+            <strong><StockLink code={score.code} name={score.name} /> {score.score}</strong>
             <span>置信度 {score.confidence}%</span>
           </div>
         )}
@@ -570,8 +572,8 @@ function WatchPanel({ watchlist, triggers, watchForm, setWatchForm, addWatchItem
           <h2>触发推荐池</h2>
         </div>
         <div className="watch-grid">
-          <InfoBlock title="监控中" items={watchlist.map((item: WatchItem) => `${item.name}：${item.conditionPrompt}`)} />
-          <InfoBlock title="已触发" items={triggers.map((item: any) => `${item.name} ${item.priority} ${item.score}`)} />
+          <InfoBlock title="监控中" items={watchlist.map((item: WatchItem) => <React.Fragment key={item.id}><StockLink code={item.code} name={item.name} />：{item.conditionPrompt}</React.Fragment>)} />
+          <InfoBlock title="已触发" items={triggers.map((item: any) => <React.Fragment key={item.id ?? item.code}><StockLink code={item.code} name={item.name} /> {item.priority} {item.score}</React.Fragment>)} />
         </div>
       </section>
     </div>
@@ -588,7 +590,7 @@ function RankingTable({ items }: { items: Recommendation[] }) {
         {items.map((item) => (
           <tr key={`${item.rank}-${item.code}`}>
             <td>{item.rank}</td>
-            <td><strong>{item.name}</strong><span>{item.code} {item.market}</span></td>
+            <td><StockLink code={item.code} name={item.name}><strong>{item.name}</strong><span>{item.code}</span></StockLink><span>{item.market}</span></td>
             <td><HeatBar value={item.score} /></td>
             <td>{item.confidence}%</td>
             <td>{item.reasons.slice(0, 2).join("；")}</td>
@@ -600,11 +602,11 @@ function RankingTable({ items }: { items: Recommendation[] }) {
   );
 }
 
-function InfoBlock({ title, items }: { title: string; items: string[] }) {
+function InfoBlock({ title, items }: { title: string; items: React.ReactNode[] }) {
   return (
     <div className="info-block">
       <h3>{title}</h3>
-      {items.length ? items.map((item, index) => <p key={`${title}-${index}`}>{item}</p>) : <p>暂无数据</p>}
+      {items.length ? items.map((item, index) => <p key={`${title}-${index}`}>{typeof item === "string" ? <StockText>{item}</StockText> : item}</p>) : <p>暂无数据</p>}
     </div>
   );
 }
@@ -622,4 +624,4 @@ function formatYi(value: number) {
   return `${Math.round((value / 100000000) * 100) / 100}亿`;
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(<StockChartProvider><App /></StockChartProvider>);

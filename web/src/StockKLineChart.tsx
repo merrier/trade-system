@@ -95,7 +95,7 @@ function KLinePlot({ bars, period }: { bars: ReturnType<typeof chartCandles>; pe
         }
       },
       axisPointer: { link: [{ xAxisIndex: "all" }] },
-      grid: [{ left: 65, right: 20, top: 72, height: "48%" }, { left: 65, right: 20, top: "71%", height: "16%" }],
+      grid: [{ left: 65, right: 20, top: 72, height: "44%" }, { left: 65, right: 20, top: "71%", height: "16%" }],
       xAxis: [0, 1].map((gridIndex) => ({ type: "category", gridIndex, data: dates, boundaryGap: true,
         axisLine: { onZero: false, lineStyle: { color: "#9aa7b5" } }, axisLabel: { show: gridIndex === 1, color: "#52606f", hideOverlap: true } })),
       yAxis: [{ scale: true, name: "价格 / 元", splitLine: { lineStyle: { color: "#edf0f4" } }, axisLabel: { formatter: (value: number) => number(value) } },

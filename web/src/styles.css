@@ -439,3 +439,34 @@ td span {
     flex-direction: column;
   }
 }
+
+.stock-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #2765b0;
+  cursor: pointer;
+  text-align: inherit;
+  font-weight: inherit;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+.stock-link:hover { text-decoration-style: solid; }
+.stock-link:focus-visible, .stock-chart-dialog button:focus-visible { outline: 2px solid #2765b0; outline-offset: 3px; }
+.stock-chart-dialog {
+  width: min(1100px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  padding: 16px;
+  border: 1px solid #dbe2ea;
+  border-radius: 8px;
+  color: #202329;
+  background: #f4f6f8;
+  overflow: auto;
+}
+.stock-chart-dialog::backdrop { background: rgb(23 32 42 / 60%); }
+.stock-chart-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.stock-chart-dialog-header h2 { font-size: 18px; }
+@media (max-width: 480px) { .stock-chart-dialog { padding: 8px; } }
