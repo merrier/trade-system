@@ -83,6 +83,16 @@ nav {
   background: #263544;
 }
 
+.nav-group { min-width: 0; }
+.nav-group summary { width: 100%; list-style: none; }
+.nav-group summary::-webkit-details-marker { display: none; }
+.nav-group summary svg { flex-shrink: 0; }
+.nav-chevron { margin-left: auto; transform: rotate(-90deg); }
+.nav-group[open] .nav-chevron { transform: rotate(0deg); }
+.nav-submenu { margin: 4px 0 0 20px; padding-left: 8px; border-left: 1px solid #425163; }
+.nav-submenu .tab { width: 100%; font-size: 13px; line-height: 1.5; text-align: left; }
+.nav-group :focus-visible { outline: 2px solid #a8caff; outline-offset: 2px; }
+
 .primary {
   background: #c83f31;
   color: #fff;
@@ -422,6 +432,7 @@ td span {
   }
 
   nav {
+    align-items: start;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   }
 

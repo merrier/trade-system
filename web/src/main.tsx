@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Activity, BellRing, CandlestickChart, Clock3, FileText, Layers3, Play, Plus, RefreshCw, Search, ShieldAlert, Star, Sun } from "lucide-react";
+import { Activity, BellRing, CandlestickChart, ChevronDown, Clock3, FileText, Layers3, Play, Plus, RefreshCw, Search, ShieldAlert, Star, Sun } from "lucide-react";
 import "./styles.css";
 import { StockChartProvider, StockLink, StockText } from "./StockChartDialog.js";
 
+const INTRADAY_STRATEGY_NAME = "沿五日线阴线回调策略";
 const StockChartPanel = React.lazy(() => import("./StockKLineChart.js"));
 
 type Recommendation = {
@@ -275,7 +276,7 @@ function App() {
   const visiblePanel = useMemo(() => {
     if (tab === "kline") return <React.Suspense fallback={<p role="status">正在加载 K 线组件…</p>}><StockChartPanel /></React.Suspense>;
     if (tab === "morning") return <ReportPanel title="9:00 晨报" report={reports.morning} />;
-    if (tab === "intradayReport") return <IntradayReportPanel report={reports["intraday-selection"]} />;
+    if (tab === "intradayMa5") return <IntradayReportPanel report={reports["intraday-selection"]} />;
     if (tab === "closeReport") return <CloseReportPanel report={reports.close} />;
     if (tab === "ladder") return <LadderPanel limitUps={limitUps} sectors={sectors} />;
     if (tab === "stock") return <StockPanel analysisCode={analysisCode} setAnalysisCode={setAnalysisCode} loadAnalysis={loadAnalysis} analysis={analysis} />;
@@ -296,7 +297,16 @@ function App() {
         <nav>
           <TabButton active={tab === "recommend"} icon={<Star size={18} />} label="推荐榜" onClick={() => setTab("recommend")} />
           <TabButton active={tab === "morning"} icon={<Sun size={18} />} label="9点晨报" onClick={() => setTab("morning")} />
-          <TabButton active={tab === "intradayReport"} icon={<Clock3 size={18} />} label="14:50选股" onClick={() => setTab("intradayReport")} />
+          <details className="nav-group" open>
+            <summary className={tab === "intradayMa5" ? "tab active" : "tab"}>
+              <Clock3 size={18} />
+              <span>14:50选股</span>
+              <ChevronDown className="nav-chevron" size={16} />
+            </summary>
+            <div className="nav-submenu" aria-label="14:50选股策略">
+              <TabButton active={tab === "intradayMa5"} label={INTRADAY_STRATEGY_NAME} onClick={() => setTab("intradayMa5")} />
+            </div>
+          </details>
           <TabButton active={tab === "closeReport"} icon={<FileText size={18} />} label="16点复盘" onClick={() => setTab("closeReport")} />
           <TabButton active={tab === "ladder"} icon={<Layers3 size={18} />} label="天梯" onClick={() => setTab("ladder")} />
           <TabButton active={tab === "stock"} icon={<Search size={18} />} label="个股分析" onClick={() => setTab("stock")} />
@@ -343,9 +353,9 @@ function SourceBadge({ status }: { status: DataStatus }) {
   );
 }
 
-function TabButton({ active, icon, label, onClick }: { active: boolean; icon: React.ReactNode; label: string; onClick: () => void }) {
+function TabButton({ active, icon, label, onClick }: { active: boolean; icon?: React.ReactNode; label: string; onClick: () => void }) {
   return (
-    <button className={active ? "tab active" : "tab"} onClick={onClick}>
+    <button className={active ? "tab active" : "tab"} aria-current={active ? "page" : undefined} onClick={onClick}>
       {icon}
       {label}
     </button>
@@ -384,13 +394,16 @@ function ReportPanel({ title, report }: { title: string; report?: ReportArtifact
 }
 
 function IntradayReportPanel({ report }: { report?: ReportArtifact }) {
-  if (!report) return <div className="empty">暂无14:50盘中选股报告。</div>;
+  if (!report) return <div className="empty">暂无「{INTRADAY_STRATEGY_NAME}」的 14:50 选股报告。</div>;
+  if (!report.payload?.strategy?.compiledDsl?.strategyTemplates?.includes("ma5_pullback")) {
+    return <div className="empty">当前最新报告属于其他策略，尚无「{INTRADAY_STRATEGY_NAME}」报告。</div>;
+  }
   return (
     <div className="panel-grid">
       <section className="workbench">
         <div className="section-title">
           <Clock3 size={18} />
-          <h2>策略与摘要</h2>
+          <h2>{INTRADAY_STRATEGY_NAME}</h2>
         </div>
         <p className="report-text"><StockText>{report.analysis}</StockText></p>
         {report.rankingNarrative && <p className="report-push"><StockText>{report.rankingNarrative}</StockText></p>}
