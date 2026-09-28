@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Activity, BellRing, CandlestickChart, ChevronDown, Clock3, FileText, Layers3, Play, Plus, RefreshCw, Search, ShieldAlert, Star, Sun } from "lucide-react";
+import { Activity, BellRing, CandlestickChart, ChevronDown, Clock3, FileText, Layers3, Plus, RefreshCw, Search, ShieldAlert, Sun } from "lucide-react";
 import "./styles.css";
 import { StockChartProvider, StockLink, StockText } from "./StockChartDialog.js";
 
@@ -160,9 +160,7 @@ async function loadReports(): Promise<Partial<Record<ReportArtifact["kind"], Rep
 }
 
 function App() {
-  const [tab, setTab] = useState("recommend");
-  const [prompt, setPrompt] = useState("主板里找连板强、龙虎榜净买入高、所属板块热度靠前、炸板少的短线票");
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [tab, setTab] = useState("intradayMa5");
   const [limitUps, setLimitUps] = useState<LimitUp[]>([]);
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [watchlist, setWatchlist] = useState<WatchItem[]>([]);
@@ -175,7 +173,6 @@ function App() {
   const [message, setMessage] = useState("");
   const [dataStatus, setDataStatus] = useState<DataStatus>({ warnings: [] });
 
-  const topRecommendation = recommendations[0];
 
   async function refreshDashboard() {
     setBusy(true);
@@ -187,7 +184,6 @@ function App() {
         api.get<{ items: WatchItem[] }>("/api/watchlist"),
         api.get<{ triggers: any[] }>("/api/watchlist/triggers")
       ]);
-      setRecommendations(latest.recommendations ?? []);
       setLimitUps(ladder.items ?? []);
       setSectors(sectorLadder.items ?? []);
       setWatchlist(watch.items ?? []);
@@ -216,28 +212,6 @@ function App() {
       setMessage(result.warnings?.length ? `盘后数据已落库，但有告警：${result.warnings.join("；")}` : "盘后数据已落库并生成推荐");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "盘后任务失败");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function runRecommendation() {
-    if (isStaticMode()) {
-      setMessage("静态模式下展示最近一次盘后推荐；自然语言实时选股需要后端或手动触发 Actions。");
-      return;
-    }
-    setBusy(true);
-    try {
-      const result = await api.post<{ results: Recommendation[]; source?: string; warnings?: string[]; dataAsOf?: string }>("/api/recommendations/run", {
-        prompt,
-        mode: "intraday",
-        markets: ["main"]
-      });
-      setRecommendations(result.results);
-      setDataStatus({ source: result.source, warnings: result.warnings ?? [], dataAsOf: result.dataAsOf });
-      setMessage(result.warnings?.length ? `盘中参考推荐已生成，但有告警：${result.warnings.join("；")}` : "盘中参考推荐已生成");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "推荐失败");
     } finally {
       setBusy(false);
     }
@@ -281,8 +255,8 @@ function App() {
     if (tab === "ladder") return <LadderPanel limitUps={limitUps} sectors={sectors} />;
     if (tab === "stock") return <StockPanel analysisCode={analysisCode} setAnalysisCode={setAnalysisCode} loadAnalysis={loadAnalysis} analysis={analysis} />;
     if (tab === "watch") return <WatchPanel watchlist={watchlist} triggers={triggers} watchForm={watchForm} setWatchForm={setWatchForm} addWatchItem={addWatchItem} />;
-    return <RecommendationPanel prompt={prompt} setPrompt={setPrompt} runRecommendation={runRecommendation} recommendations={recommendations} />;
-  }, [tab, prompt, recommendations, limitUps, sectors, analysisCode, analysis, watchlist, triggers, watchForm, reports]);
+    return null;
+  }, [tab, limitUps, sectors, analysisCode, analysis, watchlist, triggers, watchForm, reports]);
 
   return (
     <main className="app-shell">
@@ -295,7 +269,6 @@ function App() {
           </div>
         </div>
         <nav>
-          <TabButton active={tab === "recommend"} icon={<Star size={18} />} label="推荐榜" onClick={() => setTab("recommend")} />
           <TabButton active={tab === "morning"} icon={<Sun size={18} />} label="9点晨报" onClick={() => setTab("morning")} />
           <details className="nav-group" open>
             <summary className={tab === "intradayMa5" ? "tab active" : "tab"}>
@@ -322,12 +295,11 @@ function App() {
       <section className="content">
         <header className="topbar">
           <div>
-            <h1>盘后复盘与盘中参考推荐</h1>
+            <h1>A股策略研究台</h1>
             <p>数据分析辅助，不自动交易，不保证收益。</p>
           </div>
           <div className="status">
             <SourceBadge status={dataStatus} />
-            {topRecommendation ? <strong>Top 1：<StockLink code={topRecommendation.code} name={topRecommendation.name} /> {topRecommendation.score}</strong> : <strong>暂无推荐</strong>}
             <button className="ghost" onClick={refreshDashboard} disabled={busy}>
               <RefreshCw size={16} />
               刷新
@@ -481,27 +453,6 @@ function Metric({ label, value }: { label: string; value: string | number }) {
     <div className="metric">
       <span>{label}</span>
       <strong>{value}</strong>
-    </div>
-  );
-}
-
-function RecommendationPanel({ prompt, setPrompt, runRecommendation, recommendations }: any) {
-  return (
-    <div className="panel-grid">
-      <section className="workbench">
-        <div className="section-title">
-          <Activity size={18} />
-          <h2>自然语言选股</h2>
-        </div>
-        <textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} />
-        <button className="primary" onClick={runRecommendation}>
-          <Play size={16} />
-          生成盘中参考排名
-        </button>
-      </section>
-      <section className="table-section span-2">
-        <RankingTable items={recommendations} />
-      </section>
     </div>
   );
 }
