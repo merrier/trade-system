@@ -32,7 +32,7 @@ export async function fetchMarketDataset(mode: RunMode = "post_close", tradeDate
   try {
     const attempt = await runProviderFailover<MarketDataset>(command, getDatasetProviders(mode), { mode, tradeDate });
     const dataset = normalizeDataset(attempt.envelope.data, attempt.envelope.provider, attempt.runs);
-    if (!dataset.stocks.length || !dataset.sectors.length) {
+    if (!dataset.stocks.length || (!dataset.sectors.length && dataset.source !== "fuyao")) {
       throw new Error("provider chain returned empty dataset");
     }
     return dataset;
@@ -51,7 +51,7 @@ export async function fetchMarketDataset(mode: RunMode = "post_close", tradeDate
 }
 
 export function getDatasetProviders(mode: RunMode): string[] {
-  if (mode === "intraday") return ["akshare", "efinance", "easyquotation", "baostock"];
+  if (mode === "intraday") return [...(process.env.FUYAO_API_KEY?.trim() ? ["fuyao"] : []), "akshare", "efinance", "easyquotation", "baostock"];
   return ["akshare", "efinance", "baostock"];
 }
 

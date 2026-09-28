@@ -43,7 +43,7 @@ export function enrichDatasetWithSectorMap(dataset: MarketDataset, sectorMap: Ma
   });
 
   if (!enrichedCount) return dataset;
-  const sectors = shouldRebuildSectors(dataset.sectors) ? deriveSectors(dataset.tradeDate, stocks) : dataset.sectors;
+  const sectors = shouldRebuildSectors(dataset.sectors) && dataset.source !== "fuyao" ? deriveSectors(dataset.tradeDate, stocks) : dataset.sectors;
   return {
     ...dataset,
     stocks,

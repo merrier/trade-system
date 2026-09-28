@@ -1,12 +1,15 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getDailyBarProviders, getDatasetProviders, getMinuteBarProviders, runProviderFailover, type WorkerEnvelope } from "../src/data/akshareClient.js";
 import type { DailyBar } from "../src/shared/types.js";
 
 describe("provider failover", () => {
+  beforeEach(() => vi.stubEnv("FUYAO_API_KEY", ""));
+  afterEach(() => vi.unstubAllEnvs());
+
   it("switches to the next provider and records failed attempts", async () => {
     const result = await runProviderFailover<DailyBar[]>(
       "daily-bars",
-      ["akshare", "efinance", "baostock"],
+      ["fuyao", "efinance", "baostock"],
       {},
       async (provider, command): Promise<WorkerEnvelope<DailyBar[]>> => {
         if (provider !== "baostock") throw new Error(`${provider} unavailable`);
@@ -74,6 +77,14 @@ describe("provider failover", () => {
   it("uses easyquotation as an intraday snapshot fallback only", () => {
     expect(getDatasetProviders("intraday")).toEqual(["akshare", "efinance", "easyquotation", "baostock"]);
     expect(getDatasetProviders("post_close")).toEqual(["akshare", "efinance", "baostock"]);
+  });
+
+  it("prefers Fuyao only for intraday snapshots when configured", () => {
+    vi.stubEnv("FUYAO_API_KEY", "test-key");
+    expect(getDatasetProviders("intraday")).toEqual(["fuyao", "akshare", "efinance", "easyquotation", "baostock"]);
+    expect(getDatasetProviders("post_close")).toEqual(["akshare", "efinance", "baostock"]);
+    vi.stubEnv("FUYAO_API_KEY", "   ");
+    expect(getDatasetProviders("intraday")[0]).toBe("akshare");
   });
 
   it("uses Ashare as the minute bar fallback", () => {

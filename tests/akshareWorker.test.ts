@@ -12,6 +12,77 @@ afterEach(async () => {
 });
 
 describe("akshare worker helpers", () => {
+  it("maps paginated Fuyao quotes and rejects stale, incomplete or failed responses", async () => {
+    const stdout = await runPython(`
+import io
+import json
+import os
+import sys
+from types import SimpleNamespace
+from datetime import datetime
+from unittest.mock import patch
+from zoneinfo import ZoneInfo
+from python import akshare_worker as worker
+
+stamp = int(datetime(2026, 9, 28, 10, 30, tzinfo=ZoneInfo("Asia/Shanghai")).timestamp() * 1000)
+quote = {"ticker": "600519", "last_price": 101, "prev_price": 100, "open_price": 100,
+         "high_price": 102, "low_price": 99, "volume": 12345, "turnover": 1234567}
+calls = []
+def request(endpoint, **params):
+    calls.append((endpoint, params))
+    if endpoint.endswith("/list"):
+        if params["offset"] == 0:
+            return {"item": [{"ticker": "600519", "name": "贵州茅台"}] * 10000}
+        return {"item": [{"ticker": "000001", "name": "*ST测试"}]}
+    rows = [quote, {**quote, "ticker": "300001"}] if params["offset"] == 0 else [{**quote, "ticker": "000001", "last_price": None}]
+    return {"timestamp": stamp, "total": 3, "item": rows}
+
+with patch.object(worker, "fuyao_request", side_effect=request):
+    stocks, as_of = worker.fuyao_stocks("20260928")
+assert [s["code"] for s in stocks] == ["600519", "000001"]
+assert stocks[0]["volume"] == 123.45 and stocks[0]["turnoverAmount"] == 1234567
+assert stocks[0]["pctChange"] == 1 and stocks[0]["name"] == "贵州茅台"
+assert stocks[1]["isST"] and stocks[1]["isSuspended"]
+assert as_of == "2026-09-28T10:30:00+08:00"
+assert calls[1][1]["offset"] == 10000 and calls[3][1]["offset"] == 2
+
+def unavailable(**kwargs):
+    raise RuntimeError("sector service unavailable")
+with patch.dict(sys.modules, {"akshare": SimpleNamespace(stock_sector_fund_flow_rank=unavailable)}):
+    with patch.object(worker, "fuyao_stocks", return_value=(stocks, as_of)):
+        result = worker.run_command("intraday-snapshot", "fuyao", "20260928", "intraday", 30, 60, "5m", [], False)
+assert result["data"]["source"] == "fuyao" and result["data"]["dataAsOf"] == as_of
+assert result["data"]["sectors"] == [] and result["data"]["stocks"] == stocks
+assert any("板块资金流留空" in warning for warning in result["warnings"])
+
+for trade_date, data, names in [
+    ("20260925", {"timestamp": stamp, "total": 1, "item": [quote]}, [{"ticker": "600519", "name": "茅台"}]),
+    ("20260928", {"timestamp": None, "total": 1, "item": [quote]}, []),
+    ("20260928", {"timestamp": stamp, "total": 1, "item": []}, []),
+    ("20260928", {"timestamp": stamp, "total": 1, "item": [quote]}, []),
+]:
+    with patch.object(worker, "fuyao_request", side_effect=[{"item": names}, data]):
+        try:
+            worker.fuyao_stocks(trade_date)
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("invalid quote data was accepted")
+
+with patch.dict(os.environ, {"FUYAO_API_KEY": "test-secret"}):
+    for payload in [{"code": 2001, "message": "test-secret"}, {"code": 4001}, {"code": 0, "data": None}]:
+        with patch.object(worker, "urlopen", return_value=io.BytesIO(json.dumps(payload).encode())):
+            try:
+                worker.fuyao_request("/api/a-share/prices/snapshot")
+            except RuntimeError as exc:
+                assert "test-secret" not in str(exc)
+            else:
+                raise AssertionError("invalid response was accepted")
+print("ok")
+`);
+    expect(stdout).toBe("ok");
+  }, PYTHON_TEST_TIMEOUT_MS);
+
   it("serializes non-finite numbers as valid JSON nulls", async () => {
     const stdout = await runPython(`
 import json

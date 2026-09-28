@@ -31,6 +31,10 @@ describe("sector map enrichment", () => {
     expect(enriched.sectors.map((item) => `${item.type}:${item.name}`)).toContain("industry:银行");
     expect(enriched.sectors.map((item) => `${item.type}:${item.name}`)).toContain("concept:中特估");
     expect(enriched.warnings[0]).toContain("离线板块映射");
+
+    const fuyao = enrichDatasetWithSectorMap({ ...dataset, source: "fuyao", sectors: [] }, map);
+    expect(fuyao.stocks[0].industry).toBe("银行");
+    expect(fuyao.sectors).toEqual([]);
   });
 });
 

@@ -25,6 +25,7 @@ jobs:
     env:
       DATABASE_URL: "file:../data/trade-system.db"
       PYTHON_BIN: "python3"
+      FUYAO_API_KEY: ${{ secrets.FUYAO_API_KEY }}
       PREVIOUS_STATIC_DATA_DIR: "."
       SKIP_DAILY_BAR_REFRESH: "true"
       DATA_PROVIDER_TIMEOUT_MS: "60000"

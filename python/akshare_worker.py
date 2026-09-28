@@ -12,6 +12,9 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from numbers import Integral, Real
 from typing import Any, Optional
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
+from zoneinfo import ZoneInfo
 
 
 MAIN_PREFIXES = ("000", "001", "002", "600", "601", "603", "605")
@@ -147,13 +150,72 @@ def sample_dataset(trade_date: str) -> dict:
     }
 
 
-def akshare_dataset(trade_date: str, mode: str) -> tuple[dict, list[str]]:
+def fuyao_request(endpoint: str, **params: Any) -> dict:
+    key = os.environ.get("FUYAO_API_KEY", "").strip()
+    if not key:
+        raise RuntimeError("FUYAO_API_KEY is not configured")
+    request = Request(f"https://fuyao.aicubes.cn{endpoint}?{urlencode(params)}", headers={"X-api-key": key})
+    with urlopen(request, timeout=20) as response:
+        payload = json.load(response)
+    if payload.get("code") != 0:
+        raise RuntimeError(f"Fuyao {endpoint} failed: code={payload.get('code')}")
+    data = payload.get("data")
+    if not isinstance(data, dict) or not isinstance(data.get("item"), list):
+        raise RuntimeError(f"Fuyao {endpoint} returned invalid data")
+    return data
+
+
+def fuyao_stocks(trade_date: str) -> tuple[list[dict], str]:
+    names = {}
+    offset = 0
+    while True:
+        items = fuyao_request("/api/meta/tickers/list", asset_type="a-share", limit=10000, offset=offset)["item"]
+        names.update({item["ticker"]: item["name"] for item in items})
+        offset += len(items)
+        if len(items) < 10000:
+            break
+
+    quotes = {}
+    timestamps = []
+    offset = 0
+    while True:
+        data = fuyao_request("/api/a-share/prices/snapshot", limit=10000, offset=offset)
+        if not data["item"] or not data.get("timestamp"):
+            raise RuntimeError("Fuyao returned an empty or undated snapshot")
+        as_of = datetime.fromtimestamp(data["timestamp"] / 1000, ZoneInfo("Asia/Shanghai"))
+        if yyyymmdd(as_of) != trade_date:
+            raise RuntimeError(f"Fuyao snapshot date {yyyymmdd(as_of)} does not match {trade_date}")
+        timestamps.append(as_of)
+        for item in data["item"]:
+            code = item["ticker"]
+            if not is_main_board(code):
+                continue
+            if not names.get(code):
+                raise RuntimeError(f"Fuyao missing stock name for {code}")
+            # Reuse the existing shares-to-lots conversion and suspended-stock handling.
+            quotes[code] = {
+                "name": names[code], "now": item["last_price"], "close": item["prev_price"],
+                "open": item["open_price"], "high": item["high_price"], "low": item["low_price"],
+                "turnover": item["volume"], "volume": item["turnover"],
+            }
+        offset += len(data["item"])
+        if offset >= data["total"]:
+            break
+    return normalize_easyquotation_snapshot(quotes), min(timestamps).isoformat()
+
+
+def akshare_dataset(trade_date: str, mode: str, spot_provider: str = "akshare") -> tuple[dict, list[str]]:
     import akshare as ak
 
     warnings: list[str] = []
+    data_as_of = None
     if mode == "intraday":
-        spot_df = ak.stock_zh_a_spot_em()
-        stocks = normalize_spot_rows(spot_df, provider="akshare")
+        if spot_provider == "fuyao":
+            stocks, data_as_of = fuyao_stocks(trade_date)
+            warnings.append("盘中价格/成交量/成交额来自同花顺 Fuyao，板块资金流仍来自 AKShare；Fuyao 不提供换手率、量比、上市天数与个股主力净流入，使用现有兜底值，相关因子不代表实测数据。")
+        else:
+            spot_df = ak.stock_zh_a_spot_em()
+            stocks = normalize_spot_rows(spot_df, provider="akshare")
         limit_ups: list[dict] = []
     else:
         limit_df = ak.stock_zt_pool_em(date=trade_date)
@@ -163,22 +225,24 @@ def akshare_dataset(trade_date: str, mode: str) -> tuple[dict, list[str]]:
         sector_df = ak.stock_sector_fund_flow_rank(indicator="今日", sector_type="行业资金流")
     except Exception as exc:
         sector_df = None
-        warnings.append(f"行业资金流接口不可用，已用涨停池行业聚合兜底：{type(exc).__name__}")
+        warnings.append(f"行业资金流接口不可用，{'相关数据留空' if spot_provider == 'fuyao' else '已用涨停池行业聚合兜底'}：{type(exc).__name__}")
     try:
         concept_df = ak.stock_sector_fund_flow_rank(indicator="今日", sector_type="概念资金流")
     except Exception as exc:
         concept_df = None
-        warnings.append(f"概念资金流接口不可用，已用涨停池行业聚合兜底：{type(exc).__name__}")
+        warnings.append(f"概念资金流接口不可用，{'相关数据留空' if spot_provider == 'fuyao' else '已用涨停池行业聚合兜底'}：{type(exc).__name__}")
 
     sectors = normalize_sector_rows(trade_date, [("industry", sector_df), ("concept", concept_df)])
     if not sectors:
         sectors = derive_sectors_from_limit_ups(trade_date, stocks, limit_ups)
+    if spot_provider == "fuyao" and not sectors:
+        warnings.append("AKShare 板块资金流不可用，保留 Fuyao 行情，板块资金流留空。")
 
     return (
         {
             "tradeDate": trade_date,
-            "dataAsOf": datetime.now().isoformat(),
-            "source": "akshare" if not warnings else "akshare_partial",
+            "dataAsOf": data_as_of or datetime.now().isoformat(),
+            "source": "fuyao" if spot_provider == "fuyao" else ("akshare" if not warnings else "akshare_partial"),
             "warnings": warnings,
             "stocks": stocks,
             "limitUps": limit_ups,
@@ -1182,7 +1246,9 @@ def yfinance_us_market_brief() -> dict:
 
 def run_command(command: str, provider: str, trade_date: str, mode: str, days: int, count: int, frequency: str, codes: list[str], allow_sample: bool) -> dict:
     if command in ("intraday-snapshot", "limit-up-ladder", "sector-flow"):
-        if provider == "akshare":
+        if provider == "fuyao" and command == "intraday-snapshot":
+            dataset, warnings = akshare_dataset(trade_date, "intraday", spot_provider="fuyao")
+        elif provider == "akshare":
             dataset, warnings = akshare_dataset(trade_date, "intraday" if command == "intraday-snapshot" else mode)
         elif provider == "efinance":
             dataset, warnings = efinance_dataset(trade_date)
