@@ -481,3 +481,14 @@ td span {
 .stock-chart-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .stock-chart-dialog-header h2 { font-size: 18px; }
 @media (max-width: 480px) { .stock-chart-dialog { padding: 8px; } }
+
+.strategy-page { display: grid; gap: 16px; }
+.strategy-rules { table-layout: fixed; }
+.strategy-rules caption { text-align: left; color: #64748b; margin-bottom: 12px; }
+.strategy-rules th:first-child { width: 24%; }
+.strategy-rules tbody th { background: transparent; color: #202329; font-size: 14px; }
+.strategy-rules th, .strategy-rules td { line-height: 1.7; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .strategy-rules th:first-child { width: 30%; }
+  .strategy-rules th, .strategy-rules td { padding: 10px 6px; }
+}

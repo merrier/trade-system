@@ -276,7 +276,7 @@ function App() {
   const visiblePanel = useMemo(() => {
     if (tab === "kline") return <React.Suspense fallback={<p role="status">正在加载 K 线组件…</p>}><StockChartPanel /></React.Suspense>;
     if (tab === "morning") return <ReportPanel title="9:00 晨报" report={reports.morning} />;
-    if (tab === "intradayMa5") return <IntradayReportPanel report={reports["intraday-selection"]} />;
+    if (tab === "intradayMa5") return <IntradayStrategyPage report={reports["intraday-selection"]} />;
     if (tab === "closeReport") return <CloseReportPanel report={reports.close} />;
     if (tab === "ladder") return <LadderPanel limitUps={limitUps} sectors={sectors} />;
     if (tab === "stock") return <StockPanel analysisCode={analysisCode} setAnalysisCode={setAnalysisCode} loadAnalysis={loadAnalysis} analysis={analysis} />;
@@ -393,6 +393,35 @@ function ReportPanel({ title, report }: { title: string; report?: ReportArtifact
   );
 }
 
+const MA5_RULES = [
+  ["股票范围", "主板、非 ST、非停牌，排除上市不足 20 天"],
+  ["价格与成交额", "股价 > 5 元；近 5 日日均成交额 > 3000 万；当天成交额 ≥ 3000 万"],
+  ["均线趋势", "MA5 连续 3 日上行，且 MA5 > MA10 > MA20"],
+  ["前期走势", "今天之前的 5 个完整交易日，收盘价均站在各自 MA5 上方"],
+  ["今日形态", "采样时最新价低于开盘价，呈阴线；但仍在 MA5 上方，距离 0%～2%"],
+  ["回踩幅度", "今日最低价相对 MA5 在 −0.8%～+1.5%，允许短暂跌破后收回"],
+  ["今日涨跌幅", "−2%～+2.5%"],
+  ["波动限制", "近 5 日区间振幅 ≤ 15%，近 20 日 ≤ 35%"],
+  ["量能与形态", "量比 0.7～1.8；上影线比例 ≤ 3.5%，阴线实体跌幅不超过 3%"]
+];
+
+function IntradayStrategyPage({ report }: { report?: ReportArtifact }) {
+  return <div className="strategy-page">
+    <section className="table-section" aria-labelledby="strategy-rules-title">
+      <div className="section-title">
+        <Clock3 size={18} />
+        <h2 id="strategy-rules-title">{INTRADAY_STRATEGY_NAME}</h2>
+      </div>
+      <table className="strategy-rules">
+        <caption>筛选条件（需同时满足）</caption>
+        <thead><tr><th scope="col">条件</th><th scope="col">当前规则</th></tr></thead>
+        <tbody>{MA5_RULES.map(([condition, rule]) => <tr key={condition}><th scope="row">{condition}</th><td>{rule}</td></tr>)}</tbody>
+      </table>
+    </section>
+    <IntradayReportPanel report={report} />
+  </div>;
+}
+
 function IntradayReportPanel({ report }: { report?: ReportArtifact }) {
   if (!report) return <div className="empty">暂无「{INTRADAY_STRATEGY_NAME}」的 14:50 选股报告。</div>;
   if (!report.payload?.strategy?.compiledDsl?.strategyTemplates?.includes("ma5_pullback")) {
@@ -403,7 +432,7 @@ function IntradayReportPanel({ report }: { report?: ReportArtifact }) {
       <section className="workbench">
         <div className="section-title">
           <Clock3 size={18} />
-          <h2>{INTRADAY_STRATEGY_NAME}</h2>
+          <h2>选股报告与摘要</h2>
         </div>
         <p className="report-text"><StockText>{report.analysis}</StockText></p>
         {report.rankingNarrative && <p className="report-push"><StockText>{report.rankingNarrative}</StockText></p>}
