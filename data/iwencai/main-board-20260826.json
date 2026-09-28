@@ -1,0 +1,15 @@
+{
+  "source": "iwencai",
+  "query": "A股主板股票 股票代码 股票简称 上市板块 最新价 涨跌幅 开盘价 最高价 最低价 收盘价 成交量 成交额 换手率 主力资金流向 主力增仓占比",
+  "fetchedAt": "2026-08-26T09:25:59.345Z",
+  "codeCount": 0,
+  "rows": [],
+  "pages": [
+    {
+      "page": "1",
+      "returnedCount": 0,
+      "hasMore": false,
+      "traceId": "07a73cdee703f29295838a1d337f974b11eba447332703db81e1300d2ff5ad02"
+    }
+  ]
+}

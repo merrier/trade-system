@@ -1,0 +1,16 @@
+{
+  "source": "iwencai",
+  "query": "今日A股龙虎榜 股票代码 股票简称 上榜日期 上榜原因 龙虎榜净买入额 龙虎榜买入额 龙虎榜卖出额 营业部名称 买卖席位 营业部类型 买入额占成交额比例 卖出额占成交额比例 净买入额占成交额比例",
+  "fetchedAt": "2026-09-24T13:52:04.192Z",
+  "codeCount": 0,
+  "stockCount": 0,
+  "rows": [],
+  "pages": [
+    {
+      "page": "1",
+      "returnedCount": 0,
+      "hasMore": false,
+      "traceId": "e887041408790d3062499abb039afb8468d9a9342ec2021d6e5e919a0a74e20e"
+    }
+  ]
+}
