@@ -11,6 +11,7 @@ import { rankSectors } from "../core/scoring.js";
 import { normalizeMarkets, strategyDslSchema, strategyRequiresDailyBars } from "../core/strategy.js";
 import { fetchDailyBars, fetchMarketDataset } from "../data/akshareClient.js";
 import { readDailyBarCache } from "../data/dailyBarCache.js";
+import { fetchStockHistory } from "../data/stockHistory.js";
 import { appendWeixinInboundMessage, readLatestWeixinInboundMessages } from "../inbox/weixinInbox.js";
 import { readReportArtifact } from "../jobs/reportArtifacts.js";
 import type { RunMode, StrategyStyle } from "../shared/types.js";
@@ -54,6 +55,11 @@ export function createApp(prisma: PrismaClient) {
     name: "trade-system",
     now: new Date().toISOString()
   }));
+
+  app.get("/api/stocks/:code/history", async (request) => {
+    const { code } = request.params as { code: string };
+    return fetchStockHistory(code);
+  });
 
   app.post("/api/strategies/compile", async (request) => {
     const body = compileBodySchema.parse(request.body ?? {});

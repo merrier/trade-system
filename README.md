@@ -262,6 +262,12 @@ npm run monitor:pool -- disable --code=600226
 
 监控池不会改变策略筛选结果；它是独立的“指定股票状态体检”小节。
 
+### 个股 K 线图
+
+启动前后端后，在侧栏选择「K 线图」，输入六位主板股票代码。支持日 K / 周 K 切换，默认显示最近 30 根 K 线，叠加 MA5、MA10、MA20、MA60，下方成交量以手计；悬停查看详情，拖动滑块查看更长历史。
+
+可复用组件：`web/src/StockKLineChart.tsx` 中的 `<StockKLineChart code="600519" />`。`GET /api/stocks/:code/history` 使用服务端 `FUYAO_API_KEY` 获取最近三年前复权日线以预热周 MA60，同一股票缓存 10 分钟，上游请求串行且间隔至少 2 秒。MA 在完整历史上计算后再显示最近 30 根；历史不足时留空，最新周可能未结束。该组件需要后端，纯静态站点须通过 `VITE_API_BASE_URL` 连接已部署的 API，密钥不得配置到浏览器环境。
+
 ### 微信入站转发
 
 Hermes 微信网关可以通过用户插件把所有 Weixin 入站消息转发到本项目。默认落盘位置是 `data/inbox/weixin.jsonl`，该文件已加入 `.gitignore`，避免把私人消息提交到仓库。

@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { Activity, BellRing, CandlestickChart, Clock3, FileText, Layers3, Play, Plus, RefreshCw, Search, ShieldAlert, Star, Sun } from "lucide-react";
 import "./styles.css";
 
+const StockChartPanel = React.lazy(() => import("./StockKLineChart.js"));
+
 type Recommendation = {
   rank: number;
   code: string;
@@ -269,6 +271,7 @@ function App() {
   }, []);
 
   const visiblePanel = useMemo(() => {
+    if (tab === "kline") return <React.Suspense fallback={<p role="status">正在加载 K 线组件…</p>}><StockChartPanel /></React.Suspense>;
     if (tab === "morning") return <ReportPanel title="9:00 晨报" report={reports.morning} />;
     if (tab === "intradayReport") return <IntradayReportPanel report={reports["intraday-selection"]} />;
     if (tab === "closeReport") return <CloseReportPanel report={reports.close} />;
@@ -295,6 +298,7 @@ function App() {
           <TabButton active={tab === "closeReport"} icon={<FileText size={18} />} label="16点复盘" onClick={() => setTab("closeReport")} />
           <TabButton active={tab === "ladder"} icon={<Layers3 size={18} />} label="天梯" onClick={() => setTab("ladder")} />
           <TabButton active={tab === "stock"} icon={<Search size={18} />} label="个股分析" onClick={() => setTab("stock")} />
+          <TabButton active={tab === "kline"} icon={<CandlestickChart size={18} />} label="K 线图" onClick={() => setTab("kline")} />
           <TabButton active={tab === "watch"} icon={<BellRing size={18} />} label="监控池" onClick={() => setTab("watch")} />
         </nav>
         <button className="primary wide" onClick={runPostClose} disabled={busy}>
