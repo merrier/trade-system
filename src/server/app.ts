@@ -15,6 +15,7 @@ import { fetchStockCatalog } from "../data/stockCatalog.js";
 import { fetchStockHistory } from "../data/stockHistory.js";
 import { appendWeixinInboundMessage, readLatestWeixinInboundMessages } from "../inbox/weixinInbox.js";
 import { readReportArtifact } from "../jobs/reportArtifacts.js";
+import { readLatestMorningReport } from "../jobs/latestMorningReport.js";
 import type { RunMode, StrategyStyle } from "../shared/types.js";
 import { fromJsonText, toJsonText } from "./json.js";
 import { evaluateActiveWatchlist, latestDatasetFromDb, persistMarketDataset, runPostCloseIngest, runRecommendation } from "./repository.js";
@@ -291,7 +292,10 @@ export function createApp(prisma: PrismaClient) {
   app.get("/api/reports/:kind/latest", async (request) => {
     const { kind } = z.object({ kind: z.enum(["morning", "intraday-selection", "close"]) }).parse(request.params);
     const dataRoots = [path.resolve(process.cwd(), "dist-web", "data"), path.resolve(process.cwd(), "data")];
-    if (kind === "morning") dataRoots.reverse();
+    if (kind === "morning") {
+      const artifact = await readLatestMorningReport(dataRoots);
+      return artifact ?? app.httpErrors.notFound("morning report not found");
+    }
     for (const dataRoot of dataRoots) {
       const artifact = await readReportArtifact(dataRoot, kind);
       if (artifact) return artifact;

@@ -270,7 +270,7 @@ GitHub Actions 的 `morning-report-0900.yml` 在北京时间周一至周五 9:00
 
 外盘使用 yfinance，Fuyao 提供国内原油连续和商品指数，分栏展示。仅采用报告日前已完成、距报告日不超过 7 天的日线；涨跌幅按相邻两根有效日线计算。Yahoo 限流时保留 Fuyao 栏目并标注外盘缺失，全部数据源失败则不覆盖已有报告。报告日期为 A 股晨报日期，各行情另标数据日期。
 
-报告持久保存在 `data/reports/morning/`，同时写入 `dist-web/data/reports/morning/`。API 优先读取持久目录；前端构建后会恢复持久化报告，避免构建清空晨报。旧日报在页面明确标注为历史数据。定时任务需运行在持有代码、Python 依赖和 `FUYAO_API_KEY` 的机器上；静态远程站点需要另行发布生成的文件，仅保存 GitHub artifact 不会更新页面。
+报告持久保存在 `data/reports/morning/`，同时写入 `dist-web/data/reports/morning/`。本地晨报 API 每分钟检查 GitHub 已发布报告，并在云端与本地文件中选择报告日期、生成时间较新的一份；网络失败时保留可用数据。其他报告仍按原路径读取；前端构建后会恢复持久化报告，避免构建清空晨报。旧日报在页面明确标注为历史数据。定时任务需运行在持有代码、Python 依赖和 `FUYAO_API_KEY` 的机器上；静态远程站点需要另行发布生成的文件，仅保存 GitHub artifact 不会更新页面。
 
 ### 个股 K 线图
 
