@@ -297,7 +297,7 @@ function App() {
             <p>数据分析辅助，不自动交易，不保证收益。</p>
           </div>
           <div className="status">
-            {tab === "intradayMa5" ? <div className="source-badge"><strong>{reports["intraday-selection"]?.payload?.runStatus === "failed" ? "选股任务失败" : reports["intraday-selection"] ? "选股报告" : "选股报告未生成"}</strong><span>{reports["intraday-selection"]?.tradeDate ?? ""}</span></div> : <SourceBadge status={dataStatus} />}
+            {tab === "closeReport" ? <div className="source-badge"><strong>{reports.close?.provider ?? "复盘未生成"}</strong><span>{reports.close?.tradeDate ?? ""}</span></div> : tab === "intradayMa5" ? <div className="source-badge"><strong>{reports["intraday-selection"]?.payload?.runStatus === "failed" ? "选股任务失败" : reports["intraday-selection"] ? "选股报告" : "选股报告未生成"}</strong><span>{reports["intraday-selection"]?.tradeDate ?? ""}</span></div> : <SourceBadge status={dataStatus} />}
             <button className="ghost" onClick={refreshDashboard} disabled={busy}>
               <RefreshCw size={16} />
               刷新
@@ -306,7 +306,7 @@ function App() {
         </header>
 
         {message && <div className="message">{message}</div>}
-        {tab !== "intradayMa5" && dataStatus.warnings.length > 0 && <div className="warning-strip">{dataStatus.warnings.join("；")}</div>}
+        {tab !== "intradayMa5" && tab !== "closeReport" && dataStatus.warnings.length > 0 && <div className="warning-strip">{dataStatus.warnings.join("；")}</div>}
         {visiblePanel}
       </section>
     </main>
@@ -436,19 +436,24 @@ function IntradayReportPanel({ report }: { report?: ReportArtifact }) {
 function CloseReportPanel({ report }: { report?: ReportArtifact }) {
   if (!report) return <div className="empty">暂无16:00收盘复盘。</div>;
   const breadth = report.payload?.marketBreadth;
+  const industries: Array<{ name: string; pctChange: number }> | undefined = report.payload?.industryPerformance;
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()).replaceAll("-", "");
   return (
     <div className="report-layout">
       <section className="table-section">
         <div className="section-title">
           <FileText size={18} />
-          <h2>收盘复盘</h2>
+          <h2>收盘复盘 · {report.tradeDate}</h2>
         </div>
         <p className="report-text"><StockText>{report.analysis}</StockText></p>
+        <p>行情时间：{new Date(report.dataAsOf).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}</p>
+        {report.tradeDate !== today && <p role="status">当前为 {report.tradeDate} 的历史复盘，并非今日数据。</p>}
+        <InfoBlock title="统计口径与数据说明" items={report.warnings ?? []} />
         {breadth && (
           <div className="summary-grid">
             <Metric label="上涨" value={breadth.up} />
             <Metric label="下跌" value={breadth.down} />
-            <Metric label="涨停" value={breadth.limitUp} />
+            <Metric label="涨停" value={breadth.limitUp ?? "—"} />
             <Metric label="成交额" value={formatYi(breadth.turnoverAmount)} />
           </div>
         )}
@@ -456,9 +461,9 @@ function CloseReportPanel({ report }: { report?: ReportArtifact }) {
       <section className="table-section">
         <div className="section-title">
           <Layers3 size={18} />
-          <h2>板块前排</h2>
+          <h2>{industries ? "行业指数涨幅前排" : "板块前排"}</h2>
         </div>
-        <InfoBlock title="板块" items={(report.payload?.sectors ?? []).slice(0, 8).map((item: Sector) => `${item.name} 热度 ${Math.round(item.heatScore)}，涨停 ${item.limitUpCount}`)} />
+        <InfoBlock title={industries ? "按指数涨跌幅排序" : "板块"} items={industries ? industries.slice(0, 8).map(item => `${item.name} ${item.pctChange > 0 ? "+" : ""}${item.pctChange.toFixed(2)}%`) : (report.payload?.sectors ?? []).slice(0, 8).map((item: Sector) => `${item.name} 热度 ${Math.round(item.heatScore)}，涨停 ${item.limitUpCount}`)} />
       </section>
     </div>
   );

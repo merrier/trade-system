@@ -220,7 +220,8 @@ def akshare_dataset(trade_date: str, mode: str, spot_provider: str = "akshare") 
         limit_ups: list[dict] = []
     else:
         limit_df = ak.stock_zt_pool_em(date=trade_date)
-        stocks, limit_ups = normalize_limit_rows(limit_df, trade_date)
+        _, limit_ups = normalize_limit_rows(limit_df, trade_date)
+        stocks = normalize_spot_rows(ak.stock_zh_a_spot_em(), provider="akshare")
 
     try:
         sector_df = ak.stock_sector_fund_flow_rank(indicator="今日", sector_type="行业资金流")

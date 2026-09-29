@@ -174,6 +174,7 @@ export interface SectorSnapshot {
 }
 
 export interface MarketDataset {
+  closeSummary?: { limitUp: number | null; limitDown: number | null; industries: Array<{ name: string; pctChange: number }> };
   tradeDate: string;
   dataAsOf: string;
   source: MarketDataSource;
@@ -348,13 +349,14 @@ export interface IntradaySelectionReportPayload {
 }
 
 export interface CloseReportPayload {
+  industryPerformance?: Array<{ name: string; pctChange: number }>;
   marketBreadth: {
     total: number;
     up: number;
     down: number;
     flat: number;
-    limitUp: number;
-    limitDown: number;
+    limitUp: number | null;
+    limitDown: number | null;
     turnoverAmount: number;
   };
   limitUps: Array<LimitUpSnapshot & { strengthScore: number }>;

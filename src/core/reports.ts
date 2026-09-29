@@ -1,4 +1,6 @@
 import { fetchMorningMarket } from "../data/morningMarket.js";
+import { fetchCloseMarket } from "../data/closeMarket.js";
+import { currentShanghaiTradeDate } from "../data/tradingCalendar.js";
 import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -222,13 +224,15 @@ function summarizeProviderError(error: unknown): string {
 }
 
 export async function buildCloseReport(hermes = new HermesAgentClient(), tradeDate?: string): Promise<ReportArtifact<CloseReportPayload>> {
-  const dataset = await fetchMarketDataset("post_close", tradeDate);
+  const dataset = process.env.FUYAO_API_KEY?.trim()
+    ? await fetchCloseMarket(tradeDate ?? currentShanghaiTradeDate())
+    : await fetchMarketDataset("post_close", tradeDate);
   return buildCloseReportFromDataset(dataset, hermes);
 }
 
 export async function buildCloseReportFromDataset(dataset: MarketDataset, hermes = new HermesAgentClient()): Promise<ReportArtifact<CloseReportPayload>> {
   const dsl = createDefaultStrategy("short_term", ["main"]);
-  const recommendations = rankStocks(dataset, dsl, "post_close");
+  const recommendations = dataset.closeSummary ? [] : rankStocks(dataset, dsl, "post_close");
   const sectors = rankSectors(dataset);
   const limitUps = [...dataset.limitUps]
     .map((item) => ({
@@ -237,12 +241,13 @@ export async function buildCloseReportFromDataset(dataset: MarketDataset, hermes
     }))
     .sort((a, b) => b.consecutive - a.consecutive || b.strengthScore - a.strengthScore);
   const payload: CloseReportPayload = {
-    marketBreadth: marketBreadth(dataset, limitUps.length),
+    marketBreadth: { ...marketBreadth(dataset, limitUps.length), ...(dataset.closeSummary ? { limitUp: dataset.closeSummary.limitUp, limitDown: dataset.closeSummary.limitDown } : {}) },
+    industryPerformance: dataset.closeSummary?.industries,
     limitUps,
     sectors,
     recommendations
   };
-  const hermesResult = await hermes.analyze({
+  const hermesResult = dataset.closeSummary ? { analysis: "", pushMessage: "", warnings: [] } : await hermes.analyze({
     kind: "close",
     title: `${dataset.tradeDate} 收盘复盘`,
     marketContext: {
@@ -252,7 +257,11 @@ export async function buildCloseReportFromDataset(dataset: MarketDataset, hermes
       topSectors: sectors.slice(0, 15)
     }
   });
-  return finalizeReport("close", dataset.tradeDate, dataset.source, [...dataset.warnings, ...hermesResult.warnings], payload, hermesResult);
+  const report = finalizeReport("close", dataset.tradeDate, dataset.source, [...dataset.warnings, ...hermesResult.warnings], payload, hermesResult);
+  report.dataAsOf = dataset.dataAsOf;
+  if (dataset.closeSummary) report.analysis = `${dataset.tradeDate} 沪深主板收盘统计：有成交股票 ${payload.marketBreadth.total} 只，上涨 ${payload.marketBreadth.up} 只，下跌 ${payload.marketBreadth.down} 只，平盘 ${payload.marketBreadth.flat} 只。行业排行使用指数涨跌幅。`;
+  report.pushMessage = formatReportMarkdown(report);
+  return report;
 }
 
 export function validateReportArtifact<T>(value: ReportArtifact<T>): ReportArtifact<T> {
@@ -870,15 +879,17 @@ function formatClosePayload(payload: CloseReportPayload): string[] {
     "",
     "## 市场概览",
     `- 上涨 ${breadth.up} 家，下跌 ${breadth.down} 家，平盘 ${breadth.flat} 家`,
-    `- 涨停 ${breadth.limitUp} 家，跌停 ${breadth.limitDown} 家，主板成交额 ${formatYi(breadth.turnoverAmount)}`,
+    `- 涨停 ${breadth.limitUp ?? "暂无数据"} 家，跌停 ${breadth.limitDown ?? "暂无数据"} 家，主板成交额 ${formatYi(breadth.turnoverAmount)}`,
     "",
     "## 连板梯队",
     ...(payload.limitUps.length
       ? payload.limitUps.slice(0, 10).map((item) => `- **${item.code} ${item.name}**：${item.consecutive} 连板，开板 ${item.openCount} 次，强度 ${formatNumber(item.strengthScore)}`)
       : ["- 暂无涨停梯队数据。"]),
     "",
-    "## 板块热度",
-    ...(payload.sectors.length
+    payload.industryPerformance ? "## 行业指数涨跌幅" : "## 板块热度",
+    ...(payload.industryPerformance
+      ? (payload.industryPerformance.length ? payload.industryPerformance.slice(0, 8).map(item => `- **${item.name}**：${formatSignedPct(item.pctChange)}`) : ["- 暂无行业指数行情。"])
+      : payload.sectors.length
       ? payload.sectors.slice(0, 8).map((item) => {
           const heatScore = "heatScore" in item && typeof item.heatScore === "number" ? item.heatScore : 0;
           return `- **${item.name}**：热度 ${formatNumber(heatScore)}，涨幅 ${formatSignedPct(item.pctChange)}，涨停 ${item.limitUpCount} 家`;

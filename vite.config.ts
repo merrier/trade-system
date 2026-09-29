@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react(), {
     name: "preserve-report-artifacts",
     async closeBundle() {
-      try { await fs.cp("data/reports/morning", "dist-web/data/reports/morning", { recursive: true }); }
+      try { await fs.cp("data/reports", "dist-web/data/reports", { recursive: true }); }
       catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
     }
   }],

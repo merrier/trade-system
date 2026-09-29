@@ -72,7 +72,7 @@ const reports = [];
 for (const reportKind of kinds) {
   const builtReport = await buildReport(reportKind, strategyPrompt, tradingDay.tradeDate, { dailyBars: dailyBarsForReport, dailyBarWarnings });
   const report = skipDelivery ? builtReport : await deliverReport(builtReport);
-  if (report.kind === "morning") await writeReportArtifact(persistentRoot, report);
+  await writeReportArtifact(persistentRoot, report);
   await writeReportArtifact(outputRoot, report);
   reports.push({ kind: report.kind, tradeDate: report.tradeDate, provider: report.provider, warnings: report.warnings.length });
 }
