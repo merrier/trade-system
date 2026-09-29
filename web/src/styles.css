@@ -514,3 +514,9 @@ td span {
 .data-details { margin-bottom: 16px; color: #52606f; font-size: 13px; }
 .data-details summary { cursor: pointer; padding: 6px 0; }
 .data-details .source-badge { display: inline-flex; margin-top: 8px; }
+
+.watch-filter { display: grid; gap: 12px; }
+.watch-filter input { width: min(100%, 360px); padding: 10px 12px; border: 1px solid #d8dee6; border-radius: 7px; }
+.watch-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.watch-tags button { border-radius: 20px; }
+.watch-tags button[aria-pressed="true"] { background: #263544; color: white; border-color: #263544; }

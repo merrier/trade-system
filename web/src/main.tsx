@@ -548,6 +548,10 @@ function StockPanel({ analysisCode, setAnalysisCode, loadAnalysis, analysis }: a
 }
 
 function WatchPanel({ busy, watchlist, watchForm, setWatchForm, addWatchItem }: any) {
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState("");
+  const matches = watchlist.filter((item: WatchItem) => `${item.code} ${item.name}`.includes(query.trim()));
+  const visible = matches.filter((item: WatchItem) => !selected || item.code === selected);
   return (
     <div className="watch-page">
       <section className="workbench">
@@ -567,12 +571,20 @@ function WatchPanel({ busy, watchlist, watchForm, setWatchForm, addWatchItem }: 
         </button>
         </>}
       </section>
-      {watchlist.length ? watchlist.map((item: WatchItem) => <article key={item.id} className="watch-stock" aria-label={`${item.name}监控图表`}>
+      <section className="workbench watch-filter" aria-label="筛选监控股票">
+        <label htmlFor="watch-search">搜索监控股票</label>
+        <input id="watch-search" type="search" placeholder="输入股票代码或公司名称" value={query} onChange={(event) => { setQuery(event.target.value); setSelected(""); }} />
+        <div className="watch-tags" role="group" aria-label="股票标签">
+          <button className="ghost" aria-pressed={!selected} onClick={() => { setSelected(""); setQuery(""); }}>全部（{watchlist.length}）</button>
+          {matches.map((item: WatchItem) => <button key={item.code} className="ghost" aria-pressed={selected === item.code} onClick={() => setSelected(item.code)}>{item.name} · {item.code}</button>)}
+        </div>
+      </section>
+      {visible.length ? visible.map((item: WatchItem) => <article key={item.id} className="watch-stock" aria-label={`${item.name}监控图表`}>
         <h2>{item.name} · {item.code}</h2>
         <React.Suspense fallback={<p role="status">正在加载 K 线组件…</p>}>
           <StockKLineChart code={item.code} />
         </React.Suspense>
-      </article>) : <p className="empty">暂无监控股票，添加后将在这里展示 K 线与成交量。</p>}
+      </article>) : <p className="empty">{watchlist.length ? "没有匹配的监控股票，请修改搜索条件或点击全部。" : "暂无监控股票，添加后将在这里展示 K 线与成交量。"}</p>}
     </div>
   );
 }
