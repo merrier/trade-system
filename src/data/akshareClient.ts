@@ -25,7 +25,7 @@ export interface ProviderAttempt<T> {
 
 export type WorkerRunner<T> = (provider: string, command: WorkerCommand) => Promise<WorkerEnvelope<T>>;
 
-const usBriefProviders = ["yfinance", "stooq", "alpha_vantage"];
+const usBriefProviders = ["yfinance"];
 
 export async function fetchMarketDataset(mode: RunMode = "post_close", tradeDate?: string): Promise<MarketDataset> {
   const command: WorkerCommand = mode === "intraday" ? "intraday-snapshot" : "limit-up-ladder";
@@ -190,7 +190,7 @@ function runPythonWorker<T>(
     const timeout = setTimeout(() => {
       child.kill("SIGTERM");
       reject(new Error(`${provider} ${command} timeout`));
-    }, Number(process.env.DATA_PROVIDER_TIMEOUT_MS ?? 120_000));
+    }, Number(process.env.DATA_PROVIDER_TIMEOUT_MS ?? (command === "us-market-brief" ? 45_000 : 120_000)));
 
     child.stdout.on("data", (chunk) => {
       stdout += chunk.toString();

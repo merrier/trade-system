@@ -159,8 +159,8 @@ function parseHermesOutput(output: string): HermesAnalysis {
 function localAnalysis(request: HermesRequest, warning: string): HermesAnalysis {
   if (request.kind === "morning") {
     return {
-      analysis: "隔夜外盘与期货数据已汇总，关注风险偏好、美元/人民币、商品价格对主板权重与周期板块的传导。",
-      pushMessage: `【A股晨报】${request.title}\n外盘、期货与板块线索已更新，详见静态报告。`,
+      analysis: "晨报仅汇总已获取的近期已完成日线；各市场的数据日期和缺失项见下方，国内期货不代表隔夜外盘。",
+      pushMessage: `【A股晨报】${request.title}\n已获取行情及缺失情况详见报告。`,
       warnings: [warning]
     };
   }

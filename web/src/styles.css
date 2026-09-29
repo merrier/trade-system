@@ -262,6 +262,8 @@ input {
   align-items: start;
 }
 
+.table-wrap { overflow-x: auto; }
+
 table {
   width: 100%;
   border-collapse: collapse;

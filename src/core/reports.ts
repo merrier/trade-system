@@ -1,3 +1,4 @@
+import { fetchMorningMarket } from "../data/morningMarket.js";
 import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -9,7 +10,7 @@ import { createDefaultStrategy } from "./defaults.js";
 import { HermesAgentClient } from "./hermesAgentClient.js";
 import { evaluateMonitorPool, readMonitorPool } from "./monitorPool.js";
 import { rankSectors, rankStocks } from "./scoring.js";
-import { fetchMarketDataset, fetchUsMarketBrief } from "../data/akshareClient.js";
+import { fetchMarketDataset } from "../data/akshareClient.js";
 import { enrichDatasetWithSectorMap, readSectorMap } from "../data/sectorMap.js";
 import type {
   CloseReportPayload,
@@ -61,18 +62,18 @@ const factorLegend: Record<string, string> = {
   bullishMaAlignment: "MA5 > MA10 > MA20 多头排列"
 };
 
-export async function buildMorningReport(hermes = new HermesAgentClient()): Promise<ReportArtifact<MorningReportPayload>> {
-  const result = await fetchUsMarketBrief();
+export async function buildMorningReport(hermes = new HermesAgentClient(), tradeDate = currentTradeDate()): Promise<ReportArtifact<MorningReportPayload>> {
+  const result = await fetchMorningMarket(tradeDate);
   const payload: MorningReportPayload = {
     brief: result.brief,
     aShareReadThrough: inferAshareReadThrough(result.brief)
   };
   const hermesResult = await hermes.analyze({
     kind: "morning",
-    title: `${result.brief.previousSession || "最近一日"} 外盘晨报`,
-    marketContext: payload
+    title: `${tradeDate} 晨报（行情截至 ${result.brief.previousSession}）`,
+    marketContext: { ...payload, warnings: result.warnings }
   });
-  return finalizeReport("morning", result.brief.previousSession || currentTradeDate(), result.provider, [...result.warnings, ...hermesResult.warnings], payload, hermesResult);
+  return finalizeReport("morning", tradeDate, result.provider, [...result.warnings, ...hermesResult.warnings], payload, hermesResult);
 }
 
 export async function buildIntradaySelectionReport(
@@ -323,14 +324,15 @@ function reportTitle(kind: ReportKind, tradeDate: string): string {
 }
 
 function formatMorningPayload(payload: MorningReportPayload): string[] {
+  const groups = [
+    ["美股指数", payload.brief.indices], ["国际期货", payload.brief.futures],
+    ["美股板块", payload.brief.sectors], ["汇率", payload.brief.currencies],
+    ["国际商品", payload.brief.commodities], ["国内期货与商品指数（Fuyao）", payload.brief.domesticFutures ?? []]
+  ] as const;
   return [
-    "",
-    "## 外盘线索",
-    ...payload.brief.indices.slice(0, 4).map((item) => `- **${item.name}**：${formatNumber(item.close)}（${formatSignedPct(item.pctChange)}）`),
-    ...payload.brief.futures.slice(0, 4).map((item) => `- **${item.name}**：${formatNumber(item.price)}（${formatSignedPct(item.pctChange)}）`),
-    "",
-    "## A股预判",
-    ...payload.aShareReadThrough.slice(0, 4).map((item) => `- ${item}`)
+    ...groups.flatMap(([label, rows]) => ["", `## ${label}`,
+      ...(rows.length ? rows.map((item) => `- **${item.name}**：${item.close ?? item.price ?? "—"}（${formatSignedPct(item.pctChange)}）；数据日期 ${item.date ?? "未知"}`) : ["- 暂无有效数据"])]),
+    "", "## A股观察", ...payload.aShareReadThrough.map((item) => `- ${item}`)
   ];
 }
 
@@ -918,8 +920,8 @@ function inferAshareReadThrough(brief: MorningReportPayload["brief"]): string[] 
   const lines: string[] = [];
   if (nasdaq) lines.push(nasdaq.pctChange >= 0 ? "纳指走强时，A股主板科技映射和风险偏好通常更容易获得支撑。" : "纳指回落时，关注高估值科技映射回撤对主板情绪的拖累。");
   if (oil) lines.push(oil.pctChange >= 0 ? "原油偏强时，留意能源、化工与通胀链条。" : "原油走弱时，周期资源链条可能承压。");
-  if (cnh) lines.push(cnh.pctChange >= 0 ? "离岸人民币价格上行需结合美元方向判断，重点观察北向风险偏好。" : "人民币偏弱时，主板权重和外资敏感资产需降低预期。");
-  return lines.length ? lines : ["外盘关键指标已更新，需结合开盘集合竞价确认 A 股主板风险偏好。"];
+  if (cnh) lines.push(cnh.pctChange >= 0 ? "美元兑离岸人民币上行，表示人民币相对走弱，留意汇率敏感资产。" : "美元兑离岸人民币下行，表示人民币相对走强，留意汇率敏感资产。");
+  return lines.length ? lines : ["外盘关键指标不足，暂不生成外盘方向判断；国内期货单独展示。"];
 }
 
 function textValue(row: Record<string, unknown>, prefix: string): string {

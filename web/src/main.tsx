@@ -333,7 +333,12 @@ function TabButton({ active, icon, label, onClick }: { active: boolean; icon?: R
 }
 
 function ReportPanel({ title, report }: { title: string; report?: ReportArtifact }) {
-  if (!report) return <div className="empty">暂无{title}数据。</div>;
+  if (!report) return <div className="empty">暂无{title}数据。{title.includes("晨报") && "晨报在 A 股交易日 9:00 生成；数据源全部失败时不会生成空报告。"}</div>;
+  const today = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Shanghai" }).format(new Date()).replaceAll("-", "");
+  const morningGroups = report.kind === "morning" ? [
+    ["美股指数", "indices"], ["国际期货", "futures"], ["美股板块", "sectors"],
+    ["汇率", "currencies"], ["国际商品", "commodities"], ["国内期货与商品指数", "domesticFutures"]
+  ] : [];
   return (
     <div className="report-layout">
       <section className="table-section">
@@ -346,8 +351,18 @@ function ReportPanel({ title, report }: { title: string; report?: ReportArtifact
           <span>{report.provider}</span>
           <span>{new Date(report.dataAsOf).toLocaleString()}</span>
         </div>
+        {report.kind === "morning" && report.tradeDate !== today && <p role="status">当前展示 {report.tradeDate} 的历史晨报，并非今日数据；非交易日不生成晨报。</p>}
         <p className="report-text"><StockText>{report.analysis}</StockText></p>
-        <p className="report-push"><StockText>{report.pushMessage}</StockText></p>
+        {morningGroups.map(([label, key]) => <section key={key}>
+          <h3>{label}</h3>
+          {report.payload?.brief?.[key]?.length ? <div className="table-wrap"><table>
+            <thead><tr><th>标的</th><th>收盘价</th><th>涨跌幅</th><th>数据日期</th><th>来源</th></tr></thead>
+            <tbody>{report.payload.brief[key].map((item: { symbol: string; name: string; close?: number; price?: number; pctChange: number; date?: string; source?: string }) =>
+              <tr key={item.symbol}><td>{item.name}</td><td>{item.close ?? item.price ?? "—"}</td><td>{item.pctChange.toFixed(2)}%</td><td>{item.date ?? "未知"}</td><td>{item.source ?? report.provider}</td></tr>
+            )}</tbody>
+          </table></div> : <p>暂无有效数据</p>}
+        </section>)}
+        {report.kind !== "morning" && <p className="report-push"><StockText>{report.pushMessage}</StockText></p>}
       </section>
       <section className="table-section">
         <div className="section-title">

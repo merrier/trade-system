@@ -8,6 +8,7 @@ import json
 import math
 import os
 import sys
+import time
 from collections import defaultdict
 from datetime import datetime, timedelta
 from numbers import Integral, Real
@@ -1226,10 +1227,21 @@ def yfinance_us_market_brief() -> dict:
         "commodities": [("HG=F", "铜"), ("SI=F", "白银")],
     }
     brief: dict[str, Any] = {"asOf": datetime.now().isoformat(), "previousSession": "", "indices": [], "futures": [], "sectors": [], "currencies": [], "commodities": []}
+    deadline = time.monotonic() + 30
+    stopped = False
     for key, symbols in groups.items():
         for symbol, name in symbols:
-            hist = yf.Ticker(symbol).history(period="5d", interval="1d")
-            if hist.empty:
+            if stopped or time.monotonic() >= deadline:
+                break
+            try:
+                hist = yf.Ticker(symbol).history(period="10d", interval="1d", timeout=8)
+            except Exception as exc:
+                if type(exc).__name__ == "YFRateLimitError":
+                    stopped = True
+                continue
+            today = datetime.now(ZoneInfo("Asia/Shanghai")).date()
+            hist = hist[[d.date() < today for d in hist.index]]
+            if len(hist) < 2:
                 continue
             last = hist.iloc[-1]
             prev = hist.iloc[-2] if len(hist) > 1 else last
@@ -1238,7 +1250,7 @@ def yfinance_us_market_brief() -> dict:
             pct = ((close - prev_close) / prev_close * 100) if prev_close else 0
             if not brief["previousSession"]:
                 brief["previousSession"] = str(hist.index[-1].date()).replace("-", "")
-            brief[key].append({"symbol": symbol, "name": name, "close" if key == "indices" else "price": close, "pctChange": pct})
+            brief[key].append({"symbol": symbol, "name": name, "close" if key == "indices" else "price": close, "pctChange": pct, "date": str(hist.index[-1].date()), "source": "yfinance"})
     if not brief["indices"]:
         raise RuntimeError("yfinance returned no US indices")
     return brief

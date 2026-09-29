@@ -291,6 +291,7 @@ export function createApp(prisma: PrismaClient) {
   app.get("/api/reports/:kind/latest", async (request) => {
     const { kind } = z.object({ kind: z.enum(["morning", "intraday-selection", "close"]) }).parse(request.params);
     const dataRoots = [path.resolve(process.cwd(), "dist-web", "data"), path.resolve(process.cwd(), "data")];
+    if (kind === "morning") dataRoots.reverse();
     for (const dataRoot of dataRoots) {
       const artifact = await readReportArtifact(dataRoot, kind);
       if (artifact) return artifact;

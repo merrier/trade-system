@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import dotenv from "dotenv";
-import { buildReport, deliverReport, defaultStrategyPrompt, writeReportArtifact } from "./reportArtifacts.js";
+import { buildReport, deliverReport, defaultStrategyPrompt, readReportArtifact, writeReportArtifact } from "./reportArtifacts.js";
 import { fetchDailyBars } from "../data/akshareClient.js";
 import { mergeDailyBarCache, readDailyBarCache, writeDailyBarCache } from "../data/dailyBarCache.js";
 import { tradingDayDecision } from "../data/tradingCalendar.js";
@@ -10,6 +10,7 @@ import type { DailyBar, ReportKind } from "../shared/types.js";
 dotenv.config();
 
 const outputRoot = path.resolve(process.cwd(), "dist-web", "data");
+const persistentRoot = path.resolve(process.cwd(), "data");
 const previousRoot = path.resolve(process.cwd(), process.env.PREVIOUS_STATIC_DATA_DIR ?? ".");
 const kind = (process.argv.find((arg) => arg.startsWith("--kind="))?.split("=")[1] ?? "close") as ReportKind | "all";
 const tradeDate = process.argv.find((arg) => arg.startsWith("--trade-date="))?.split("=")[1];
@@ -37,10 +38,19 @@ if (!tradingDay.isTradingDay && !forceNonTrading) {
   process.exit(0);
 }
 
+if (kind === "morning" && process.argv.includes("--if-missing")) {
+  const previous = await readReportArtifact(persistentRoot, "morning");
+  if (previous?.tradeDate === tradingDay.tradeDate) {
+    await writeReportArtifact(outputRoot, previous);
+    console.log(JSON.stringify({ skipped: true, reason: "今日晨报已生成", tradeDate: tradingDay.tradeDate }));
+    process.exit(0);
+  }
+}
+
 let cacheSummary: unknown = null;
 let dailyBarsForReport: DailyBar[] = [];
 let dailyBarWarnings: string[] = [];
-try {
+if (kinds.some((item) => item !== "morning")) try {
   const previous = await readDailyBarCache(previousRoot);
   dailyBarsForReport = previous?.bars ?? [];
   if (skipDailyBarRefresh) {
@@ -62,6 +72,7 @@ const reports = [];
 for (const reportKind of kinds) {
   const builtReport = await buildReport(reportKind, strategyPrompt, tradingDay.tradeDate, { dailyBars: dailyBarsForReport, dailyBarWarnings });
   const report = skipDelivery ? builtReport : await deliverReport(builtReport);
+  if (report.kind === "morning") await writeReportArtifact(persistentRoot, report);
   await writeReportArtifact(outputRoot, report);
   reports.push({ kind: report.kind, tradeDate: report.tradeDate, provider: report.provider, warnings: report.warnings.length });
 }

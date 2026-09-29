@@ -304,14 +304,25 @@ export interface ReportArtifact<TPayload = unknown> {
   generatedAt: string;
 }
 
+export interface MorningQuote {
+  symbol: string;
+  name: string;
+  price?: number;
+  close?: number;
+  pctChange: number;
+  date?: string;
+  source?: string;
+}
+
 export interface UsMarketBrief {
   asOf: string;
   previousSession: string;
-  indices: Array<{ symbol: string; name: string; close: number; pctChange: number }>;
-  futures: Array<{ symbol: string; name: string; price: number; pctChange: number }>;
-  sectors: Array<{ symbol: string; name: string; pctChange: number }>;
-  currencies: Array<{ symbol: string; name: string; price: number; pctChange: number }>;
-  commodities: Array<{ symbol: string; name: string; price: number; pctChange: number }>;
+  indices: MorningQuote[];
+  futures: MorningQuote[];
+  sectors: MorningQuote[];
+  currencies: MorningQuote[];
+  commodities: MorningQuote[];
+  domesticFutures?: MorningQuote[];
 }
 
 export interface MorningReportPayload {

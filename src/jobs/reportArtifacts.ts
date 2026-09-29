@@ -14,7 +14,7 @@ export async function buildReport(
   options: { dailyBars?: DailyBar[]; dailyBarWarnings?: string[] } = {}
 ): Promise<ReportArtifact> {
   const hermes = new HermesAgentClient();
-  if (kind === "morning") return buildMorningReport(hermes);
+  if (kind === "morning") return buildMorningReport(hermes, tradeDate);
   if (kind === "intraday-selection") return buildIntradaySelectionReport(strategyPrompt, hermes, tradeDate, options);
   return buildCloseReport(hermes, tradeDate);
 }
@@ -26,8 +26,9 @@ export async function writeReportArtifact(outputRoot: string, report: ReportArti
   const fileName = `${report.tradeDate}.json`;
   await Promise.all([
     fs.writeFile(path.join(reportDir, fileName), `${JSON.stringify(report, null, 2)}\n`, "utf8"),
-    fs.writeFile(path.join(reportDir, "latest.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8")
+    fs.writeFile(path.join(reportDir, `${report.id}.tmp`), `${JSON.stringify(report, null, 2)}\n`, "utf8")
   ]);
+  await fs.rename(path.join(reportDir, `${report.id}.tmp`), path.join(reportDir, "latest.json"));
 }
 
 export async function readReportArtifact(dataRoot: string, kind: ReportKind): Promise<ReportArtifact | null> {

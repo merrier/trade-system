@@ -10,6 +10,7 @@ data/*.db-journal
 data/*.sqlite
 data/*.sqlite-journal
 data/inbox/*.jsonl
+data/reports/
 data/iwencai/
 data/mootdx/
 data/company-context/
