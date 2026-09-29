@@ -259,7 +259,7 @@ export async function buildCloseReportFromDataset(dataset: MarketDataset, hermes
   });
   const report = finalizeReport("close", dataset.tradeDate, dataset.source, [...dataset.warnings, ...hermesResult.warnings], payload, hermesResult);
   report.dataAsOf = dataset.dataAsOf;
-  if (dataset.closeSummary) report.analysis = `${dataset.tradeDate} 沪深主板收盘统计：有成交股票 ${payload.marketBreadth.total} 只，上涨 ${payload.marketBreadth.up} 只，下跌 ${payload.marketBreadth.down} 只，平盘 ${payload.marketBreadth.flat} 只。行业排行使用指数涨跌幅。`;
+  if (dataset.closeSummary) report.analysis = `${dataset.tradeDate} 全A股收盘统计：有成交股票 ${payload.marketBreadth.total} 只，上涨 ${payload.marketBreadth.up} 只，下跌 ${payload.marketBreadth.down} 只，平盘 ${payload.marketBreadth.flat} 只。行业排行使用指数涨跌幅。`;
   report.pushMessage = formatReportMarkdown(report);
   return report;
 }
@@ -879,7 +879,7 @@ function formatClosePayload(payload: CloseReportPayload): string[] {
     "",
     "## 市场概览",
     `- 上涨 ${breadth.up} 家，下跌 ${breadth.down} 家，平盘 ${breadth.flat} 家`,
-    `- 涨停 ${breadth.limitUp ?? "暂无数据"} 家，跌停 ${breadth.limitDown ?? "暂无数据"} 家，主板成交额 ${formatYi(breadth.turnoverAmount)}`,
+    `- 涨停 ${breadth.limitUp ?? "暂无数据"} 家，跌停 ${breadth.limitDown ?? "暂无数据"} 家，成交额 ${formatYi(breadth.turnoverAmount)}`,
     "",
     "## 连板梯队",
     ...(payload.limitUps.length
@@ -912,7 +912,7 @@ function formatNumber(value: number): string {
 }
 
 function marketBreadth(dataset: MarketDataset, limitUpCount: number): CloseReportPayload["marketBreadth"] {
-  const mainStocks = dataset.stocks.filter((stock) => stock.market === "main");
+  const mainStocks = dataset.closeSummary ? dataset.stocks : dataset.stocks.filter((stock) => stock.market === "main");
   return {
     total: mainStocks.length,
     up: mainStocks.filter((stock) => stock.pctChange > 0).length,

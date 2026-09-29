@@ -43,18 +43,22 @@ export async function fuyao(endpoint: string, params: Record<string, string>) {
   throw new Error("Fuyao 请求失败");
 }
 
-export interface MainStock { ticker: string; name: string; list_date: string | null }
-export async function mainStockCatalog(): Promise<MainStock[]> {
+export interface MainStock { ticker: string; name: string; list_date: string | null; exchange?: string }
+export async function aShareCatalog(): Promise<MainStock[]> {
   const items: MainStock[] = [];
   for (let offset = 0; offset < 100000; offset += 10000) {
     const page = await fuyao("/api/meta/tickers/list", { asset_type: "a-share", limit: "10000", offset: String(offset) });
-    items.push(...page.item.filter((item: MainStock) => /^(000|001|002|600|601|603|605)\d{3}$/.test(item.ticker)));
+    items.push(...page.item);
     if (page.item.length < 10000) {
-      if (!items.length) throw new Error("主板代码表为空");
+      if (!items.length) throw new Error("A股代码表为空");
       return items;
     }
   }
-  throw new Error("主板代码表分页异常");
+  throw new Error("A股代码表分页异常");
+}
+
+export async function mainStockCatalog(): Promise<MainStock[]> {
+  return (await aShareCatalog()).filter(item => /^(000|001|002|600|601|603|605)\d{3}$/.test(item.ticker));
 }
 
 export function validateHistory(bars: DailyBar[], dates: string[]): boolean {

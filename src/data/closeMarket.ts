@@ -1,4 +1,4 @@
-import { fuyao, mainStockCatalog } from "./intradayPreparation.js";
+import { fuyao, aShareCatalog } from "./intradayPreparation.js";
 import { currentShanghaiTradeDate } from "./tradingCalendar.js";
 import type { MarketDataset, StockSnapshot } from "../shared/types.js";
 
@@ -10,7 +10,9 @@ export function validateCloseTimestamp(timestamp: number, tradeDate: string) {
 }
 
 export async function fetchCloseMarket(tradeDate: string): Promise<MarketDataset> {
-  const catalog = (await mainStockCatalog()).filter(stock => !stock.list_date || stock.list_date.replaceAll("-", "") <= tradeDate);
+  const allCodes = await aShareCatalog();
+  const undated = allCodes.filter(stock => !stock.list_date);
+  const catalog = allCodes.filter(stock => stock.list_date && stock.list_date.replaceAll("-", "") <= tradeDate);
   const names = new Map(catalog.map(stock => [stock.ticker, stock.name]));
   const stocks: StockSnapshot[] = [];
   const seen = new Set<string>();
@@ -22,19 +24,20 @@ export async function fetchCloseMarket(tradeDate: string): Promise<MarketDataset
     timestamp = Math.min(timestamp, page.timestamp);
     for (const row of page.item) {
       if (!names.has(row.ticker)) continue;
-      if (seen.has(row.ticker)) throw new Error("主板行情代码重复");
+      if (seen.has(row.ticker)) throw new Error("A股行情代码重复");
       seen.add(row.ticker);
       if (row.volume === 0 && row.turnover === 0) { suspended++; continue; }
       if (![row.last_price, row.prev_price, row.turnover, row.volume].every(Number.isFinite) || row.last_price <= 0 || row.prev_price <= 0 || row.turnover <= 0 || row.volume <= 0) throw new Error(`${row.ticker} 收盘价格或成交额无效`);
-      stocks.push({ code: row.ticker, name: names.get(row.ticker)!, market: "main", concepts: [], close: row.last_price,
+      stocks.push({ code: row.ticker, name: names.get(row.ticker)!, market: catalog.find(stock => stock.ticker === row.ticker)?.exchange === "BJ" ? "bse" : row.ticker.startsWith("30") ? "gem" : row.ticker.startsWith("68") ? "star" : "main", concepts: [], close: row.last_price,
         pctChange: (row.last_price / row.prev_price - 1) * 100, turnoverAmount: row.turnover,
         volume: row.volume / 100, turnoverRate: 0, volumeRatio: 0 });
     }
     if (offset + page.item.length >= page.total) break;
     if (!page.item.length || offset >= 90000) throw new Error("收盘行情分页不完整");
   }
-  if (seen.size !== names.size || !stocks.length) throw new Error(`主板行情覆盖不完整：${seen.size}/${names.size}`);
-  const warnings = [`统计范围：沪深主板 ${names.size} 只，其中 ${stocks.length} 只当日有成交、${suspended} 只无成交；不含创业板、科创板和北交所。`];
+  if (seen.size !== names.size || !stocks.length) throw new Error(`A股行情覆盖不完整：${seen.size}/${names.size}`);
+  const warnings = [`统计范围：全A股 ${names.size} 只，其中 ${stocks.length} 只当日有成交、${suspended} 只无成交；包含沪深主板、创业板、科创板和北交所（含ST），不含尚未上市股票。`];
+  if (undated.length) warnings.push(`另有 ${undated.length} 个代码缺少上市日期，未纳入统计：${undated.map(stock => stock.ticker).join("、")}。`);
   const date_ms = String(Date.parse(`${tradeDate.slice(0, 4)}-${tradeDate.slice(4, 6)}-${tradeDate.slice(6)}T00:00:00+08:00`));
   async function poolCount(kind: "up" | "down"): Promise<number | null> {
     try {
@@ -72,7 +75,7 @@ export async function fetchCloseMarket(tradeDate: string): Promise<MarketDataset
     industries.length = 0;
     warnings.push("行业指数行情暂不可用，行业排行留空。");
   }
-  warnings.push("行业排行按同花顺行业指数涨跌幅排序；资金流、综合热度和开板次数未获取，不使用涨停池代算。行业指数成分范围与主板统计范围不同。");
+  warnings.push("行业排行按同花顺行业指数涨跌幅排序；资金流、综合热度和开板次数未获取，不使用涨停池代算。行业指数按其实际成分范围统计。");
   return { tradeDate, dataAsOf: new Date(timestamp).toISOString(), source: "fuyao", warnings, stocks,
     limitUps: [], dragonTiger: [], sectors: [], closeSummary: { limitUp, limitDown, industries } };
 }
