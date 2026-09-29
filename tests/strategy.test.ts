@@ -106,11 +106,11 @@ describe("strategy compiler", () => {
 });
 
 
-it("uses one MA5 default in manual CI and keeps its thresholds when DeepSeek is configured", async () => {
+it("uses one MA5 default in scheduled CI and keeps its thresholds when DeepSeek is configured", async () => {
   const workflow = readFileSync(new URL("../.github/workflows/intraday-selection-1450.yml", import.meta.url), "utf8");
   expect(workflow).not.toContain("INTRADAY_STRATEGY_PROMPT:");
-  expect(workflow).not.toContain("ref: dev");
-  expect(workflow).toContain('DAILY_BARS_LIMIT_UP_UNIVERSE: "false"');
+  expect(workflow).toContain("ref: dev");
+  expect(workflow).toContain("src/jobs/scheduledIntraday.ts");
   vi.stubEnv("INTRADAY_STRATEGY_PROMPT", "");
   vi.stubEnv("DEEPSEEK_API_KEY", "test-only");
   const fetch = vi.fn();

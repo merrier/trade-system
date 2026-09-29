@@ -19,3 +19,5 @@ cache/
 coverage/
 __pycache__/
 *.pyc
+
+data/intraday-history/

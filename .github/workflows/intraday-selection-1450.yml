@@ -1,98 +1,154 @@
-name: Send 14:50 intraday selection
+name: Publish 14:50 intraday selection
 
 on:
+  schedule:
+    # Asia/Shanghai: prepare at 08:00, sample at 14:50. Schedules may be delayed.
+    - cron: "0 0 * * 1-5"
+    - cron: "50 6 * * 1-5"
   workflow_dispatch:
     inputs:
-      skip_delivery:
-        description: "Skip message delivery for manual test runs"
-        required: false
-        default: "true"
+      mode:
+        description: "validate / prepare history / generate and publish report"
         type: choice
-        options:
-          - "true"
-          - "false"
+        default: validate
+        options: [validate, prepare, report]
+      skip_delivery:
+        description: "Skip Feishu delivery for manual testing"
+        type: boolean
+        default: true
 
 permissions:
-  contents: read
+  contents: write
+  pages: write
 
 concurrency:
-  group: intraday-selection-1450
-  cancel-in-progress: true
+  group: intraday-${{ github.event.schedule || inputs.mode }}
+  cancel-in-progress: false
 
 jobs:
   report:
     runs-on: ubuntu-latest
+    timeout-minutes: 240
     env:
-      DATABASE_URL: "file:../data/trade-system.db"
-      PYTHON_BIN: "python3"
       FUYAO_API_KEY: ${{ secrets.FUYAO_API_KEY }}
-      PREVIOUS_STATIC_DATA_DIR: "."
-      SKIP_DAILY_BAR_REFRESH: "true"
-      DAILY_BARS_LIMIT_UP_UNIVERSE: "false"
-      DATA_PROVIDER_TIMEOUT_MS: "60000"
-      IWENCAI_API_KEY: ${{ secrets.IWENCAI_API_KEY }}
-      IWENCAI_API_KEY_FALLBACK: ${{ secrets.IWENCAI_API_KEY_FALLBACK }}
-      IWENCAI_BASE_URL: "https://openapi.iwencai.com"
-      IWENCAI_SKILL_CLI: "~/.codex/skills/hithink-market-query/scripts/cli.py"
-      IWENCAI_TIMEOUT_MS: "30000"
-      IWENCAI_CONTEXT_TOP_N: "10"
-      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-      DEEPSEEK_BASE_URL: ${{ vars.DEEPSEEK_BASE_URL || 'https://api.deepseek.com' }}
-      DEEPSEEK_MODEL: ${{ vars.DEEPSEEK_MODEL || 'deepseek-chat' }}
-      HERMES_ANALYSIS_COMMAND: "./scripts/hermes-analysis.sh"
+      SKIP_REPORT_DELIVERY: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_delivery && 'true' || 'false' }}
+      HERMES_ANALYSIS_COMMAND: ""
       FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
       FEISHU_WEBHOOK_SECRET: ${{ secrets.FEISHU_WEBHOOK_SECRET }}
       FEISHU_WEBHOOK_MODE: ${{ vars.FEISHU_WEBHOOK_MODE }}
       FEISHU_WEBHOOK_KEYWORD: ${{ vars.FEISHU_WEBHOOK_KEYWORD }}
-
     steps:
-      - name: Checkout selected branch
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          persist-credentials: false
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Install Node dependencies
+      - run: npm install --no-package-lock
+      - name: Calendar and mode
+        id: plan
+        env:
+          RUN_MODE: ${{ inputs.mode || (github.event.schedule == '0 0 * * 1-5' && 'prepare' || 'report') }}
         run: |
-          corepack enable
-          corepack prepare yarn@1.22.22 --activate
-          yarn install --non-interactive --no-lockfile
-
-      - name: Install Python data dependencies
-        run: python3 -m pip install --user akshare pandas efinance baostock easyquotation
-
-      - name: Install Iwencai SkillHub CLI
+          node --import tsx --input-type=module - <<'JS' >> "$GITHUB_OUTPUT"
+          import { tradingDayDecision } from './src/data/tradingCalendar.ts';
+          const day = tradingDayDecision();
+          console.log(`trading=${day.isTradingDay}`);
+          console.log(`date=${day.tradeDate}`);
+          console.log(`mode=${process.env.RUN_MODE}`);
+          JS
+      - name: Generate client
+        run: npm run prisma:generate
+      - name: Validate migration
+        if: steps.plan.outputs.mode == 'validate'
         run: |
-          curl -fsSL -o /tmp/iwencai-skillhub-cli.zip https://www.iwencai.com/skillhub/static/0.0.4/iwencai-skillhub-cli.zip
-          rm -rf /tmp/iwencai-skillhub-cli
-          mkdir -p /tmp/iwencai-skillhub-cli
-          unzip -q -o /tmp/iwencai-skillhub-cli.zip -d /tmp/iwencai-skillhub-cli
-          bash /tmp/iwencai-skillhub-cli/iwencai-skillhub-cli/iwencai-install.sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-      - name: Install hithink market query skill
-        run: iwencai-skillhub-cli --dir "$HOME/.codex/skills" install hithink-market-query
-
-      - name: Generate Prisma client
-        run: yarn prisma:generate
-
-      - name: Initialize SQLite schema
-        run: yarn db:init
-
-      - name: Build and send 14:50 intraday selection
-        run: |
-          extra_args=""
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.skip_delivery }}" != "false" ]; then
-            extra_args="--skip-delivery"
-          fi
-          yarn reports:run -- --kind=intraday-selection --skip-daily-bar-refresh ${extra_args}
-
-      - name: Upload report artifact
-        uses: actions/upload-artifact@v4
+          npm run lint
+          npm test
+          npm run build
+      - uses: actions/cache/restore@v4
+        if: steps.plan.outputs.trading == 'true' && steps.plan.outputs.mode != 'validate'
         with:
-          name: intraday-selection-1450
-          path: dist-web/data/reports/intraday-selection/*.json
-          if-no-files-found: warn
+          path: data/intraday-history
+          key: intraday-history-v1-${{ steps.plan.outputs.date }}-${{ github.run_id }}
+          restore-keys: |
+            intraday-history-v1-${{ steps.plan.outputs.date }}-
+            intraday-history-v1-
+      - name: Prepare 30 complete trading sessions
+        if: steps.plan.outputs.trading == 'true' && steps.plan.outputs.mode == 'prepare'
+        run: node --import tsx src/jobs/scheduledIntraday.ts --prepare
+      - uses: actions/cache/save@v4
+        if: always() && steps.plan.outputs.trading == 'true' && steps.plan.outputs.mode == 'prepare'
+        with:
+          path: data/intraday-history
+          key: intraday-history-v1-${{ steps.plan.outputs.date }}-${{ github.run_id }}
+      - name: Build website
+        if: steps.plan.outputs.trading == 'true' && steps.plan.outputs.mode == 'report'
+        run: npm run build
+      - name: Generate report and deliver by Feishu webhook
+        id: selection
+        if: steps.plan.outputs.trading == 'true' && steps.plan.outputs.mode == 'report'
+        continue-on-error: true
+        run: node --import tsx src/jobs/scheduledIntraday.ts
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.plan.outputs.trading == 'true' && steps.plan.outputs.mode != 'validate'
+        with:
+          name: intraday-${{ steps.plan.outputs.date }}-${{ steps.plan.outputs.mode }}
+          path: |
+            data/reports/intraday-selection/*.json
+            data/intraday-history/coverage.json
+          if-no-files-found: error
           retention-days: 30
+      - uses: actions/checkout@v4
+        if: steps.plan.outputs.trading == 'true' && steps.plan.outputs.mode == 'report'
+        with:
+          ref: main
+          path: published-site
+      - name: Publish report including explicit failure status
+        if: steps.plan.outputs.trading == 'true' && steps.plan.outputs.mode == 'report'
+        run: |
+          cp dist-web/index.html published-site/index.html
+          cp -a dist-web/assets/. published-site/assets/
+          mkdir -p published-site/data/reports/intraday-selection
+          cp -a data/reports/intraday-selection/. published-site/data/reports/intraday-selection/
+          cd published-site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets data/reports/intraday-selection
+          if ! git diff --cached --quiet; then
+            git commit -m "data: publish intraday report ${{ steps.plan.outputs.date }}"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Rebuild Pages
+        if: steps.plan.outputs.trading == 'true' && steps.plan.outputs.mode == 'report'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"
+      - name: Verify public intraday-selection report
+        if: steps.plan.outputs.trading == 'true' && steps.plan.outputs.mode == 'report'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          export INTRADAY_SITE_URL=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq .html_url)
+          python3 - <<'PY'
+          import json, os, time, urllib.request
+          expected = json.load(open('data/reports/intraday-selection/latest.json'))
+          base = os.environ['INTRADAY_SITE_URL'].replace('http://', 'https://').rstrip('/')
+          for attempt in range(12):
+              try:
+                  url = f'{base}/data/reports/intraday-selection/latest.json?verify={time.time_ns()}'
+                  with urllib.request.urlopen(url, timeout=15) as response:
+                      actual = json.load(response)
+                  if actual['id'] == expected['id'] and actual['tradeDate'] == expected['tradeDate']:
+                      print('Public intraday-selection report verified:', actual['tradeDate'], actual['provider'])
+                      break
+              except Exception as error:
+                  print('Waiting for Pages:', type(error).__name__)
+              time.sleep(15)
+          else:
+              raise SystemExit('Pages did not serve the generated report before the deadline')
+          PY
+      - name: Fail visibly when sampling or delivery failed
+        if: steps.selection.outputs.failed == 'true' || steps.selection.outcome == 'failure'
+        run: exit 1

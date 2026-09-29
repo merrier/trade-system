@@ -297,7 +297,7 @@ function App() {
             <p>数据分析辅助，不自动交易，不保证收益。</p>
           </div>
           <div className="status">
-            <SourceBadge status={dataStatus} />
+            {tab === "intradayMa5" ? <div className="source-badge"><strong>{reports["intraday-selection"]?.payload?.runStatus === "failed" ? "选股任务失败" : reports["intraday-selection"] ? "选股报告" : "选股报告未生成"}</strong><span>{reports["intraday-selection"]?.tradeDate ?? ""}</span></div> : <SourceBadge status={dataStatus} />}
             <button className="ghost" onClick={refreshDashboard} disabled={busy}>
               <RefreshCw size={16} />
               刷新
@@ -306,7 +306,7 @@ function App() {
         </header>
 
         {message && <div className="message">{message}</div>}
-        {dataStatus.warnings.length > 0 && <div className="warning-strip">{dataStatus.warnings.join("；")}</div>}
+        {tab !== "intradayMa5" && dataStatus.warnings.length > 0 && <div className="warning-strip">{dataStatus.warnings.join("；")}</div>}
         {visiblePanel}
       </section>
     </main>
@@ -409,6 +409,7 @@ function IntradayStrategyPage({ report }: { report?: ReportArtifact }) {
 
 function IntradayReportPanel({ report }: { report?: ReportArtifact }) {
   if (!report) return <div className="empty">暂无「{INTRADAY_STRATEGY_NAME}」的 14:50 选股报告。</div>;
+  if (report.payload?.runStatus === "failed") return <div className="empty">{report.tradeDate} · {report.analysis}</div>;
   if (!report.payload?.strategy?.compiledDsl?.strategyTemplates?.includes("ma5_pullback")) {
     return <div className="empty">当前最新报告属于其他策略，尚无「{INTRADAY_STRATEGY_NAME}」报告。</div>;
   }
@@ -417,10 +418,12 @@ function IntradayReportPanel({ report }: { report?: ReportArtifact }) {
       <section className="workbench">
         <div className="section-title">
           <Clock3 size={18} />
-          <h2>选股报告与摘要</h2>
+          <h2>选股报告与摘要 · {report.tradeDate}</h2>
         </div>
         <p className="report-text"><StockText>{report.analysis}</StockText></p>
         {report.rankingNarrative && <p className="report-push"><StockText>{report.rankingNarrative}</StockText></p>}
+        <p>实际采样：{new Date(report.dataAsOf).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}</p>
+        <InfoBlock title="数据说明" items={report.warnings ?? []} />
         <InfoBlock title="策略" items={[report.payload?.strategy?.prompt ?? "默认策略"]} />
       </section>
       <section className="table-section span-2">

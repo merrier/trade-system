@@ -292,3 +292,11 @@ Hermes 微信网关可以通过用户插件把所有 Weixin 入站消息转发�
 - `GET /api/inbox/weixin/latest?limit=50`：读取最近消息，按新到旧排序。
 
 如果本地 API 正在运行，可设置 `TRADE_SYSTEM_INBOX_HTTP_URL=http://127.0.0.1:8787/api/inbox/weixin` 让投递脚本额外 fan-out 到 HTTP；未设置时仍会可靠写入 JSONL。
+
+### GitHub 14:50 选股
+
+`.github/workflows/intraday-selection-1450.yml` 使用 `dev` 源码运行：北京时间工作日 08:00 串行准备主板最近 30 个完整交易日日线，14:50 读取当日缓存、采样 Fuyao、按现有沿五日线阴线回调规则筛选前 5，再通过已有 `FEISHU_WEBHOOK_URL` / `FEISHU_WEBHOOK_SECRET` 推送并更新 Pages。节假日由内置 A 股交易日历跳过。GitHub 调度可能延迟；超过 15:00 不补造盘中结果，网站和 Webhook 均显示失败原因。
+
+历史请求间隔至少 2 秒，限流按 Retry-After 和 60/120/240 秒退避；每只股票落盘，Actions cache 保存中断进度。前复权窗口整体刷新以避免混用复权基准；同日有效窗口复用。缺失日、重复日期、无效 OHLC 或成交量额使准备失败，不能当作停牌或零结果。上市不足 30 个完整交易日及 ST 股票单独排除。量比用实际累计成交量 / 近 5 日日均成交量 / 已交易分钟占比计算，成交量统一为手；不会填默认量比。
+
+手动运行默认为 `validate`（检查代码，不请求行情、不发消息）；`prepare` 补齐当天使用的历史窗口；`report` 生成并发布当天报告（默认跳过飞书，窗口外发布明确失败状态）。检查 Actions 的 `coverage.json` 与报告 artifact，可区分数据准备失败、无人符合条件和推送失败。首次全量准备约需两小时，数据源异常可能更久。
