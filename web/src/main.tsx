@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Activity, BellRing, CandlestickChart, ChevronDown, Clock3, FileText, Layers3, Plus, RefreshCw, Search, ShieldAlert, Sun } from "lucide-react";
 import "./styles.css";
+import StockSearch from "./StockSearch.js";
 import { StockChartProvider, StockLink, StockText } from "./StockChartDialog.js";
 
 const INTRADAY_STRATEGY_NAME = "沿五日线阴线回调策略";
@@ -516,8 +517,8 @@ function StockPanel({ analysisCode, setAnalysisCode, loadAnalysis, analysis }: a
           <h2>个股分析</h2>
         </div>
         <div className="inline-form">
-          <input value={analysisCode} onChange={(event) => setAnalysisCode(event.target.value)} placeholder="输入代码" />
-          <button className="primary" onClick={loadAnalysis}>分析</button>
+          <StockSearch initialCode={analysisCode} onSelect={(stock) => setAnalysisCode(stock?.code ?? "")} />
+          <button className="primary" disabled={!analysisCode} onClick={loadAnalysis}>分析</button>
         </div>
         {score && (
           <div className="score-box">
@@ -535,7 +536,7 @@ function StockPanel({ analysisCode, setAnalysisCode, loadAnalysis, analysis }: a
             <InfoBlock title="龙虎榜" items={(analysis.dragonTiger ?? []).map((item: any) => `${item.tradeDate} 净买入 ${formatYi(item.netAmount)}`)} />
           </div>
         ) : (
-          <div className="empty">输入股票代码查看分析。</div>
+          <div className="empty">输入股票代码或公司名称查看分析。</div>
         )}
       </section>
     </div>
@@ -550,11 +551,10 @@ function WatchPanel({ watchlist, triggers, watchForm, setWatchForm, addWatchItem
           <BellRing size={18} />
           <h2>加入监控池</h2>
         </div>
-        <input value={watchForm.code} onChange={(event) => setWatchForm({ ...watchForm, code: event.target.value })} placeholder="股票代码" />
-        <input value={watchForm.name} onChange={(event) => setWatchForm({ ...watchForm, name: event.target.value })} placeholder="股票名称" />
+        <StockSearch initialCode={watchForm.code} onSelect={(stock) => setWatchForm({ ...watchForm, code: stock?.code ?? "", name: stock?.name ?? "" })} />
         <textarea value={watchForm.thesis} onChange={(event) => setWatchForm({ ...watchForm, thesis: event.target.value })} />
         <textarea value={watchForm.conditionPrompt} onChange={(event) => setWatchForm({ ...watchForm, conditionPrompt: event.target.value })} />
-        <button className="primary" onClick={addWatchItem}>
+        <button className="primary" disabled={!watchForm.code || !watchForm.name} onClick={addWatchItem}>
           <Plus size={16} />
           加入监控
         </button>

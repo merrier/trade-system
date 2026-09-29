@@ -492,3 +492,15 @@ td span {
   .strategy-rules th:first-child { width: 30%; }
   .strategy-rules th, .strategy-rules td { padding: 10px 6px; }
 }
+
+.stock-search { min-width: 0; margin-bottom: 12px; }
+.stock-search label { display: block; font-size: 13px; color: #52606f; margin-bottom: 6px; }
+.stock-search input { width: 100%; margin-bottom: 4px; }
+.stock-search small { display: block; color: #64748b; line-height: 1.5; }
+.stock-search input:focus-visible { outline: 2px solid #2765b0; outline-offset: 2px; }
+.kline-search .stock-search { width: min(100%, 340px); }
+.kline-search .stock-search input { width: 100%; }
+
+.stock-search-results { list-style: none; padding: 0; margin: 4px 0; max-height: 180px; overflow-y: auto; border: 1px solid #d8dee6; border-radius: 7px; background: #fff; }
+.stock-search-results button { width: 100%; padding: 9px 12px; border: 0; background: transparent; text-align: left; cursor: pointer; color: #263544; }
+.stock-search-results button:hover, .stock-search-results button:focus-visible { background: #edf3fa; outline: 2px solid #2765b0; outline-offset: -2px; }

@@ -11,6 +11,7 @@ import { rankSectors } from "../core/scoring.js";
 import { normalizeMarkets, strategyDslSchema, strategyRequiresDailyBars } from "../core/strategy.js";
 import { fetchDailyBars, fetchMarketDataset } from "../data/akshareClient.js";
 import { readDailyBarCache } from "../data/dailyBarCache.js";
+import { fetchStockCatalog } from "../data/stockCatalog.js";
 import { fetchStockHistory } from "../data/stockHistory.js";
 import { appendWeixinInboundMessage, readLatestWeixinInboundMessages } from "../inbox/weixinInbox.js";
 import { readReportArtifact } from "../jobs/reportArtifacts.js";
@@ -55,6 +56,15 @@ export function createApp(prisma: PrismaClient) {
     name: "trade-system",
     now: new Date().toISOString()
   }));
+
+  app.get("/api/stocks/catalog", async () => {
+    try { return { items: await fetchStockCatalog() }; }
+    catch {
+      const items = await prisma.stock.findMany({ select: { code: true, name: true }, orderBy: { code: "asc" } });
+      if (!items.length) throw app.httpErrors.serviceUnavailable("股票名称索引暂不可用，请输入六位代码或稍后重试");
+      return { items };
+    }
+  });
 
   app.get("/api/stocks/:code/history", async (request) => {
     const { code } = request.params as { code: string };

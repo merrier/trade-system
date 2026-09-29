@@ -6,6 +6,7 @@ import { CanvasRenderer } from "echarts/renderers";
 import type { EChartsOption } from "echarts";
 import { chartCandles, MA_PERIODS, type CandlePeriod, type StockHistory } from "../../src/shared/kline.js";
 import "./stock-kline.css";
+import StockSearch from "./StockSearch.js";
 
 use([CandlestickChart, LineChart, BarChart, GridComponent, TooltipComponent, LegendComponent, DataZoomComponent, AriaComponent, CanvasRenderer]);
 
@@ -122,10 +123,9 @@ export default function StockChartPanel() {
   const [input, setInput] = useState("600519");
   const [code, setCode] = useState("600519");
   return <div className="kline-workspace">
-    <form className="kline-search" onSubmit={(event) => { event.preventDefault(); setCode(input.trim()); }}>
-      <label htmlFor="kline-code">主板股票代码</label>
-      <input id="kline-code" value={input} onChange={(event) => setInput(event.target.value)} inputMode="numeric" pattern="(000|001|002|600|601|603|605)[0-9]{3}" maxLength={6} required placeholder="例如 600519" />
-      <button className="primary" type="submit">查看 K 线</button>
+    <form className="kline-search" onSubmit={(event) => { event.preventDefault(); if (input) setCode(input); }}>
+      <StockSearch initialCode="600519" onSelect={(stock) => setInput(stock?.code ?? "")} />
+      <button className="primary" type="submit" disabled={!input}>查看 K 线</button>
     </form>
     <StockKLineChart code={code} />
   </div>;

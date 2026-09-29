@@ -3,6 +3,7 @@ import path from "node:path";
 import { createDefaultStrategy } from "../core/defaults.js";
 import { buildCloseReportFromDataset } from "../core/reports.js";
 import { rankSectors, rankStocks } from "../core/scoring.js";
+import { fetchStockCatalog } from "../data/stockCatalog.js";
 import { fetchMarketDataset } from "../data/akshareClient.js";
 import { writeReportArtifact } from "./reportArtifacts.js";
 
@@ -26,6 +27,8 @@ await fs.mkdir(path.join(outputRoot, "sectors"), { recursive: true });
 await fs.mkdir(path.join(outputRoot, "watchlist"), { recursive: true });
 await fs.mkdir(path.join(outputRoot, "stocks"), { recursive: true });
 await fs.mkdir(path.join(outputRoot, "reports"), { recursive: true });
+
+await writeJson("stocks/catalog.json", { items: await fetchStockCatalog().catch(() => dataset.stocks.map(({ code, name }) => ({ code, name }))) });
 
 await writeJson("manifest.json", {
   tradeDate: dataset.tradeDate,
