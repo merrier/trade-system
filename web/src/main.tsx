@@ -178,7 +178,7 @@ function App() {
       const loadedReports = await loadReports();
       setReports(loadedReports);
       setDataStatus({ source: latest.source, tradeDate: latest.tradeDate, dataAsOf: latest.dataAsOf, warnings: latest.warnings ?? [] });
-      setMessage(isStaticMode() ? "静态盘后数据已刷新" : "数据已刷新");
+      setMessage("");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "刷新失败");
     } finally {
@@ -273,6 +273,11 @@ function App() {
           <TabButton active={tab === "kline"} icon={<CandlestickChart size={18} />} label="K 线图" onClick={() => setTab("kline")} />
           <TabButton active={tab === "watch"} icon={<BellRing size={18} />} label="监控池" onClick={() => setTab("watch")} />
         </nav>
+        <button className="ghost wide" onClick={refreshDashboard} disabled={busy}>
+          <RefreshCw size={16} />
+          {busy ? "刷新中…" : "刷新数据"}
+        </button>
+        <p className="sidebar-note">数据分析辅助，不自动交易，不保证收益。</p>
         <button className="primary wide" onClick={runPostClose} disabled={busy}>
           <RefreshCw size={16} />
           盘后落库
@@ -280,22 +285,12 @@ function App() {
       </aside>
 
       <section className="content">
-        <header className="topbar">
-          <div>
-            <h1>A股策略研究台</h1>
-            <p>数据分析辅助，不自动交易，不保证收益。</p>
-          </div>
-          <div className="status">
-            {tab === "closeReport" ? <div className="source-badge"><strong>{reports.close?.provider ?? "复盘未生成"}</strong><span>{reports.close?.tradeDate ?? ""}</span></div> : tab === "intradayMa5" ? <div className="source-badge"><strong>{reports["intraday-selection"]?.payload?.runStatus === "failed" ? "选股任务失败" : reports["intraday-selection"] ? "选股报告" : "选股报告未生成"}</strong><span>{reports["intraday-selection"]?.tradeDate ?? ""}</span></div> : <SourceBadge status={dataStatus} />}
-            <button className="ghost" onClick={refreshDashboard} disabled={busy}>
-              <RefreshCw size={16} />
-              刷新
-            </button>
-          </div>
-        </header>
-
-        {message && <div className="message">{message}</div>}
-        {tab !== "intradayMa5" && tab !== "closeReport" && dataStatus.warnings.length > 0 && <div className="warning-strip">{dataStatus.warnings.join("；")}</div>}
+        {message && <div className="message" role="status">{message}</div>}
+        {["ladder", "stock"].includes(tab) && <details className="data-details">
+          <summary>数据来源与状态{dataStatus.warnings.length > 0 ? "（有告警）" : ""}</summary>
+          <SourceBadge status={dataStatus} />
+          {dataStatus.warnings.length > 0 && <div className="warning-strip">{dataStatus.warnings.join("；")}</div>}
+        </details>}
         {visiblePanel}
       </section>
     </main>

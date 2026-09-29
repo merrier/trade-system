@@ -509,3 +509,8 @@ td span {
 .watch-page > .workbench .stock-search { max-width: 420px; }
 .watch-stock { min-width: 0; }
 .watch-stock > h2 { font-size: 18px; margin-bottom: 12px; }
+
+.sidebar-note { color: #aebac8; font-size: 12px; line-height: 1.6; margin: 12px 0; }
+.data-details { margin-bottom: 16px; color: #52606f; font-size: 13px; }
+.data-details summary { cursor: pointer; padding: 6px 0; }
+.data-details .source-badge { display: inline-flex; margin-top: 8px; }
