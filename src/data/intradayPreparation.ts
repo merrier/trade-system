@@ -110,7 +110,7 @@ export async function prepareIntradayHistory(tradeDate: string) {
 }
 
 export async function readPreparedHistory(tradeDate: string): Promise<DailyBar[]> {
-  const coverage = JSON.parse(await fs.readFile(`${historyRoot}/coverage.json`, "utf8"));
+  const coverage = JSON.parse(await fs.readFile(`${historyRoot}/coverage.json`, "utf8").catch(() => { throw new Error("未找到历史准备结果，请检查当天08:00的 GitHub 日线准备任务"); }));
   const dates = completeTradingWindow(tradeDate);
   if (!coverage.ready || coverage.tradeDate !== tradeDate || coverage.endDate !== dates.at(-1)) throw new Error("近30个完整交易日日线尚未补齐或已过期");
   const bars: DailyBar[] = [];
