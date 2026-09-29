@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-29T13:16:25.536460+00:00",
+  "items": [
+    {
+      "code": "603330",
+      "name": "天洋新材",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-13T14:56:47.764Z",
+      "updatedAt": "2026-06-13T14:56:47.764Z"
+    },
+    {
+      "code": "002709",
+      "name": "天赐材料",
+      "market": "main",
+      "isActive": true,
+      "addedAt": "2026-06-16T06:24:16.038Z",
+      "updatedAt": "2026-06-16T06:24:16.038Z"
+    },
+    {
+      "code": "603026",
+      "name": "石大胜华",
+      "market": "main",
+      "isActive": true,
+      "addedAt": "2026-06-16T06:24:33.542Z",
+      "updatedAt": "2026-06-16T06:24:33.542Z"
+    },
+    {
+      "code": "000973",
+      "name": "佛塑科技",
+      "market": "main",
+      "isActive": true,
+      "addedAt": "2026-06-16T06:24:39.239Z",
+      "updatedAt": "2026-06-16T06:24:39.239Z"
+    },
+    {
+      "code": "600460",
+      "name": "士兰微",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-22T07:34:01.160Z",
+      "updatedAt": "2026-06-22T07:34:01.160Z"
+    },
+    {
+      "code": "600961",
+      "name": "株冶集团",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-22T07:34:38.302Z",
+      "updatedAt": "2026-06-22T07:34:38.302Z"
+    },
+    {
+      "code": "600367",
+      "name": "红星发展",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-26T06:26:19.317Z",
+      "updatedAt": "2026-06-26T06:26:19.317Z"
+    },
+    {
+      "code": "000021",
+      "name": "深科技",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-30T03:50:43.554Z",
+      "updatedAt": "2026-06-30T03:50:43.554Z"
+    },
+    {
+      "code": "002436",
+      "name": "兴森科技",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-30T11:40:55.182Z",
+      "updatedAt": "2026-06-30T11:40:55.182Z"
+    },
+    {
+      "code": "000811",
+      "name": "冰轮环境",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-30T11:55:53.620Z",
+      "updatedAt": "2026-06-30T11:55:53.620Z"
+    },
+    {
+      "code": "002585",
+      "name": "双星新材",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-30T12:17:12.657Z",
+      "updatedAt": "2026-06-30T12:17:12.657Z"
+    },
+    {
+      "code": "002859",
+      "name": "洁美科技",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-06-30T12:17:12.904Z",
+      "updatedAt": "2026-06-30T12:17:12.904Z"
+    },
+    {
+      "code": "603618",
+      "name": "杭电股份",
+      "market": "main",
+      "isActive": true,
+      "addedAt": "2026-09-29T04:54:23.712Z"
+    }
+  ]
+}
