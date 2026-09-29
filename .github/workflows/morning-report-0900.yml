@@ -1,0 +1,129 @@
+name: Publish 09:00 morning report
+
+on:
+  schedule:
+    # 09:00 Asia/Shanghai; GitHub schedules may start late.
+    - cron: "0 1 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: morning-report-0900
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHON_BIN: python3
+      SKIP_REPORT_DELIVERY: "true"
+      HERMES_ANALYSIS_COMMAND: ""
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Node dependencies
+        run: npm install --no-package-lock
+      - name: Check A-share trading calendar
+        id: calendar
+        run: |
+          node --import tsx --input-type=module - <<'JS' >> "$GITHUB_OUTPUT"
+          import { tradingDayDecision } from './src/data/tradingCalendar.ts';
+          const day = tradingDayDecision();
+          console.log(`trading=${day.isTradingDay}`);
+          console.log(`date=${day.tradeDate}`);
+          JS
+      - name: Install morning data dependencies
+        if: steps.calendar.outputs.trading == 'true'
+        run: python3 -m pip install -r python/requirements-morning.txt
+      - name: Validate code
+        if: steps.calendar.outputs.trading == 'true'
+        run: |
+          npm run prisma:generate
+          npm run lint
+          npm test
+      - name: Checkout published website
+        if: steps.calendar.outputs.trading == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: published-site
+      - name: Restore previous morning reports
+        if: steps.calendar.outputs.trading == 'true'
+        run: |
+          mkdir -p data/reports/morning
+          if [ -d published-site/data/reports/morning ]; then
+            cp -a published-site/data/reports/morning/. data/reports/morning/
+          fi
+      - name: Generate morning report without message delivery
+        if: steps.calendar.outputs.trading == 'true'
+        env:
+          FUYAO_API_KEY: ${{ secrets.FUYAO_API_KEY }}
+        run: npm run reports:morning -- --skip-delivery --if-missing
+      - name: Build website and preserve report files
+        if: steps.calendar.outputs.trading == 'true'
+        run: npm run build
+      - name: Save report artifact
+        if: steps.calendar.outputs.trading == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: morning-report-${{ steps.calendar.outputs.date }}
+          path: data/reports/morning/*.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish to existing Pages branch
+        if: steps.calendar.outputs.trading == 'true'
+        run: |
+          cp dist-web/index.html published-site/index.html
+          cp -a dist-web/assets/. published-site/assets/
+          mkdir -p published-site/data/reports/morning
+          cp -a dist-web/data/reports/morning/. published-site/data/reports/morning/
+          cd published-site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets data/reports/morning
+          if ! git diff --cached --quiet; then
+            git commit -m "data: publish morning report ${{ steps.calendar.outputs.date }}"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Request Pages rebuild
+        if: steps.calendar.outputs.trading == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"
+      - name: Verify public morning report
+        if: steps.calendar.outputs.trading == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          export MORNING_SITE_URL=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq .html_url)
+          python3 - <<'PY'
+          import json, os, time, urllib.request
+          expected = json.load(open('data/reports/morning/latest.json'))
+          base = os.environ['MORNING_SITE_URL'].replace('http://', 'https://').rstrip('/')
+          for attempt in range(12):
+              try:
+                  url = f'{base}/data/reports/morning/latest.json?verify={time.time_ns()}'
+                  with urllib.request.urlopen(url, timeout=15) as response:
+                      actual = json.load(response)
+                  if actual['id'] == expected['id'] and actual['tradeDate'] == expected['tradeDate']:
+                      print('Public morning report verified:', actual['tradeDate'], actual['provider'])
+                      break
+              except Exception as error:
+                  print('Waiting for Pages:', type(error).__name__)
+              time.sleep(15)
+          else:
+              raise SystemExit('Pages did not serve the generated report before the deadline')
+          PY

@@ -266,7 +266,7 @@ npm run monitor:pool -- disable --code=600226
 
 晨报依赖安装：`python3 -m pip install -r python/requirements-morning.txt`。手动生成：`npm run reports:morning -- --skip-delivery`；定时运行加 `--if-missing`，当天已有报告时直接跳过。非 A 股交易日会在请求数据之前退出，晨报不扫描 A 股日线。
 
-当前已配置 Codex 本地自动化「9:00 A股晨报」，北京时间周一至周五 9:00 在本图表工作区运行上述命令，节假日由项目日历跳过；仅生成页面数据，不发送飞书或微信消息。该自动化依赖本机 Codex 可运行，迁移工作区或部署到服务器时需同步修改自动化目录。
+GitHub Actions 的 `morning-report-0900.yml` 在北京时间周一至周五 9:00 运行（GitHub 排队可能延迟），也支持手动触发。任务读取仓库 Secret `FUYAO_API_KEY`，节假日由项目日历跳过；生成后更新 `main` 分支上的 GitHub Pages 静态页面和晨报数据，主动触发 Pages 构建并验证公网报告。只生成页面数据，不发送飞书或微信消息，不依赖本机 Codex。原本地晨报自动化停用。
 
 外盘使用 yfinance，Fuyao 提供国内原油连续和商品指数，分栏展示。仅采用报告日前已完成、距报告日不超过 7 天的日线；涨跌幅按相邻两根有效日线计算。Yahoo 限流时保留 Fuyao 栏目并标注外盘缺失，全部数据源失败则不覆盖已有报告。报告日期为 A 股晨报日期，各行情另标数据日期。
 
