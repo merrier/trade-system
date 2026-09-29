@@ -1,0 +1,91 @@
+{
+  "id": "intraday-selection-20260929-1790680054397",
+  "kind": "intraday-selection",
+  "tradeDate": "20260929",
+  "dataAsOf": "2026-09-29T11:07:34.397Z",
+  "generatedAt": "2026-09-29T11:07:34.397Z",
+  "provider": "fuyao",
+  "warnings": [
+    "选股任务失败：未在当日14:50至15:00采样窗口内，未使用盘后数据补造选股报告。本次未生成选股结果。"
+  ],
+  "analysis": "选股任务失败：未在当日14:50至15:00采样窗口内，未使用盘后数据补造选股报告。本次未生成选股结果。",
+  "pushMessage": "20260929 沿五日线阴线回调策略\n\n状态：失败\n\n任务检查时间：2026/9/29 19:07:34\n\n选股任务失败：未在当日14:50至15:00采样窗口内，未使用盘后数据补造选股报告。本次未生成选股结果。\n\n选股任务失败：未在当日14:50至15:00采样窗口内，未使用盘后数据补造选股报告。本次未生成选股结果。\n\nhttps://merrier.wang/trade-system/",
+  "payload": {
+    "runStatus": "failed",
+    "strategy": {
+      "prompt": "沿五日线阴线回调策略：主板股票，非ST，非科创板，非北交所，非创业板，股价大于5元，近5日日均成交额大于3000万，MA5连续3日上行，MA5大于MA10，MA10大于MA20，今日之前最近5个完整交易日收盘价均在各自5日线上方，今日14:50呈阴线回调且最新价仍在5日线上方，距离5日线0%到2%，今日最低价触碰或接近5日线，最低价距离5日线不超过1.5%，盘中若短暂跌破5日线则跌破幅度不超过0.8%且已收回，今日涨幅在-2%到+2.5%，近5日最大涨幅小于15%，近20日最大涨幅小于35%，今日量比0.7到1.8，剔除涨停、跌停、停牌、长上影、放量大阴线和距离5日线过远的股票",
+      "compiledDsl": {
+        "style": "short_term",
+        "markets": [
+          "main"
+        ],
+        "strategyTemplates": [
+          "ma5_pullback"
+        ],
+        "include": [
+          "沿五日线回调",
+          "MA5连续上行",
+          "回踩五日线",
+          "五日线止损",
+          "均线多头排列",
+          "量能不过热"
+        ],
+        "exclude": [
+          "ST",
+          "科创板",
+          "北交所",
+          "创业板",
+          "股价小于5元",
+          "近5日日均成交额低于3000万",
+          "跌破五日线",
+          "距离五日线过远",
+          "涨停",
+          "跌停",
+          "长上影",
+          "放量大阴线"
+        ],
+        "weights": {
+          "strategyMatch": 44,
+          "limitUpStrength": 0,
+          "dragonTiger": 2,
+          "sectorHeat": 14,
+          "moneyFlow": 12,
+          "liquidity": 12,
+          "riskPenalty": 24
+        },
+        "filters": {
+          "excludeST": true,
+          "excludeSuspended": true,
+          "excludeNewStocksDays": 20,
+          "minTurnoverAmount": 30000000,
+          "sectorTopN": 10,
+          "minPrice": 5,
+          "minFiveDayAvgAmount": 30000000,
+          "requireBullishMaAlignment": true,
+          "requireAboveMa": "ma5_or_ma10",
+          "requireMa5RisingDays": 3,
+          "closeAboveMa5LookbackDays": 5,
+          "minCloseAboveMa5Days": 5,
+          "requireBearishCandle": true,
+          "maxMaDistancePct": 2,
+          "maxLowMa5DistancePct": 1.5,
+          "maxIntradayBreakMa5Pct": 0.8,
+          "minTodayPctChange": -2,
+          "maxTodayPctChange": 2.5,
+          "maxFiveDayRangePct": 15,
+          "maxTwentyDayRangePct": 35,
+          "minVolumeRatio": 0.7,
+          "maxVolumeRatio": 1.8
+        }
+      },
+      "warnings": [],
+      "unsupported": [],
+      "compiledAt": "2026-09-29T11:07:34.397Z",
+      "engine": "local"
+    },
+    "recommendations": [],
+    "monitorPool": [],
+    "sectorFlowLeaders": [],
+    "factorLegend": {}
+  }
+}
