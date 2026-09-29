@@ -77,7 +77,7 @@ const api = {
     if (isStaticMode() && url === "/api/watchlist") {
       return { items: readStoredWatchlist() } as T;
     }
-    const response = await fetch(apiUrl(url));
+    const response = await fetch(`${apiUrl(url)}${isStaticMode() ? `?refresh=${Date.now()}` : ""}`, { cache: "no-store" });
     if (!response.ok) throw new Error(await response.text());
     return response.json() as Promise<T>;
   },
