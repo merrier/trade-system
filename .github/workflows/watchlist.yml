@@ -1,0 +1,66 @@
+name: Publish shared watchlist
+on:
+  push:
+    branches: [dev]
+    paths:
+      - data/watchlist/monitor-pool.json
+      - web/**
+      - .github/workflows/watchlist.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+concurrency:
+  group: publish-watchlist
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-package-lock
+      - name: Validate and build
+        run: |
+          npm run prisma:generate
+          npm run lint
+          npm test
+          npm run build
+          node --input-type=module - <<'JS'
+          import fs from 'node:fs';
+          const pool = JSON.parse(fs.readFileSync('data/watchlist/monitor-pool.json', 'utf8'));
+          if (pool.version !== 1 || !Array.isArray(pool.items) || typeof pool.updatedAt !== 'string') throw Error('Invalid watchlist');
+          const codes = new Set();
+          for (const item of pool.items) {
+            if (!/^\d{6}$/.test(item.code) || !item.name || typeof item.addedAt !== 'string' || !['main', 'gem', 'star', 'bse'].includes(item.market) || typeof item.isActive !== 'boolean' || codes.has(item.code)) throw Error('Invalid or duplicate stock');
+            codes.add(item.code);
+          }
+          JS
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: published-site
+      - name: Publish watchlist and frontend
+        run: |
+          cp dist-web/index.html published-site/index.html
+          cp -a dist-web/assets/. published-site/assets/
+          mkdir -p published-site/data/watchlist
+          cp data/watchlist/monitor-pool.json published-site/data/watchlist/monitor-pool.json
+          cd published-site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets data/watchlist/monitor-pool.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: publish shared watchlist"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Rebuild Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"

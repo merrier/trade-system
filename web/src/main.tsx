@@ -75,7 +75,10 @@ type ReportArtifact = {
 const api = {
   async get<T>(url: string): Promise<T> {
     if (isStaticMode() && url === "/api/watchlist") {
-      return { items: readStoredWatchlist() } as T;
+      const response = await fetch(`./data/watchlist/monitor-pool.json?refresh=${Date.now()}`, { cache: "no-store" });
+      if (!response.ok) throw new Error("GitHub 监控池读取失败，请稍后刷新");
+      const pool = await response.json();
+      return { items: pool.items.filter((item: WatchItem) => item.isActive).map((item: WatchItem) => ({ ...item, id: item.code })) } as T;
     }
     const response = await fetch(`${apiUrl(url)}${isStaticMode() ? `?refresh=${Date.now()}` : ""}`, { cache: "no-store" });
     if (!response.ok) throw new Error(await response.text());
@@ -83,9 +86,7 @@ const api = {
   },
   async post<T>(url: string, body: unknown): Promise<T> {
     if (isStaticMode() && url === "/api/watchlist") {
-      const items = [createStoredWatchItem(body), ...readStoredWatchlist()];
-      localStorage.setItem("trade-system-watchlist", JSON.stringify(items));
-      return { item: items[0] } as T;
+      throw new Error("请通过 GitHub 修改监控池并提交保存");
     }
     if (isStaticMode()) {
       throw new Error("静态模式下不能执行写入操作；盘后数据由 GitHub Actions 自动生成。");
@@ -132,18 +133,6 @@ function readStoredWatchlist(): WatchItem[] {
   } catch {
     return [];
   }
-}
-
-function createStoredWatchItem(body: unknown): WatchItem {
-  const value = body as Partial<WatchItem>;
-  return {
-    id: crypto.randomUUID(),
-    code: String(value.code ?? ""),
-    name: String(value.name ?? ""),
-    thesis: String(value.thesis ?? ""),
-    conditionPrompt: String(value.conditionPrompt ?? ""),
-    isActive: true
-  };
 }
 
 async function loadReports(): Promise<Partial<Record<ReportArtifact["kind"], ReportArtifact>>> {
@@ -571,11 +560,17 @@ function WatchPanel({ busy, watchlist, watchForm, setWatchForm, addWatchItem }: 
           <BellRing size={18} />
           <h2>加入监控池</h2>
         </div>
+        {isStaticMode() ? <>
+          <p>监控池保存在公开 GitHub 仓库，列表公开可见，所有设备共用。点击下方链接，登录 GitHub 后编辑 items 列表并提交到 dev，发布完成后刷新此页。</p>
+          <a href="https://github.com/merrier/trade-system/edit/dev/data/watchlist/monitor-pool.json" target="_blank" rel="noreferrer">在 GitHub 管理监控池</a>
+          {readStoredWatchlist().length > 0 && <details><summary>此浏览器还有旧监控数据（未删除，请合并到 GitHub）</summary><pre>{JSON.stringify(readStoredWatchlist(), null, 2)}</pre></details>}
+        </> : <>
         <StockSearch initialCode={watchForm.code} onSelect={(stock) => setWatchForm({ ...watchForm, code: stock?.code ?? "", name: stock?.name ?? "" })} />
         <button className="primary" disabled={busy || !watchForm.code || !watchForm.name} onClick={addWatchItem}>
           <Plus size={16} />
           加入监控
         </button>
+        </>}
       </section>
       {watchlist.length ? watchlist.map((item: WatchItem) => <article key={item.id} className="watch-stock" aria-label={`${item.name}监控图表`}>
         <h2>{item.name} · {item.code}</h2>

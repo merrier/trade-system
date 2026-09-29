@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-30T12:17:12.904Z",
+  "updatedAt": "2026-09-29T13:16:25.536460+00:00",
   "items": [
     {
       "code": "603330",
@@ -106,6 +106,13 @@
       "isActive": true,
       "addedAt": "2026-06-30T12:17:12.904Z",
       "updatedAt": "2026-06-30T12:17:12.904Z"
+    },
+    {
+      "code": "603618",
+      "name": "杭电股份",
+      "market": "main",
+      "isActive": true,
+      "addedAt": "2026-09-29T04:54:23.712Z"
     }
   ]
 }
