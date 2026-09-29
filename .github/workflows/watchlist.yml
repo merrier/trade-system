@@ -5,7 +5,11 @@ on:
     paths:
       - data/watchlist/monitor-pool.json
       - web/**
+      - src/jobs/exportWatchHistory.ts
+      - src/data/stockHistory.ts
       - .github/workflows/watchlist.yml
+  schedule:
+    - cron: "20 8 * * 1-5"
   workflow_dispatch:
 permissions:
   contents: write
@@ -41,6 +45,10 @@ jobs:
             codes.add(item.code);
           }
           JS
+      - name: Export paced watchlist history
+        env:
+          FUYAO_API_KEY: ${{ secrets.FUYAO_API_KEY }}
+        run: node --import tsx src/jobs/exportWatchHistory.ts
       - uses: actions/checkout@v4
         with:
           ref: main
@@ -49,12 +57,14 @@ jobs:
         run: |
           cp dist-web/index.html published-site/index.html
           cp -a dist-web/assets/. published-site/assets/
+          mkdir -p published-site/data/history
+          cp -a data/history/. published-site/data/history/
           mkdir -p published-site/data/watchlist
           cp data/watchlist/monitor-pool.json published-site/data/watchlist/monitor-pool.json
           cd published-site
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html assets data/watchlist/monitor-pool.json
+          git add index.html assets data/watchlist/monitor-pool.json data/history
           if ! git diff --cached --quiet; then
             git commit -m "data: publish shared watchlist"
             git pull --rebase origin main

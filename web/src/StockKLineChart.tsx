@@ -33,8 +33,11 @@ export function StockKLineChart({ code }: { code: string }) {
     }
     setLoading(true);
     const base = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "";
-    fetch(`${base}/api/stocks/${code}/history`, { signal: controller.signal })
+    const staticMode = !base && !["localhost", "127.0.0.1", ""].includes(window.location.hostname);
+    const url = staticMode ? `./data/history/${code}.json?refresh=${Date.now()}` : `${base}/api/stocks/${code}/history`;
+    fetch(url, { signal: controller.signal, cache: "no-store" })
       .then(async (response) => {
+        if (staticMode && response.status === 404) throw new Error("该股票的历史行情尚未发布，请加入监控池并等待数据更新。");
         if (!response.headers.get("content-type")?.includes("application/json")) throw new Error("K 线图需要连接行情服务，当前站点未提供该接口。");
         const body = await response.json();
         if (!response.ok) throw new Error(body.message || "历史行情加载失败");

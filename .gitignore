@@ -21,3 +21,4 @@ __pycache__/
 *.pyc
 
 data/intraday-history/
+data/history/
