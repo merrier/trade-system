@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Activity, BellRing, CandlestickChart, ChevronDown, Clock3, FileText, Layers3, Plus, RefreshCw, Search, ShieldAlert, Sun } from "lucide-react";
+import { Activity, BellRing, CandlestickChart, ChevronDown, Clock3, FileText, Layers3, Plus, RefreshCw, Search, Sun } from "lucide-react";
 import "./styles.css";
 import StockSearch from "./StockSearch.js";
 import { StockChartProvider, StockLink, StockText } from "./StockChartDialog.js";
 
 const INTRADAY_STRATEGY_NAME = "沿五日线阴线回调策略";
+const StockKLineChart = React.lazy(() => import("./StockKLineChart.js").then((module) => ({ default: module.StockKLineChart })));
 const StockChartPanel = React.lazy(() => import("./StockKLineChart.js"));
 
 type Recommendation = {
@@ -115,7 +116,6 @@ function staticDataUrl(path: string) {
   if (path === "/api/recommendations/latest") return "./data/recommendations/latest.json";
   if (path === "/api/limit-up/ladder") return "./data/limit-up/ladder.json";
   if (path === "/api/sectors/ladder") return "./data/sectors/ladder.json";
-  if (path === "/api/watchlist/triggers") return "./data/watchlist/triggers.json";
   if (path === "/api/reports/morning/latest") return "./data/reports/morning/latest.json";
   if (path === "/api/reports/intraday-selection/latest") return "./data/reports/intraday-selection/latest.json";
   if (path === "/api/reports/close/latest") return "./data/reports/close/latest.json";
@@ -165,11 +165,10 @@ function App() {
   const [limitUps, setLimitUps] = useState<LimitUp[]>([]);
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [watchlist, setWatchlist] = useState<WatchItem[]>([]);
-  const [triggers, setTriggers] = useState<any[]>([]);
   const [reports, setReports] = useState<Partial<Record<ReportArtifact["kind"], ReportArtifact>>>({});
   const [analysisCode, setAnalysisCode] = useState("603000");
   const [analysis, setAnalysis] = useState<any>(null);
-  const [watchForm, setWatchForm] = useState({ code: "603000", name: "人民网", thesis: "主观看好 AI 应用主线", conditionPrompt: "所属概念进入前三且个股放量突破5日线" });
+  const [watchForm, setWatchForm] = useState({ code: "603000", name: "人民网", thesis: "", conditionPrompt: "" });
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [dataStatus, setDataStatus] = useState<DataStatus>({ warnings: [] });
@@ -178,17 +177,15 @@ function App() {
   async function refreshDashboard() {
     setBusy(true);
     try {
-      const [latest, ladder, sectorLadder, watch, triggerData] = await Promise.all([
+      const [latest, ladder, sectorLadder, watch] = await Promise.all([
         api.get<{ recommendations: Recommendation[]; source?: string; tradeDate?: string; dataAsOf?: string; warnings?: string[] }>("/api/recommendations/latest"),
         api.get<{ items: LimitUp[] }>("/api/limit-up/ladder"),
         api.get<{ items: Sector[] }>("/api/sectors/ladder"),
-        api.get<{ items: WatchItem[] }>("/api/watchlist"),
-        api.get<{ triggers: any[] }>("/api/watchlist/triggers")
+        api.get<{ items: WatchItem[] }>("/api/watchlist")
       ]);
       setLimitUps(ladder.items ?? []);
       setSectors(sectorLadder.items ?? []);
       setWatchlist(watch.items ?? []);
-      setTriggers(triggerData.triggers ?? []);
       const loadedReports = await loadReports();
       setReports(loadedReports);
       setDataStatus({ source: latest.source, tradeDate: latest.tradeDate, dataAsOf: latest.dataAsOf, warnings: latest.warnings ?? [] });
@@ -234,8 +231,8 @@ function App() {
   async function addWatchItem() {
     setBusy(true);
     try {
-      await api.post("/api/watchlist", { ...watchForm, market: watchForm.code.startsWith("300") ? "gem" : "main", markets: ["main", "gem"] });
-      await refreshDashboard();
+      const { item } = await api.post<{ item: WatchItem }>("/api/watchlist", { ...watchForm, market: watchForm.code.startsWith("300") ? "gem" : "main", markets: ["main", "gem"] });
+      setWatchlist((items) => [item, ...items]);
       setMessage(isStaticMode() ? "已保存到本机浏览器监控池；自动触发需要后端或 GitHub Actions 支持。" : "已加入监控池");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "加入监控池失败");
@@ -255,9 +252,9 @@ function App() {
     if (tab === "closeReport") return <CloseReportPanel report={reports.close} />;
     if (tab === "ladder") return <LadderPanel limitUps={limitUps} sectors={sectors} />;
     if (tab === "stock") return <StockPanel analysisCode={analysisCode} setAnalysisCode={setAnalysisCode} loadAnalysis={loadAnalysis} analysis={analysis} />;
-    if (tab === "watch") return <WatchPanel watchlist={watchlist} triggers={triggers} watchForm={watchForm} setWatchForm={setWatchForm} addWatchItem={addWatchItem} />;
+    if (tab === "watch") return <WatchPanel busy={busy} watchlist={watchlist} watchForm={watchForm} setWatchForm={setWatchForm} addWatchItem={addWatchItem} />;
     return null;
-  }, [tab, limitUps, sectors, analysisCode, analysis, watchlist, triggers, watchForm, reports]);
+  }, [tab, limitUps, sectors, analysisCode, analysis, watchlist, watchForm, reports, busy]);
 
   return (
     <main className="app-shell">
@@ -543,32 +540,26 @@ function StockPanel({ analysisCode, setAnalysisCode, loadAnalysis, analysis }: a
   );
 }
 
-function WatchPanel({ watchlist, triggers, watchForm, setWatchForm, addWatchItem }: any) {
+function WatchPanel({ busy, watchlist, watchForm, setWatchForm, addWatchItem }: any) {
   return (
-    <div className="panel-grid">
+    <div className="watch-page">
       <section className="workbench">
         <div className="section-title">
           <BellRing size={18} />
           <h2>加入监控池</h2>
         </div>
         <StockSearch initialCode={watchForm.code} onSelect={(stock) => setWatchForm({ ...watchForm, code: stock?.code ?? "", name: stock?.name ?? "" })} />
-        <textarea value={watchForm.thesis} onChange={(event) => setWatchForm({ ...watchForm, thesis: event.target.value })} />
-        <textarea value={watchForm.conditionPrompt} onChange={(event) => setWatchForm({ ...watchForm, conditionPrompt: event.target.value })} />
-        <button className="primary" disabled={!watchForm.code || !watchForm.name} onClick={addWatchItem}>
+        <button className="primary" disabled={busy || !watchForm.code || !watchForm.name} onClick={addWatchItem}>
           <Plus size={16} />
           加入监控
         </button>
       </section>
-      <section className="table-section span-2">
-        <div className="section-title">
-          <ShieldAlert size={18} />
-          <h2>触发推荐池</h2>
-        </div>
-        <div className="watch-grid">
-          <InfoBlock title="监控中" items={watchlist.map((item: WatchItem) => <React.Fragment key={item.id}><StockLink code={item.code} name={item.name} />：{item.conditionPrompt}</React.Fragment>)} />
-          <InfoBlock title="已触发" items={triggers.map((item: any) => <React.Fragment key={item.id ?? item.code}><StockLink code={item.code} name={item.name} /> {item.priority} {item.score}</React.Fragment>)} />
-        </div>
-      </section>
+      {watchlist.length ? watchlist.map((item: WatchItem) => <article key={item.id} className="watch-stock" aria-label={`${item.name}监控图表`}>
+        <h2>{item.name} · {item.code}</h2>
+        <React.Suspense fallback={<p role="status">正在加载 K 线组件…</p>}>
+          <StockKLineChart code={item.code} />
+        </React.Suspense>
+      </article>) : <p className="empty">暂无监控股票，添加后将在这里展示 K 线与成交量。</p>}
     </div>
   );
 }

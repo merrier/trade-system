@@ -322,8 +322,7 @@ td span {
   font-size: 13px;
 }
 
-.analysis-grid,
-.watch-grid {
+.analysis-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
@@ -439,8 +438,7 @@ td span {
   .panel-grid,
   .panel-grid.two,
   .report-layout,
-  .analysis-grid,
-  .watch-grid {
+  .analysis-grid {
     grid-template-columns: 1fr;
   }
 
@@ -504,3 +502,8 @@ td span {
 .stock-search-results { list-style: none; padding: 0; margin: 4px 0; max-height: 180px; overflow-y: auto; border: 1px solid #d8dee6; border-radius: 7px; background: #fff; }
 .stock-search-results button { width: 100%; padding: 9px 12px; border: 0; background: transparent; text-align: left; cursor: pointer; color: #263544; }
 .stock-search-results button:hover, .stock-search-results button:focus-visible { background: #edf3fa; outline: 2px solid #2765b0; outline-offset: -2px; }
+
+.watch-page { display: grid; gap: 24px; min-width: 0; }
+.watch-page > .workbench .stock-search { max-width: 420px; }
+.watch-stock { min-width: 0; }
+.watch-stock > h2 { font-size: 18px; margin-bottom: 12px; }
