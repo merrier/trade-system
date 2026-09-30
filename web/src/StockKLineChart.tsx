@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ZoomIn, ZoomOut } from "lucide-react";
 import { init, use } from "echarts/core";
 import { BarChart, CandlestickChart, LineChart } from "echarts/charts";
 import { AriaComponent, DataZoomComponent, GridComponent, LegendComponent, TooltipComponent } from "echarts/components";
@@ -50,21 +51,32 @@ export function StockKLineChart({ code }: { code: string }) {
   }, [code, retry]);
 
   const bars = useMemo(() => chartCandles(data?.bars ?? [], period), [data, period]);
+  const chartRef = useRef<ReturnType<typeof init> | null>(null);
+  function zoom(factor: number) {
+    const chart = chartRef.current;
+    if (!chart || bars.length < 2) return;
+    const current = (chart.getOption().dataZoom as { start: number; end: number }[])[0];
+    const width = Math.min(100, Math.max(100 * Math.min(4, bars.length - 1) / (bars.length - 1), (current.end - current.start) * factor));
+    const start = Math.max(0, Math.min(100 - width, (current.start + current.end - width) / 2));
+    chart.dispatchAction({ type: "dataZoom", start, end: start + width });
+  }
   const visible = bars.slice(-30);
   const warmupMissing = visible.some((bar) => bar.ma.includes(null));
 
   return <section className="table-section kline-panel" aria-label={`${code} K线图`}>
     <div className="kline-heading">
       <div><h2>{code} · {period === "day" ? "日 K 线" : "周 K 线"}</h2></div>
-      <div className="kline-period" role="group" aria-label="K线周期">
+      <div className="kline-period" role="group" aria-label="K线操作">
         <button className="ghost" aria-pressed={period === "day"} onClick={() => setPeriod("day")}>日 K</button>
         <button className="ghost" aria-pressed={period === "week"} onClick={() => setPeriod("week")}>周 K</button>
+        <button className="ghost kline-icon" aria-label="放大" title="放大" disabled={loading || !!error || !bars.length} onClick={() => zoom(0.7)}><ZoomIn size={18} /></button>
+        <button className="ghost kline-icon" aria-label="缩小" title="缩小" disabled={loading || !!error || !bars.length} onClick={() => zoom(1 / 0.7)}><ZoomOut size={18} /></button>
       </div>
     </div>
     {loading && <div className="kline-loading" role="status" aria-busy="true">正在加载历史行情…</div>}
     {error && <div className="kline-error" role="alert">{error} <button className="ghost" onClick={() => setRetry((value) => value + 1)}>重试</button></div>}
     {!loading && !error && data?.code === code && (bars.length ? <>
-      <KLinePlot key={`${code}:${period}`} bars={bars} period={period} />
+      <KLinePlot chartRef={chartRef} key={`${code}:${period}`} bars={bars} period={period} />
       {warmupMissing && <p className="kline-note" role="status">部分均线历史不足，起始段留空；不足 30 根时展示全部有效 K 线。</p>}
       <details className="kline-table"><summary>查看最近 {visible.length} 根 K 线数据</summary>
         <div className="kline-table-scroll"><table><caption>{code} {period === "day" ? "日线" : "周线"}，价格：元，成交量：手</caption>
@@ -76,17 +88,8 @@ export function StockKLineChart({ code }: { code: string }) {
   </section>;
 }
 
-function KLinePlot({ bars, period }: { bars: ReturnType<typeof chartCandles>; period: CandlePeriod }) {
+function KLinePlot({ bars, period, chartRef }: { bars: ReturnType<typeof chartCandles>; period: CandlePeriod; chartRef: React.RefObject<ReturnType<typeof init> | null> }) {
   const container = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<ReturnType<typeof init> | null>(null);
-  function zoom(factor: number) {
-    const chart = chartRef.current;
-    if (!chart || bars.length < 2) return;
-    const current = (chart.getOption().dataZoom as { start: number; end: number }[])[0];
-    const width = Math.min(100, Math.max(100 * Math.min(4, bars.length - 1) / (bars.length - 1), (current.end - current.start) * factor));
-    const start = Math.max(0, Math.min(100 - width, (current.start + current.end - width) / 2));
-    chart.dispatchAction({ type: "dataZoom", start, end: start + width });
-  }
   useEffect(() => {
     if (!container.current) return;
     const chart = init(container.current);
@@ -106,7 +109,7 @@ function KLinePlot({ bars, period }: { bars: ReturnType<typeof chartCandles>; pe
         }
       },
       axisPointer: { link: [{ xAxisIndex: "all" }] },
-      grid: [{ left: 65, right: 20, top: 72, height: "44%" }, { left: 65, right: 20, top: "71%", height: "16%" }],
+      grid: [{ left: 65, right: 20, top: 48, height: "48%" }, { left: 65, right: 20, top: "71%", height: "16%" }],
       xAxis: [0, 1].map((gridIndex) => ({ type: "category", gridIndex, data: dates, boundaryGap: true,
         axisLine: { onZero: false, lineStyle: { color: "#9aa7b5" } }, axisLabel: { show: gridIndex === 1, color: "#52606f", hideOverlap: true } })),
       yAxis: [{ scale: true, name: "价格 / 元", splitLine: { lineStyle: { color: "#edf0f4" } }, axisLabel: { formatter: (value: number) => number(value) } },
@@ -126,13 +129,7 @@ function KLinePlot({ bars, period }: { bars: ReturnType<typeof chartCandles>; pe
     observer.observe(container.current);
     return () => { observer.disconnect(); chart.dispose(); chartRef.current = null; };
   }, [bars, period]);
-  return <>
-    <div className="kline-period" role="group" aria-label="K线缩放">
-      <button className="ghost" onClick={() => zoom(0.7)}>放大</button>
-      <button className="ghost" onClick={() => zoom(1 / 0.7)}>缩小</button>
-    </div>
-    <div ref={container} className="kline-canvas" />
-  </>;
+  return <div ref={container} className="kline-canvas" />;
 }
 
 export default function StockChartPanel() {

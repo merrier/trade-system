@@ -605,12 +605,12 @@ function WatchPanel({ busy, watchlist, watchForm, setWatchForm, addWatchItem }: 
           })}
         </div>
       </section>
-      {visible.length ? visible.map((item: WatchItem) => <article key={item.id} className="watch-stock" aria-label={`${item.name}监控图表`}>
+      <div className="watch-charts">{visible.length ? visible.map((item: WatchItem) => <article key={item.id} className="watch-stock" aria-label={`${item.name}监控图表`}>
         <h2>{item.name} · {item.code}</h2>
         <React.Suspense fallback={<p role="status">正在加载 K 线组件…</p>}>
           <StockKLineChart code={item.code} />
         </React.Suspense>
-      </article>) : <p className="empty">{watchlist.length ? "没有匹配的监控股票，请修改搜索条件或点击全部。" : "暂无监控股票，添加后将在这里展示 K 线与成交量。"}</p>}
+      </article>) : <p className="empty">{watchlist.length ? "没有匹配的监控股票，请修改搜索条件或点击全部。" : "暂无监控股票，添加后将在这里展示 K 线与成交量。"}</p>}</div>
     </div>
   );
 }
