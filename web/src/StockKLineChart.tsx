@@ -81,9 +81,19 @@ export function StockKLineChart({ code }: { code: string }) {
 
 function KLinePlot({ bars, period }: { bars: ReturnType<typeof chartCandles>; period: CandlePeriod }) {
   const container = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<ReturnType<typeof init> | null>(null);
+  function zoom(factor: number) {
+    const chart = chartRef.current;
+    if (!chart || bars.length < 2) return;
+    const current = (chart.getOption().dataZoom as { start: number; end: number }[])[0];
+    const width = Math.min(100, Math.max(100 * Math.min(4, bars.length - 1) / (bars.length - 1), (current.end - current.start) * factor));
+    const start = Math.max(0, Math.min(100 - width, (current.start + current.end - width) / 2));
+    chart.dispatchAction({ type: "dataZoom", start, end: start + width });
+  }
   useEffect(() => {
     if (!container.current) return;
     const chart = init(container.current);
+    chartRef.current = chart;
     const dates = bars.map((bar) => bar.date);
     const option: EChartsOption = {
       animation: false,
@@ -105,7 +115,7 @@ function KLinePlot({ bars, period }: { bars: ReturnType<typeof chartCandles>; pe
       yAxis: [{ scale: true, name: "价格 / 元", splitLine: { lineStyle: { color: "#edf0f4" } }, axisLabel: { formatter: (value: number) => number(value) } },
         { gridIndex: 1, name: "成交量 / 手", min: 0, splitNumber: 2, splitLine: { show: false }, axisLabel: { formatter: (value: number) => value >= 10000 ? `${number(value / 10000)}万` : number(value) } }],
       dataZoom: [
-        { type: "inside", xAxisIndex: [0, 1], startValue: Math.max(0, bars.length - 30), endValue: bars.length - 1, minValueSpan: 4 },
+        { type: "inside", zoomOnMouseWheel: false, moveOnMouseWheel: false, preventDefaultMouseMove: false, xAxisIndex: [0, 1], startValue: Math.max(0, bars.length - 30), endValue: bars.length - 1, minValueSpan: 4 },
         { type: "slider", xAxisIndex: [0, 1], bottom: 0, height: 22, showDataShadow: false, brushSelect: false }
       ],
       series: [
@@ -117,9 +127,15 @@ function KLinePlot({ bars, period }: { bars: ReturnType<typeof chartCandles>; pe
     chart.setOption(option);
     const observer = new ResizeObserver(() => chart.resize());
     observer.observe(container.current);
-    return () => { observer.disconnect(); chart.dispose(); };
+    return () => { observer.disconnect(); chart.dispose(); chartRef.current = null; };
   }, [bars, period]);
-  return <div ref={container} className="kline-canvas" />;
+  return <>
+    <div className="kline-period" role="group" aria-label="K线缩放">
+      <button className="ghost" onClick={() => zoom(0.7)}>放大</button>
+      <button className="ghost" onClick={() => zoom(1 / 0.7)}>缩小</button>
+    </div>
+    <div ref={container} className="kline-canvas" />
+  </>;
 }
 
 export default function StockChartPanel() {

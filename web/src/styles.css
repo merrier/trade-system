@@ -520,3 +520,7 @@ td span {
 .watch-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .watch-tags button { border-radius: 20px; }
 .watch-tags button[aria-pressed="true"] { background: #263544; color: white; border-color: #263544; }
+
+.watch-trend-group { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 8px; }
+.watch-trend-group h3 { flex-basis: 100%; font-size: 14px; }
+.watch-trend-group small { display: block; font-size: 11px; }

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { chartCandles, type Candle } from "../src/shared/kline.js";
+import { classifyTrend, chartCandles, type Candle } from "../src/shared/kline.js";
 
 vi.mock("node:timers/promises", () => ({ setTimeout: (ms: number) => new Promise((resolve) => setTimeout(resolve, ms)) }));
 
@@ -87,4 +87,11 @@ describe("Fuyao chart history", () => {
     await second;
     expect(fetch).toHaveBeenCalledTimes(2);
   });
+});
+
+it("classifies bullish, flat and insufficient history", () => {
+  const bars = Array.from({ length: 21 }, (_, i) => candle(`2026-09-${String(i + 1).padStart(2, "0")}`, i + 1));
+  expect(classifyTrend(bars).label).toBe("多头趋势");
+  expect(classifyTrend(bars.map((bar) => ({ ...bar, close: 10 }))).label).toBe("非多头");
+  expect(classifyTrend(bars.slice(0, 19)).label).toBe("数据不足");
 });

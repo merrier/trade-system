@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Activity, BellRing, CandlestickChart, ChevronDown, Clock3, FileText, Layers3, Plus, RefreshCw, Search, Sun } from "lucide-react";
 import "./styles.css";
+import { classifyTrend } from "../../src/shared/kline.js";
 import StockSearch from "./StockSearch.js";
 import { StockChartProvider, StockLink, StockText } from "./StockChartDialog.js";
 
@@ -550,6 +551,24 @@ function StockPanel({ analysisCode, setAnalysisCode, loadAnalysis, analysis }: a
 function WatchPanel({ busy, watchlist, watchForm, setWatchForm, addWatchItem }: any) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState("");
+  const [trends, setTrends] = useState<Record<string, ReturnType<typeof classifyTrend>>>({});
+  useEffect(() => {
+    const controller = new AbortController();
+    setTrends({});
+    for (const item of watchlist as WatchItem[]) {
+      const base = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "";
+      const url = isStaticMode() ? `./data/history/${item.code}.json?refresh=${Date.now()}` : `${base}/api/stocks/${item.code}/history`;
+      fetch(url, { signal: controller.signal }).then(async (response) => {
+        if (!response.ok) throw new Error("history unavailable");
+        const history = await response.json();
+        if (history.code !== item.code || !Array.isArray(history.bars)) throw new Error("invalid history");
+        return classifyTrend(history.bars);
+      }).catch(() => ({ label: "数据不足", date: null })).then((trend) => {
+        if (!controller.signal.aborted) setTrends((current) => ({ ...current, [item.code]: trend }));
+      });
+    }
+    return () => controller.abort();
+  }, [watchlist]);
   const matches = watchlist.filter((item: WatchItem) => `${item.code} ${item.name}`.includes(query.trim()));
   const visible = matches.filter((item: WatchItem) => !selected || item.code === selected);
   return (
@@ -574,9 +593,16 @@ function WatchPanel({ busy, watchlist, watchForm, setWatchForm, addWatchItem }: 
       <section className="workbench watch-filter" aria-label="筛选监控股票">
         <label htmlFor="watch-search">搜索监控股票</label>
         <input id="watch-search" type="search" placeholder="输入股票代码或公司名称" value={query} onChange={(event) => { setQuery(event.target.value); setSelected(""); }} />
+        <p>多头趋势：日线 MA5 &gt; MA10 &gt; MA20，且 MA5 较上一交易日上升。按已发布历史行情判断。</p>
         <div className="watch-tags" role="group" aria-label="股票标签">
           <button className="ghost" aria-pressed={!selected} onClick={() => { setSelected(""); setQuery(""); }}>全部（{watchlist.length}）</button>
-          {matches.map((item: WatchItem) => <button key={item.code} className="ghost" aria-pressed={selected === item.code} onClick={() => setSelected(item.code)}>{item.name} · {item.code}</button>)}
+          {["多头趋势", "非多头", "数据不足", "分析中"].map((label) => {
+            const items = matches.filter((item: WatchItem) => (trends[item.code]?.label ?? "分析中") === label);
+            return items.length > 0 && <div className="watch-trend-group" key={label}>
+              <h3>{label}（{items.length}）</h3>
+              {items.map((item: WatchItem) => <button key={item.code} className="ghost" aria-pressed={selected === item.code} onClick={() => setSelected(item.code)} title={trends[item.code]?.date ? `判断日期：${trends[item.code].date}` : undefined}>{item.name}</button>)}
+            </div>;
+          })}
         </div>
       </section>
       {visible.length ? visible.map((item: WatchItem) => <article key={item.id} className="watch-stock" aria-label={`${item.name}监控图表`}>

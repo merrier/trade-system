@@ -44,3 +44,15 @@ export function chartCandles(daily: Candle[], period: CandlePeriod) {
       bars.slice(index + 1 - window, index + 1).reduce((sum, item) => sum + item.close, 0) / window)
   }));
 }
+
+export function classifyTrend(daily: Candle[]): { label: string; date: string | null } {
+  const bars = chartCandles(daily, "day");
+  const latest = bars.at(-1);
+  const previous = bars.at(-2);
+  const date = latest?.date ?? null;
+  if (!latest || !previous || bars.length < 20 || !daily.every((bar) => Number.isFinite(bar.close) && bar.close > 0)) return { label: "数据不足", date };
+  const [ma5, ma10, ma20] = latest.ma;
+  const prev5 = previous.ma[0];
+  if (ma5 === null || ma10 === null || ma20 === null || prev5 === null) return { label: "数据不足", date };
+  return { label: ma5 > ma10 && ma10 > ma20 && ma5 > prev5 ? "多头趋势" : "非多头", date };
+}
