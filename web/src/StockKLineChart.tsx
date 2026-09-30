@@ -55,8 +55,7 @@ export function StockKLineChart({ code }: { code: string }) {
 
   return <section className="table-section kline-panel" aria-label={`${code} K线图`}>
     <div className="kline-heading">
-      <div><h2>{code} · {period === "day" ? "日 K 线" : "周 K 线"}</h2>
-        <p>前复权 · 默认最近 30 {period === "day" ? "个交易日" : "周"} · 红涨绿跌</p></div>
+      <div><h2>{code} · {period === "day" ? "日 K 线" : "周 K 线"}</h2></div>
       <div className="kline-period" role="group" aria-label="K线周期">
         <button className="ghost" aria-pressed={period === "day"} onClick={() => setPeriod("day")}>日 K</button>
         <button className="ghost" aria-pressed={period === "week"} onClick={() => setPeriod("week")}>周 K</button>
@@ -66,8 +65,6 @@ export function StockKLineChart({ code }: { code: string }) {
     {error && <div className="kline-error" role="alert">{error} <button className="ghost" onClick={() => setRetry((value) => value + 1)}>重试</button></div>}
     {!loading && !error && data?.code === code && (bars.length ? <>
       <KLinePlot key={`${code}:${period}`} bars={bars} period={period} />
-      <p className="kline-note">同花顺 Fuyao · 数据截至 {data.asOf} · 成交量单位：手（100 股）</p>
-      <p className="kline-note">{period === "week" ? "周 K 按周一至周日聚合，日期为该周最后一条日线；最新周可能尚未结束，MA 表示周均线。" : "MA 表示对应交易日的收盘均价。"} 拖动底部滑块可查看更长历史。</p>
       {warmupMissing && <p className="kline-note" role="status">部分均线历史不足，起始段留空；不足 30 根时展示全部有效 K 线。</p>}
       <details className="kline-table"><summary>查看最近 {visible.length} 根 K 线数据</summary>
         <div className="kline-table-scroll"><table><caption>{code} {period === "day" ? "日线" : "周线"}，价格：元，成交量：手</caption>
