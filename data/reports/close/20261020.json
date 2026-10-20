@@ -1,0 +1,1311 @@
+{
+  "id": "close-20261020-1792502863063",
+  "kind": "close",
+  "tradeDate": "20261020",
+  "dataAsOf": "2026-10-20T13:27:20.000Z",
+  "provider": "fuyao",
+  "warnings": [
+    "统计范围：全A股 5574 只，其中 5567 只当日有成交、7 只无成交；包含沪深主板、创业板、科创板和北交所（含ST），不含尚未上市股票。",
+    "另有 4 个代码缺少上市日期，未纳入统计：301718、001381、920285、920306。",
+    "行业排行按同花顺行业指数涨跌幅排序；资金流、综合热度和开板次数未获取，不使用涨停池代算。行业指数按其实际成分范围统计。"
+  ],
+  "payload": {
+    "marketBreadth": {
+      "total": 5567,
+      "up": 3778,
+      "down": 1667,
+      "flat": 122,
+      "limitUp": 54,
+      "limitDown": 7,
+      "turnoverAmount": 1471537349500.6995
+    },
+    "industryPerformance": [
+      {
+        "name": "其他医疗服务",
+        "pctChange": 6.529758
+      },
+      {
+        "name": "其他自动化设备",
+        "pctChange": 5.30092
+      },
+      {
+        "name": "医疗美容",
+        "pctChange": 4.420542
+      },
+      {
+        "name": "横向通用软件",
+        "pctChange": 4.280232
+      },
+      {
+        "name": "机器人",
+        "pctChange": 4.237646
+      },
+      {
+        "name": "数字芯片设计",
+        "pctChange": 4.233631
+      },
+      {
+        "name": "自动化设备",
+        "pctChange": 4.086156
+      },
+      {
+        "name": "品牌消费电子",
+        "pctChange": 3.929445
+      },
+      {
+        "name": "模拟芯片设计",
+        "pctChange": 3.708045
+      },
+      {
+        "name": "水产饲料",
+        "pctChange": 3.644717
+      },
+      {
+        "name": "通信终端及配件",
+        "pctChange": 3.632483
+      },
+      {
+        "name": "仪器仪表",
+        "pctChange": 3.570301
+      },
+      {
+        "name": "被动元件",
+        "pctChange": 3.56192
+      },
+      {
+        "name": "消费电子",
+        "pctChange": 3.366416
+      },
+      {
+        "name": "工控设备",
+        "pctChange": 3.341536
+      },
+      {
+        "name": "其他黑色家电",
+        "pctChange": 3.334932
+      },
+      {
+        "name": "其他通信设备",
+        "pctChange": 3.302682
+      },
+      {
+        "name": "消费电子零部件及组装",
+        "pctChange": 3.293541
+      },
+      {
+        "name": "安防设备",
+        "pctChange": 3.247452
+      },
+      {
+        "name": "医疗设备",
+        "pctChange": 3.221437
+      },
+      {
+        "name": "光学元件",
+        "pctChange": 3.16896
+      },
+      {
+        "name": "分立器件",
+        "pctChange": 3.02681
+      },
+      {
+        "name": "数字媒体",
+        "pctChange": 3.006234
+      },
+      {
+        "name": "耐火材料",
+        "pctChange": 2.990508
+      },
+      {
+        "name": "半导体",
+        "pctChange": 2.924478
+      },
+      {
+        "name": "金属制品",
+        "pctChange": 2.920501
+      },
+      {
+        "name": "激光设备",
+        "pctChange": 2.868657
+      },
+      {
+        "name": "半导体材料",
+        "pctChange": 2.836077
+      },
+      {
+        "name": "IT服务",
+        "pctChange": 2.834705
+      },
+      {
+        "name": "磁性材料",
+        "pctChange": 2.73436
+      },
+      {
+        "name": "纺织服装设备",
+        "pctChange": 2.730176
+      },
+      {
+        "name": "医疗服务",
+        "pctChange": 2.722207
+      },
+      {
+        "name": "软件开发",
+        "pctChange": 2.715813
+      },
+      {
+        "name": "医疗研发外包",
+        "pctChange": 2.584449
+      },
+      {
+        "name": "其他电子",
+        "pctChange": 2.581348
+      },
+      {
+        "name": "磨具磨料",
+        "pctChange": 2.577117
+      },
+      {
+        "name": "非金属材料",
+        "pctChange": 2.562007
+      },
+      {
+        "name": "通用设备",
+        "pctChange": 2.545588
+      },
+      {
+        "name": "印刷包装机械",
+        "pctChange": 2.533852
+      },
+      {
+        "name": "集成电路封测",
+        "pctChange": 2.497881
+      },
+      {
+        "name": "锂电专用设备",
+        "pctChange": 2.467819
+      },
+      {
+        "name": "工程机械",
+        "pctChange": 2.466527
+      },
+      {
+        "name": "小家电",
+        "pctChange": 2.447366
+      },
+      {
+        "name": "计算机设备",
+        "pctChange": 2.426589
+      },
+      {
+        "name": "通信设备",
+        "pctChange": 2.409084
+      },
+      {
+        "name": "黑色家电",
+        "pctChange": 2.36169
+      },
+      {
+        "name": "镍",
+        "pctChange": 2.329287
+      },
+      {
+        "name": "通信应用增值服务",
+        "pctChange": 2.298525
+      },
+      {
+        "name": "环保设备",
+        "pctChange": 2.210657
+      },
+      {
+        "name": "其他专用设备",
+        "pctChange": 2.203243
+      },
+      {
+        "name": "医疗器械",
+        "pctChange": 2.19619
+      },
+      {
+        "name": "玻璃玻纤",
+        "pctChange": 2.193349
+      },
+      {
+        "name": "电机",
+        "pctChange": 2.189946
+      },
+      {
+        "name": "电子化学品",
+        "pctChange": 2.171883
+      },
+      {
+        "name": "乳品",
+        "pctChange": 2.166323
+      },
+      {
+        "name": "改性塑料",
+        "pctChange": 2.152939
+      },
+      {
+        "name": "膜材料",
+        "pctChange": 2.133625
+      },
+      {
+        "name": "光学光电子",
+        "pctChange": 2.111615
+      },
+      {
+        "name": "底盘与发动机系统",
+        "pctChange": 2.099915
+      },
+      {
+        "name": "光伏加工设备",
+        "pctChange": 2.098218
+      },
+      {
+        "name": "其他计算机设备",
+        "pctChange": 2.072761
+      },
+      {
+        "name": "垂直应用软件",
+        "pctChange": 2.061345
+      },
+      {
+        "name": "汽车电子电气系统",
+        "pctChange": 2.059118
+      },
+      {
+        "name": "家电零部件",
+        "pctChange": 2.057841
+      },
+      {
+        "name": "元件",
+        "pctChange": 2.006096
+      },
+      {
+        "name": "通信服务",
+        "pctChange": 2.004888
+      },
+      {
+        "name": "体外诊断",
+        "pctChange": 1.992327
+      },
+      {
+        "name": "教育",
+        "pctChange": 1.988065
+      },
+      {
+        "name": "汽车服务",
+        "pctChange": 1.944688
+      },
+      {
+        "name": "通信工程及服务",
+        "pctChange": 1.908806
+      },
+      {
+        "name": "其他通用设备",
+        "pctChange": 1.902937
+      },
+      {
+        "name": "金属新材料",
+        "pctChange": 1.897257
+      },
+      {
+        "name": "LED",
+        "pctChange": 1.893879
+      },
+      {
+        "name": "其他塑料制品",
+        "pctChange": 1.893784
+      },
+      {
+        "name": "厨卫电器",
+        "pctChange": 1.892958
+      },
+      {
+        "name": "塑料制品",
+        "pctChange": 1.871871
+      },
+      {
+        "name": "其他汽车零部件",
+        "pctChange": 1.867231
+      },
+      {
+        "name": "其他橡胶制品",
+        "pctChange": 1.829089
+      },
+      {
+        "name": "汽车零部件",
+        "pctChange": 1.822366
+      },
+      {
+        "name": "农用机械",
+        "pctChange": 1.771792
+      },
+      {
+        "name": "专用设备",
+        "pctChange": 1.761932
+      },
+      {
+        "name": "互联网电商",
+        "pctChange": 1.758794
+      },
+      {
+        "name": "通信线缆及配套",
+        "pctChange": 1.742765
+      },
+      {
+        "name": "调味发酵品",
+        "pctChange": 1.717464
+      },
+      {
+        "name": "其他食品",
+        "pctChange": 1.712012
+      },
+      {
+        "name": "电池",
+        "pctChange": 1.710027
+      },
+      {
+        "name": "面板",
+        "pctChange": 1.70583
+      },
+      {
+        "name": "工程咨询服务",
+        "pctChange": 1.697357
+      },
+      {
+        "name": "车身附件及饰件",
+        "pctChange": 1.662113
+      },
+      {
+        "name": "专业服务",
+        "pctChange": 1.654676
+      },
+      {
+        "name": "军工电子",
+        "pctChange": 1.642286
+      },
+      {
+        "name": "电池化学品",
+        "pctChange": 1.635469
+      },
+      {
+        "name": "其他电池",
+        "pctChange": 1.621507
+      },
+      {
+        "name": "其他生物制品",
+        "pctChange": 1.602801
+      },
+      {
+        "name": "钨",
+        "pctChange": 1.589135
+      },
+      {
+        "name": "医疗耗材",
+        "pctChange": 1.587212
+      },
+      {
+        "name": "楼宇设备",
+        "pctChange": 1.580174
+      },
+      {
+        "name": "橡胶制品",
+        "pctChange": 1.557626
+      },
+      {
+        "name": "机床工具",
+        "pctChange": 1.533801
+      },
+      {
+        "name": "通信网络设备及器件",
+        "pctChange": 1.523354
+      },
+      {
+        "name": "其他社会服务",
+        "pctChange": 1.516662
+      },
+      {
+        "name": "稀土",
+        "pctChange": 1.505742
+      },
+      {
+        "name": "影视院线",
+        "pctChange": 1.504171
+      },
+      {
+        "name": "其他小金属",
+        "pctChange": 1.50091
+      },
+      {
+        "name": "锂",
+        "pctChange": 1.494273
+      },
+      {
+        "name": "广告营销",
+        "pctChange": 1.481577
+      },
+      {
+        "name": "印制电路板",
+        "pctChange": 1.476448
+      },
+      {
+        "name": "种子生产",
+        "pctChange": 1.438815
+      },
+      {
+        "name": "其他化学制品",
+        "pctChange": 1.437265
+      },
+      {
+        "name": "粮食种植",
+        "pctChange": 1.423278
+      },
+      {
+        "name": "白色家电",
+        "pctChange": 1.419188
+      },
+      {
+        "name": "小金属",
+        "pctChange": 1.397743
+      },
+      {
+        "name": "能源金属",
+        "pctChange": 1.373875
+      },
+      {
+        "name": "其他纺织",
+        "pctChange": 1.373242
+      },
+      {
+        "name": "电气自控设备",
+        "pctChange": 1.359174
+      },
+      {
+        "name": "锂电池",
+        "pctChange": 1.343344
+      },
+      {
+        "name": "有机硅",
+        "pctChange": 1.341551
+      },
+      {
+        "name": "原料药",
+        "pctChange": 1.333669
+      },
+      {
+        "name": "动物保健",
+        "pctChange": 1.333121
+      },
+      {
+        "name": "成品家居",
+        "pctChange": 1.300885
+      },
+      {
+        "name": "预加工食品",
+        "pctChange": 1.300443
+      },
+      {
+        "name": "食品加工制造",
+        "pctChange": 1.294263
+      },
+      {
+        "name": "综合环境治理",
+        "pctChange": 1.25948
+      },
+      {
+        "name": "生物制品",
+        "pctChange": 1.25193
+      },
+      {
+        "name": "涂料油墨",
+        "pctChange": 1.241305
+      },
+      {
+        "name": "其他金属新材料",
+        "pctChange": 1.236401
+      },
+      {
+        "name": "氟化工",
+        "pctChange": 1.22136
+      },
+      {
+        "name": "化妆品",
+        "pctChange": 1.208911
+      },
+      {
+        "name": "软饮料",
+        "pctChange": 1.192633
+      },
+      {
+        "name": "休闲食品",
+        "pctChange": 1.175028
+      },
+      {
+        "name": "油气开采",
+        "pctChange": 1.167525
+      },
+      {
+        "name": "包装",
+        "pctChange": 1.159183
+      },
+      {
+        "name": "包装印刷",
+        "pctChange": 1.140981
+      },
+      {
+        "name": "农药",
+        "pctChange": 1.126326
+      },
+      {
+        "name": "游戏",
+        "pctChange": 1.09882
+      },
+      {
+        "name": "粘胶",
+        "pctChange": 1.092162
+      },
+      {
+        "name": "家纺",
+        "pctChange": 1.081023
+      },
+      {
+        "name": "汽车服务及其他",
+        "pctChange": 1.062649
+      },
+      {
+        "name": "合成树脂",
+        "pctChange": 1.038931
+      },
+      {
+        "name": "其他电源设备",
+        "pctChange": 1.025403
+      },
+      {
+        "name": "其他纤维",
+        "pctChange": 1.014816
+      },
+      {
+        "name": "化学制药",
+        "pctChange": 1.003312
+      },
+      {
+        "name": "轨交设备",
+        "pctChange": 1.001461
+      },
+      {
+        "name": "大气治理",
+        "pctChange": 0.987484
+      },
+      {
+        "name": "油气开采及服务",
+        "pctChange": 0.973291
+      },
+      {
+        "name": "医院",
+        "pctChange": 0.949549
+      },
+      {
+        "name": "疫苗",
+        "pctChange": 0.945054
+      },
+      {
+        "name": "公交",
+        "pctChange": 0.94462
+      },
+      {
+        "name": "装饰园林",
+        "pctChange": 0.939087
+      },
+      {
+        "name": "美容护理",
+        "pctChange": 0.9144
+      },
+      {
+        "name": "化学制品",
+        "pctChange": 0.892309
+      },
+      {
+        "name": "印刷",
+        "pctChange": 0.879855
+      },
+      {
+        "name": "饮料制造",
+        "pctChange": 0.878083
+      },
+      {
+        "name": "食品及饲料添加剂",
+        "pctChange": 0.86642
+      },
+      {
+        "name": "化学制剂",
+        "pctChange": 0.861717
+      },
+      {
+        "name": "制冷空调设备",
+        "pctChange": 0.856432
+      },
+      {
+        "name": "纺织制造",
+        "pctChange": 0.852122
+      },
+      {
+        "name": "炭黑",
+        "pctChange": 0.833742
+      },
+      {
+        "name": "能源及重型设备",
+        "pctChange": 0.832154
+      },
+      {
+        "name": "油服工程",
+        "pctChange": 0.831975
+      },
+      {
+        "name": "粮油加工",
+        "pctChange": 0.816784
+      },
+      {
+        "name": "辅料",
+        "pctChange": 0.780882
+      },
+      {
+        "name": "瓷砖地板",
+        "pctChange": 0.772835
+      },
+      {
+        "name": "输变电设备",
+        "pctChange": 0.75324
+      },
+      {
+        "name": "综合",
+        "pctChange": 0.744301
+      },
+      {
+        "name": "电网设备",
+        "pctChange": 0.739616
+      },
+      {
+        "name": "建筑装饰",
+        "pctChange": 0.719577
+      },
+      {
+        "name": "文娱用品",
+        "pctChange": 0.708216
+      },
+      {
+        "name": "建筑材料",
+        "pctChange": 0.708103
+      },
+      {
+        "name": "光伏辅材",
+        "pctChange": 0.69965
+      },
+      {
+        "name": "其他建材",
+        "pctChange": 0.694876
+      },
+      {
+        "name": "宠物食品",
+        "pctChange": 0.670587
+      },
+      {
+        "name": "其他运输设备",
+        "pctChange": 0.670578
+      },
+      {
+        "name": "鞋帽及其他",
+        "pctChange": 0.663813
+      },
+      {
+        "name": "农化制品",
+        "pctChange": 0.623652
+      },
+      {
+        "name": "百货零售",
+        "pctChange": 0.615696
+      },
+      {
+        "name": "农产品加工",
+        "pctChange": 0.600746
+      },
+      {
+        "name": "农业综合",
+        "pctChange": 0.597705
+      },
+      {
+        "name": "旅游零售",
+        "pctChange": 0.588526
+      },
+      {
+        "name": "造纸",
+        "pctChange": 0.576492
+      },
+      {
+        "name": "环境治理",
+        "pctChange": 0.562513
+      },
+      {
+        "name": "聚氨酯",
+        "pctChange": 0.551171
+      },
+      {
+        "name": "风电零部件",
+        "pctChange": 0.547561
+      },
+      {
+        "name": "家居用品",
+        "pctChange": 0.532382
+      },
+      {
+        "name": "无机盐",
+        "pctChange": 0.507884
+      },
+      {
+        "name": "航天装备",
+        "pctChange": 0.501217
+      },
+      {
+        "name": "热力",
+        "pctChange": 0.465105
+      },
+      {
+        "name": "医药流通",
+        "pctChange": 0.464365
+      },
+      {
+        "name": "风电设备",
+        "pctChange": 0.46402
+      },
+      {
+        "name": "文化传媒",
+        "pctChange": 0.459658
+      },
+      {
+        "name": "化学纤维",
+        "pctChange": 0.456326
+      },
+      {
+        "name": "固废治理",
+        "pctChange": 0.446019
+      },
+      {
+        "name": "棉纺",
+        "pctChange": 0.431382
+      },
+      {
+        "name": "服装家纺",
+        "pctChange": 0.426801
+      },
+      {
+        "name": "彩电",
+        "pctChange": 0.415173
+      },
+      {
+        "name": "肉制品",
+        "pctChange": 0.409455
+      },
+      {
+        "name": "酒店",
+        "pctChange": 0.405554
+      },
+      {
+        "name": "养殖业",
+        "pctChange": 0.403385
+      },
+      {
+        "name": "旅游综合",
+        "pctChange": 0.393957
+      },
+      {
+        "name": "钼",
+        "pctChange": 0.345149
+      },
+      {
+        "name": "服装",
+        "pctChange": 0.345093
+      },
+      {
+        "name": "电信运营商",
+        "pctChange": 0.330441
+      },
+      {
+        "name": "生猪养殖",
+        "pctChange": 0.327065
+      },
+      {
+        "name": "磷肥及磷化工",
+        "pctChange": 0.318134
+      },
+      {
+        "name": "餐饮",
+        "pctChange": 0.309189
+      },
+      {
+        "name": "畜禽饲料",
+        "pctChange": 0.306844
+      },
+      {
+        "name": "血液制品",
+        "pctChange": 0.29663
+      },
+      {
+        "name": "水务及水治理",
+        "pctChange": 0.280268
+      },
+      {
+        "name": "复合肥",
+        "pctChange": 0.267735
+      },
+      {
+        "name": "零售",
+        "pctChange": 0.262029
+      },
+      {
+        "name": "轮胎轮毂",
+        "pctChange": 0.244191
+      },
+      {
+        "name": "种植业与林业",
+        "pctChange": 0.23469
+      },
+      {
+        "name": "其他种植业",
+        "pctChange": 0.227873
+      },
+      {
+        "name": "医药商业",
+        "pctChange": 0.215881
+      },
+      {
+        "name": "涤纶",
+        "pctChange": 0.212808
+      },
+      {
+        "name": "其他家居用品",
+        "pctChange": 0.185299
+      },
+      {
+        "name": "纯碱",
+        "pctChange": 0.173925
+      },
+      {
+        "name": "民爆用品",
+        "pctChange": 0.154173
+      },
+      {
+        "name": "饰品",
+        "pctChange": 0.135832
+      },
+      {
+        "name": "专业工程",
+        "pctChange": 0.130507
+      },
+      {
+        "name": "线缆部件及其他",
+        "pctChange": 0.115579
+      },
+      {
+        "name": "逆变器",
+        "pctChange": 0.109364
+      },
+      {
+        "name": "冰洗",
+        "pctChange": 0.104938
+      },
+      {
+        "name": "风电整机",
+        "pctChange": 0.102006
+      },
+      {
+        "name": "钴",
+        "pctChange": 0.09739
+      },
+      {
+        "name": "海洋捕捞",
+        "pctChange": 0.07418
+      },
+      {
+        "name": "果蔬加工",
+        "pctChange": 0.068167
+      },
+      {
+        "name": "房屋建设",
+        "pctChange": 0.063433
+      },
+      {
+        "name": "铝",
+        "pctChange": 0.047123
+      },
+      {
+        "name": "半导体设备",
+        "pctChange": 0.000619
+      },
+      {
+        "name": "水产养殖",
+        "pctChange": 0
+      },
+      {
+        "name": "光伏设备",
+        "pctChange": -0.011151
+      },
+      {
+        "name": "其他酒类",
+        "pctChange": -0.019458
+      },
+      {
+        "name": "贸易",
+        "pctChange": -0.025237
+      },
+      {
+        "name": "铅锌",
+        "pctChange": -0.035096
+      },
+      {
+        "name": "钛白粉",
+        "pctChange": -0.046077
+      },
+      {
+        "name": "其他农产品加工",
+        "pctChange": -0.091782
+      },
+      {
+        "name": "定制家居",
+        "pctChange": -0.094619
+      },
+      {
+        "name": "石油加工",
+        "pctChange": -0.102957
+      },
+      {
+        "name": "石油加工贸易",
+        "pctChange": -0.104076
+      },
+      {
+        "name": "旅游及酒店",
+        "pctChange": -0.107035
+      },
+      {
+        "name": "煤化工",
+        "pctChange": -0.108986
+      },
+      {
+        "name": "油品石化贸易",
+        "pctChange": -0.109012
+      },
+      {
+        "name": "氮肥",
+        "pctChange": -0.114537
+      },
+      {
+        "name": "基础建设",
+        "pctChange": -0.183373
+      },
+      {
+        "name": "商业物业经营",
+        "pctChange": -0.217712
+      },
+      {
+        "name": "其他养殖",
+        "pctChange": -0.235344
+      },
+      {
+        "name": "国有大型银行",
+        "pctChange": -0.241547
+      },
+      {
+        "name": "肉鸡养殖",
+        "pctChange": -0.264218
+      },
+      {
+        "name": "体育",
+        "pctChange": -0.277492
+      },
+      {
+        "name": "中药",
+        "pctChange": -0.280572
+      },
+      {
+        "name": "冶钢原料",
+        "pctChange": -0.31275
+      },
+      {
+        "name": "集成电路制造",
+        "pctChange": -0.332922
+      },
+      {
+        "name": "物流",
+        "pctChange": -0.348334
+      },
+      {
+        "name": "航空装备",
+        "pctChange": -0.353764
+      },
+      {
+        "name": "工业金属",
+        "pctChange": -0.365883
+      },
+      {
+        "name": "自然景点",
+        "pctChange": -0.373935
+      },
+      {
+        "name": "多元金融",
+        "pctChange": -0.388786
+      },
+      {
+        "name": "公路铁路运输",
+        "pctChange": -0.394823
+      },
+      {
+        "name": "住宅开发",
+        "pctChange": -0.403548
+      },
+      {
+        "name": "专业连锁",
+        "pctChange": -0.463914
+      },
+      {
+        "name": "化学原料",
+        "pctChange": -0.476587
+      },
+      {
+        "name": "房地产",
+        "pctChange": -0.518114
+      },
+      {
+        "name": "药店",
+        "pctChange": -0.529556
+      },
+      {
+        "name": "水泥",
+        "pctChange": -0.533728
+      },
+      {
+        "name": "房地产服务",
+        "pctChange": -0.538694
+      },
+      {
+        "name": "钾肥",
+        "pctChange": -0.606581
+      },
+      {
+        "name": "贵金属",
+        "pctChange": -0.608728
+      },
+      {
+        "name": "铁路运输",
+        "pctChange": -0.629768
+      },
+      {
+        "name": "港口",
+        "pctChange": -0.640707
+      },
+      {
+        "name": "燃气",
+        "pctChange": -0.664959
+      },
+      {
+        "name": "印染",
+        "pctChange": -0.685472
+      },
+      {
+        "name": "钢铁",
+        "pctChange": -0.705905
+      },
+      {
+        "name": "高速公路",
+        "pctChange": -0.726258
+      },
+      {
+        "name": "商业地产",
+        "pctChange": -0.728216
+      },
+      {
+        "name": "特钢",
+        "pctChange": -0.736624
+      },
+      {
+        "name": "电能综合服务",
+        "pctChange": -0.743691
+      },
+      {
+        "name": "电视广播",
+        "pctChange": -0.758431
+      },
+      {
+        "name": "机场",
+        "pctChange": -0.776619
+      },
+      {
+        "name": "电力",
+        "pctChange": -0.78949
+      },
+      {
+        "name": "港口航运",
+        "pctChange": -0.79328
+      },
+      {
+        "name": "个护用品",
+        "pctChange": -0.796611
+      },
+      {
+        "name": "其他化学原料",
+        "pctChange": -0.841043
+      },
+      {
+        "name": "普钢",
+        "pctChange": -0.86784
+      },
+      {
+        "name": "火电",
+        "pctChange": -0.881212
+      },
+      {
+        "name": "军工装备",
+        "pctChange": -0.921317
+      },
+      {
+        "name": "航运",
+        "pctChange": -0.92977
+      },
+      {
+        "name": "产业地产",
+        "pctChange": -0.941564
+      },
+      {
+        "name": "股份制银行",
+        "pctChange": -0.96329
+      },
+      {
+        "name": "乘用车",
+        "pctChange": -0.967781
+      },
+      {
+        "name": "管材",
+        "pctChange": -1.001781
+      },
+      {
+        "name": "人工景点",
+        "pctChange": -1.06022
+      },
+      {
+        "name": "证券",
+        "pctChange": -1.076956
+      },
+      {
+        "name": "农商行",
+        "pctChange": -1.077019
+      },
+      {
+        "name": "银行",
+        "pctChange": -1.122797
+      },
+      {
+        "name": "白酒",
+        "pctChange": -1.174748
+      },
+      {
+        "name": "新能源发电",
+        "pctChange": -1.179051
+      },
+      {
+        "name": "铜",
+        "pctChange": -1.310943
+      },
+      {
+        "name": "氯碱",
+        "pctChange": -1.333386
+      },
+      {
+        "name": "机场航运",
+        "pctChange": -1.344466
+      },
+      {
+        "name": "光伏电池组件",
+        "pctChange": -1.36781
+      },
+      {
+        "name": "水电",
+        "pctChange": -1.406669
+      },
+      {
+        "name": "出版",
+        "pctChange": -1.451896
+      },
+      {
+        "name": "汽车整车",
+        "pctChange": -1.504341
+      },
+      {
+        "name": "商用载货车",
+        "pctChange": -1.530275
+      },
+      {
+        "name": "城商行",
+        "pctChange": -1.545253
+      },
+      {
+        "name": "硅料硅片",
+        "pctChange": -1.569676
+      },
+      {
+        "name": "航空运输",
+        "pctChange": -1.699362
+      },
+      {
+        "name": "空调",
+        "pctChange": -1.878312
+      },
+      {
+        "name": "啤酒",
+        "pctChange": -2.003819
+      },
+      {
+        "name": "煤炭开采",
+        "pctChange": -2.188459
+      },
+      {
+        "name": "保险",
+        "pctChange": -2.254619
+      },
+      {
+        "name": "煤炭开采加工",
+        "pctChange": -2.258707
+      },
+      {
+        "name": "商用载客车",
+        "pctChange": -2.536064
+      },
+      {
+        "name": "焦炭加工",
+        "pctChange": -2.666284
+      },
+      {
+        "name": "氨纶",
+        "pctChange": -2.749833
+      },
+      {
+        "name": "纺织化学用品",
+        "pctChange": -2.751849
+      },
+      {
+        "name": "地面兵装",
+        "pctChange": -2.821047
+      },
+      {
+        "name": "林业",
+        "pctChange": -2.854589
+      },
+      {
+        "name": "航海装备",
+        "pctChange": -2.901978
+      }
+    ],
+    "limitUps": [],
+    "sectors": [],
+    "recommendations": []
+  },
+  "analysis": "20261020 全A股收盘统计：有成交股票 5567 只，上涨 3778 只，下跌 1667 只，平盘 122 只。行业排行使用指数涨跌幅。",
+  "pushMessage": "# A股收盘复盘 20261020\n\n**数据源**：fuyao  \n**生成时间**：2026-10-20T13:27:43.063Z\n\n## 核心摘要\n20261020 全A股收盘统计：有成交股票 5567 只，上涨 3778 只，下跌 1667 只，平盘 122 只。行业排行使用指数涨跌幅。\n\n## 市场概览\n- 上涨 3778 家，下跌 1667 家，平盘 122 家\n- 涨停 54 家，跌停 7 家，成交额 14715.37 亿\n\n## 连板梯队\n- 暂无涨停梯队数据。\n\n## 行业指数涨跌幅\n- **其他医疗服务**：+6.53%\n- **其他自动化设备**：+5.3%\n- **医疗美容**：+4.42%\n- **横向通用软件**：+4.28%\n- **机器人**：+4.24%\n- **数字芯片设计**：+4.23%\n- **自动化设备**：+4.09%\n- **品牌消费电子**：+3.93%\n\n## 数据提示\n- 统计范围：全A股 5574 只，其中 5567 只当日有成交、7 只无成交；包含沪深主板、创业板、科创板和北交所（含ST），不含尚未上市股票。\n- 另有 4 个代码缺少上市日期，未纳入统计：301718、001381、920285、920306。\n- 行业排行按同花顺行业指数涨跌幅排序；资金流、综合热度和开板次数未获取，不使用涨停池代算。行业指数按其实际成分范围统计。",
+  "generatedAt": "2026-10-20T13:27:43.063Z"
+}
