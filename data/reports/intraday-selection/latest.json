@@ -1,16 +1,16 @@
 {
-  "id": "intraday-selection-20261027-1793105040628",
+  "id": "intraday-selection-20261029-1793281626789",
   "kind": "intraday-selection",
-  "tradeDate": "20261027",
-  "dataAsOf": "2026-10-27T12:44:00.628Z",
-  "generatedAt": "2026-10-27T12:44:00.628Z",
+  "tradeDate": "20261029",
+  "dataAsOf": "2026-10-29T13:47:06.789Z",
+  "generatedAt": "2026-10-29T13:47:06.789Z",
   "provider": "fuyao",
   "warnings": [
     "选股任务失败：未在当日14:50至15:00采样窗口内，未使用盘后数据补造选股报告。本次未生成选股结果。",
     "Feishu webhook 推送失败：HTTP 403: 服务已下线"
   ],
   "analysis": "选股任务失败：未在当日14:50至15:00采样窗口内，未使用盘后数据补造选股报告。本次未生成选股结果。",
-  "pushMessage": "20261027 沿五日线阴线回调策略\n\n状态：失败\n\n任务检查时间：2026/10/27 20:44:00\n\n选股任务失败：未在当日14:50至15:00采样窗口内，未使用盘后数据补造选股报告。本次未生成选股结果。\n\n选股任务失败：未在当日14:50至15:00采样窗口内，未使用盘后数据补造选股报告。本次未生成选股结果。\n\nhttps://merrier.wang/trade-system/",
+  "pushMessage": "20261029 沿五日线阴线回调策略\n\n状态：失败\n\n任务检查时间：2026/10/29 21:47:06\n\n选股任务失败：未在当日14:50至15:00采样窗口内，未使用盘后数据补造选股报告。本次未生成选股结果。\n\n选股任务失败：未在当日14:50至15:00采样窗口内，未使用盘后数据补造选股报告。本次未生成选股结果。\n\nhttps://merrier.wang/trade-system/",
   "payload": {
     "runStatus": "failed",
     "strategy": {
@@ -81,7 +81,7 @@
       },
       "warnings": [],
       "unsupported": [],
-      "compiledAt": "2026-10-27T12:44:00.628Z",
+      "compiledAt": "2026-10-29T13:47:06.789Z",
       "engine": "local"
     },
     "recommendations": [],
