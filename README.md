@@ -23,6 +23,8 @@
 
 ## 快速开始
 
+相关项目参考：[xbtlin/ai-berkshire](https://github.com/xbtlin/ai-berkshire)。
+
 ```bash
 cp .env.example .env
 npm install
