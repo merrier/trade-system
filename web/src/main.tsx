@@ -187,24 +187,6 @@ function App() {
     }
   }
 
-  async function runPostClose() {
-    if (isStaticMode()) {
-      setMessage("静态模式下盘后落库由 GitHub Actions 自动执行；也可以在 GitHub Actions 页面手动运行 workflow。");
-      return;
-    }
-    setBusy(true);
-    try {
-      const result = await api.post<DataStatus>("/api/jobs/post-close-ingest", {});
-      await refreshDashboard();
-      setDataStatus(result);
-      setMessage(result.warnings?.length ? `盘后数据已落库，但有告警：${result.warnings.join("；")}` : "盘后数据已落库并生成推荐");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "盘后任务失败");
-    } finally {
-      setBusy(false);
-    }
-  }
-
   async function loadAnalysis() {
     setBusy(true);
     try {
@@ -277,11 +259,6 @@ function App() {
         <button className="ghost wide" onClick={refreshDashboard} disabled={busy}>
           <RefreshCw size={16} />
           {busy ? "刷新中…" : "刷新数据"}
-        </button>
-        <p className="sidebar-note">数据分析辅助，不自动交易，不保证收益。</p>
-        <button className="primary wide" onClick={runPostClose} disabled={busy}>
-          <RefreshCw size={16} />
-          盘后落库
         </button>
       </aside>
 
