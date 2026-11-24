@@ -28,7 +28,14 @@ export async function fuyao(endpoint: string, params: Record<string, string>) {
   const key = process.env.FUYAO_API_KEY;
   if (!key) throw new Error("缺少 FUYAO_API_KEY");
   for (let attempt = 0; attempt <= 3; attempt++) {
-    const response = await pacedFetch(`https://fuyao.aicubes.cn${endpoint}?${new URLSearchParams(params)}`, { "X-api-key": key });
+    let response: Response;
+    try {
+      response = await pacedFetch(`https://fuyao.aicubes.cn${endpoint}?${new URLSearchParams(params)}`, { "X-api-key": key });
+    } catch {
+      if (attempt === 3) throw new Error(`Fuyao ${endpoint} 连接失败，重试3次仍失败，停止本轮并保留补齐进度`);
+      nextRequestAt = Date.now() + 2000 * 2 ** attempt;
+      continue;
+    }
     const body = response.status === 429 ? null : await response.json();
     if (response.status === 429 || body?.code === 4001) {
       if (attempt === 3) throw new Error("Fuyao 持续限流，停止本轮并保留补齐进度");
@@ -58,7 +65,7 @@ export async function aShareCatalog(): Promise<MainStock[]> {
 }
 
 export async function mainStockCatalog(): Promise<MainStock[]> {
-  return (await aShareCatalog()).filter(item => /^(000|001|002|600|601|603|605)\d{3}$/.test(item.ticker));
+  return (await aShareCatalog()).filter(item => /^(000|001|002|003|600|601|603|605)\d{3}$/.test(item.ticker));
 }
 
 export function validateHistory(bars: DailyBar[], dates: string[]): boolean {
@@ -86,7 +93,8 @@ export async function prepareIntradayHistory(tradeDate: string) {
     if (/ST|退/.test(stock.name) || (stock.list_date && stock.list_date.replaceAll("-", "") > dates[0])) {
       coverage.excluded.push(`${stock.ticker}:ST/退市标记或上市不足30个完整交易日`); continue;
     }
-    if (!stock.list_date) { coverage.missing.push(`${stock.ticker}:上市日期缺失`); continue; }
+    // The catalog may omit listing dates even for established stocks. A verified
+    // full window proves coverage; missing sessions still fail below.
     const file = `${historyRoot}/${stock.ticker}.json`;
     let stored: { endDate: string; adjustment: string; volumeUnit: string; bars: DailyBar[] } | null = null;
     try { stored = JSON.parse(await fs.readFile(file, "utf8")); } catch { /* First collection. */ }

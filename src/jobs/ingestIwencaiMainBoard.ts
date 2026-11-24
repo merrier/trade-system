@@ -31,13 +31,9 @@ interface FetchPageResult {
 }
 
 const defaultQuery = [
-  "A股主板股票",
-  "股票代码 股票简称 上市板块",
-  "最新价 涨跌幅",
-  "开盘价 最高价 最低价 收盘价",
-  "成交量 成交额 换手率",
-  "主力资金流向 主力增仓占比"
-].join(" ");
+  "沪深主板股票", "开盘价", "最高价", "最低价", "收盘价",
+  "成交量", "成交额", "换手率", "主力资金流向", "主力增仓占比"
+].join("，");
 
 const options = parseArgs(process.argv.slice(2));
 const startedAt = new Date();
@@ -104,7 +100,11 @@ async function ingestIwencaiMainBoard(config: IngestOptions) {
   }
 
   const rawRows = uniqueByCode(pages.flatMap((page) => page.datas));
+  if (!rawRows.length || rawRows.length !== total || pages.at(-1)?.has_more) {
+    throw new Error(`问财主板名单不完整：预期 ${total}，实际 ${rawRows.length}，保留旧快照和缓存`);
+  }
   const bars = rawRows.map(toDailyBar).filter((bar): bar is DailyBar => Boolean(bar));
+  if (!bars.length) throw new Error("问财未返回可用主板行情，保留旧快照和缓存");
   const tradeDate = config.tradeDate ?? mostCommon(bars.map((bar) => bar.tradeDate)) ?? inferTradeDate(rawRows) ?? formatDate(new Date());
   const finalBars = bars.map((bar) => ({ ...bar, tradeDate }));
 
@@ -179,6 +179,9 @@ async function fetchPage(input: {
       const response = JSON.parse(stdout.slice(stdout.indexOf("{"))) as IwencaiCliResponse;
       if (!response.success) {
         throw new Error(response.error ?? `Iwencai query failed on page ${input.page}`);
+      }
+      if (!Array.isArray(response.datas) || response.datas.length === 0) {
+        throw new Error(`问财第 ${input.page} 页返回空名单，不能作为采集成功结果`);
       }
       return { response, keyIndex };
     } catch (error) {
@@ -342,7 +345,7 @@ function mostCommon(values: string[]) {
 }
 
 function isMainBoardCode(code: string): boolean {
-  return /^(000|001|002|600|601|603|605)/.test(code.replace(/\.(SZ|SH)$/i, ""));
+  return /^(000|001|002|003|600|601|603|605)/.test(code.replace(/\.(SZ|SH)$/i, ""));
 }
 
 function isStName(name: string): boolean {
@@ -384,7 +387,7 @@ function parseArgs(args: string[]): IngestOptions {
   const maxPages = get("max-pages");
   return {
     query: get("query") ?? defaultQuery,
-    limit: Number(get("limit") ?? 100),
+    limit: Number(get("limit") ?? 10000),
     delayMs: Number(get("delay-ms") ?? 250),
     cacheWindowDays: Number(get("cache-window-days") ?? 90),
     maxPages: maxPages ? Number(maxPages) : undefined,

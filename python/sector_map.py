@@ -224,7 +224,7 @@ def normalize_code(value: Any) -> str:
 
 
 def is_main_board(code: str) -> bool:
-    return code.startswith(("000", "001", "002", "600", "601", "603", "605"))
+    return code.startswith(("000", "001", "002", "003", "600", "601", "603", "605"))
 
 
 def text(value: Any) -> str:

@@ -15,6 +15,7 @@
     "db:init": "python3 python/init_db.py",
     "prisma:migrate": "npm run db:init && npm run prisma:generate",
     "ingest:post-close": "tsx src/jobs/postCloseIngest.ts",
+    "ingest:a-share-daily": "tsx src/jobs/ingestAShareDaily.ts",
     "ingest:iwencai-main-board": "tsx src/jobs/ingestIwencaiMainBoard.ts",
     "ingest:iwencai-limit-ups": "tsx src/jobs/ingestIwencaiLimitUps.ts",
     "ingest:iwencai-dragon-tiger": "tsx src/jobs/ingestIwencaiDragonTiger.ts",

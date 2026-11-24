@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 
-MAIN_PREFIXES = ("000", "001", "002", "600", "601", "603", "605")
+MAIN_PREFIXES = ("000", "001", "002", "003", "600", "601", "603", "605")
 thread_state = threading.local()
 
 

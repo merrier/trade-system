@@ -28,7 +28,7 @@ export function historyEndDate(now = new Date()): string {
 }
 
 export async function fetchStockHistory(code: string): Promise<StockHistory> {
-  if (!/^(000|001|002|600|601|603|605)\d{3}$/.test(code)) {
+  if (!/^(000|001|002|003|600|601|603|605)\d{3}$/.test(code)) {
     throw Object.assign(new Error("请输入六位主板股票代码"), { statusCode: 400 });
   }
   const endDate = historyEndDate();

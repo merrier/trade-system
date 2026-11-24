@@ -6,6 +6,10 @@ import { mergeDailyBarCache, readDailyBarCache } from "../src/data/dailyBarCache
 import type { DailyBar } from "../src/shared/types.js";
 
 describe("daily bar sliding cache", () => {
+  it("includes 003 main-board codes without adding STAR, ChiNext or Beijing stocks", () => {
+    const bars = ["003001", "688001", "300001", "920001"].map(code => createBar("20261123", code));
+    expect(mergeDailyBarCache(null, bars, "mock", []).bars.map(bar => bar.code)).toEqual(["003001"]);
+  });
   it("keeps only the latest 30 trade dates and main-board stocks", () => {
     const bars: DailyBar[] = Array.from({ length: 35 }, (_, index) => {
       const day = String(20260501 + index);

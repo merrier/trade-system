@@ -18,7 +18,7 @@ from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
 
-MAIN_PREFIXES = ("000", "001", "002", "600", "601", "603", "605")
+MAIN_PREFIXES = ("000", "001", "002", "003", "600", "601", "603", "605")
 
 
 def market_from_code(code: str) -> str:
@@ -364,7 +364,7 @@ def normalize_stock_code(raw_code: Any) -> str:
         return stripped if stripped.startswith(("600", "601", "603", "605")) else ""
     if code.startswith("sz"):
         stripped = code[2:8]
-        return stripped if stripped.startswith(("000", "001", "002")) else ""
+        return stripped if stripped.startswith(("000", "001", "002", "003")) else ""
     if code.startswith("bj"):
         return ""
     digits = "".join(char for char in code if char.isdigit())

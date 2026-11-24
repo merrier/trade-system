@@ -1,0 +1,80 @@
+name: Collect and validate all A-share daily bars
+
+on:
+  push:
+    branches: [codex/verify-a-share-daily]
+  schedule:
+    # 17:30 Asia/Shanghai, with time for the upstream closing dump to be ready.
+    - cron: "30 9 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: a-share-daily-data
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      FUYAO_API_KEY: ${{ secrets.FUYAO_API_KEY }}
+      IWENCAI_API_KEY: ${{ secrets.IWENCAI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: npm install --ignore-scripts --no-package-lock
+      - name: Check trading calendar before touching data
+        id: calendar
+        run: |
+          node --import tsx --input-type=module - <<'JS' >> "$GITHUB_OUTPUT"
+          import { tradingDayDecision } from './src/data/tradingCalendar.ts';
+          console.log(`trading=${tradingDayDecision().isTradingDay}`);
+          JS
+      - if: steps.calendar.outputs.trading == 'true'
+        run: python3 -m pip install -r python/requirements-daily.txt
+      - name: Install Iwencai CLI
+        if: steps.calendar.outputs.trading == 'true'
+        run: |
+          curl -fsSL -o /tmp/iwencai-skillhub-cli.zip https://www.iwencai.com/skillhub/static/0.0.4/iwencai-skillhub-cli.zip
+          unzip -q /tmp/iwencai-skillhub-cli.zip -d /tmp/iwencai-skillhub-cli
+          bash /tmp/iwencai-skillhub-cli/iwencai-skillhub-cli/iwencai-install.sh
+          "$HOME/.local/bin/iwencai-skillhub-cli" --dir "$HOME/.codex/skills" install hithink-market-query
+      - uses: actions/cache/restore@v4
+        if: steps.calendar.outputs.trading == 'true'
+        with:
+          path: |
+            data/a-share/*.json
+            data/a-share/a-share-daily-unadjusted.parquet
+            data/a-share/raw-progress.parquet
+          key: a-share-raw-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: a-share-raw-v1-
+      - name: Collect, explain missing sessions, and atomically publish validated raw cache
+        if: steps.calendar.outputs.trading == 'true'
+        run: npm run ingest:a-share-daily
+      - uses: actions/cache/save@v4
+        if: always() && steps.calendar.outputs.trading == 'true'
+        with:
+          path: |
+            data/a-share/*.json
+            data/a-share/a-share-daily-unadjusted.parquet
+            data/a-share/raw-progress.parquet
+          key: a-share-raw-v1-${{ github.run_id }}-${{ github.run_attempt }}
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.calendar.outputs.trading == 'true'
+        with:
+          name: a-share-daily-${{ github.run_id }}
+          path: |
+            data/a-share/coverage.json
+            data/a-share/a-share-daily-unadjusted.parquet
+          if-no-files-found: error
+          retention-days: 30

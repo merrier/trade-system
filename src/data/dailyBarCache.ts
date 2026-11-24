@@ -74,7 +74,7 @@ export async function writeDailyBarCache(root: string, cache: DailyBarCache): Pr
 }
 
 function isMainBoardCode(code: string): boolean {
-  return /^(000|001|002|600|601|603|605)/.test(code);
+  return /^(000|001|002|003|600|601|603|605)/.test(code);
 }
 
 function normalizeDailyBar(bar: DailyBar): DailyBar {
