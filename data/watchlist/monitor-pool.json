@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-09T12:42:03.817Z",
+  "updatedAt": "2026-11-24T08:39:57.841Z",
   "items": [
     {
       "code": "603330",
@@ -121,6 +121,57 @@
       "isActive": true,
       "addedAt": "2026-11-09T12:42:03.817Z",
       "updatedAt": "2026-11-09T12:42:03.817Z"
+    },
+    {
+      "code": "002979",
+      "name": "雷赛智能",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-07-03T03:29:17.898Z",
+      "updatedAt": "2026-07-03T03:29:17.898Z"
+    },
+    {
+      "code": "603662",
+      "name": "柯力传感",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-07-03T03:29:23.311Z",
+      "updatedAt": "2026-07-03T03:29:23.311Z"
+    },
+    {
+      "code": "603667",
+      "name": "五洲新春",
+      "market": "main",
+      "thesis": "监控是否进入上升趋势并回踩5日线",
+      "isActive": true,
+      "addedAt": "2026-07-03T03:29:28.949Z",
+      "updatedAt": "2026-07-03T03:29:28.949Z"
+    },
+    {
+      "code": "600776",
+      "name": "东方通信",
+      "market": "main",
+      "isActive": true,
+      "addedAt": "2026-11-09T12:55:13.958Z",
+      "updatedAt": "2026-11-09T12:55:13.958Z"
+    },
+    {
+      "code": "000603",
+      "name": "盛达资源",
+      "market": "main",
+      "isActive": true,
+      "addedAt": "2026-11-10T07:34:11.291Z",
+      "updatedAt": "2026-11-10T07:34:11.291Z"
+    },
+    {
+      "code": "301209",
+      "name": "联合化学",
+      "market": "gem",
+      "isActive": true,
+      "addedAt": "2026-11-17T07:03:10.139Z",
+      "updatedAt": "2026-11-17T07:03:10.139Z"
     }
   ]
 }
