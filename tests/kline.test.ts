@@ -70,7 +70,18 @@ describe("Fuyao chart history", () => {
     expect(url.searchParams.get("thscode")).toBe("600519.SH");
     expect(url.searchParams.get("start")).toBe(String(Date.parse("2023-09-24T00:00:00+08:00")));
     expect(JSON.stringify(result)).not.toContain("test-only");
-    await expect(fetchStockHistory("300001")).rejects.toMatchObject({ statusCode: 400 });
+    await expect(fetchStockHistory("invalid")).rejects.toMatchObject({ statusCode: 400 });
+  });
+
+  it("exports ChiNext monitor-pool history using Shenzhen forward-adjusted bars", async () => {
+    const { fetchStockHistory } = await historyModule();
+    const row = { date_ms: Date.parse("2026-09-24T00:00:00+08:00"), open_price: 10, high_price: 12, low_price: 9, close_price: 11, volume: 10000 };
+    const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: 0, data: { item: [row] } })));
+    vi.stubGlobal("fetch", fetch);
+    const result = expect(fetchStockHistory("301209")).resolves.toMatchObject({ code: "301209", adjustment: "forward", bars: [{ volume: 100 }] });
+    await vi.advanceTimersByTimeAsync(0);
+    await result;
+    expect(new URL(fetch.mock.calls[0][0]).searchParams.get("thscode")).toBe("301209.SZ");
   });
 
   it("returns safe errors and backs off on an HTTP-200 rate-limit response", async () => {
