@@ -1,8 +1,6 @@
 name: Collect and validate all A-share daily bars
 
 on:
-  push:
-    branches: [codex/verify-a-share-daily]
   schedule:
     # 17:30 Asia/Shanghai, with time for the upstream closing dump to be ready.
     - cron: "30 9 * * 1-5"
