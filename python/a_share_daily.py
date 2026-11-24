@@ -8,6 +8,7 @@ import time
 from datetime import datetime
 from email.utils import parsedate_to_datetime
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import numpy as np
 import pandas as pd
@@ -37,17 +38,19 @@ class Client:
         self.calls = 0
 
     def get(self, url, params=None, fuyao=True):
+        endpoint = urlsplit(url).hostname + urlsplit(url).path
         key = os.environ.get("FUYAO_API_KEY")
         if fuyao and not key:
             raise RuntimeError("缺少 FUYAO_API_KEY")
         for attempt in range(4):
             time.sleep(max(0, self.next_at - time.time()))
+            print(f"Request {endpoint} attempt={attempt + 1}", flush=True)
             self.calls += 1
             try:
-                response = self.session.get(url, params=params, headers={"X-api-key": key} if fuyao else {}, timeout=60)
+                response = self.session.get(url, params=params, headers={"X-api-key": key} if fuyao else {}, timeout=(10, 60))
             except requests.RequestException:
                 if attempt == 3:
-                    raise RuntimeError("数据源连接失败，3次重试后停止") from None
+                    raise RuntimeError(f"数据源 {endpoint} 连接失败，3次重试后停止") from None
                 self.next_at = time.time() + 2 * 2 ** attempt
                 continue
             finally:
@@ -81,7 +84,7 @@ class Client:
         temp = file.with_suffix(".parquet.tmp")
         time.sleep(max(0, self.next_at - time.time()))
         try:
-            with self.session.get(data["presigned_url"], stream=True, timeout=60) as response:
+            with self.session.get(data["presigned_url"], stream=True, timeout=(10, 60)) as response:
                 if not response.ok:
                     raise RuntimeError(f"批量文件下载失败 HTTP {response.status_code}")
                 with temp.open("wb") as output:
